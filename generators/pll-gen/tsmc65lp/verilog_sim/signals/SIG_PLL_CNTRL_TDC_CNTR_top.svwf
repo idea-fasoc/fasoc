@@ -1,0 +1,54 @@
+
+#
+# Mnemonic Maps
+#
+mmap new -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+array unset createdGroup
+array set createdGroup {}
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.CLKREF_RETIMED}]}
+	} ]]
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.COUNT_IN[6:0]}]}
+	} ]]
+waveform format $id -radix %d -trace analogSampleAndHold
+waveform axis range $id -for default -min 0 -max 127 -scale linear
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.TDC_IN[4:0]}]}
+	} ]]
+waveform format $id -trace analogSampleAndHold
+waveform axis range $id -for default -min 0 -max 31 -scale linear
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.phase_ramp_error[12:0]}]}
+	} ]]
+waveform format $id -trace analogSampleAndHold
+waveform axis range $id -for default -min -1079 -max 4095 -scale linear
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.ssc_value[4:0]}]}
+	} ]]
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.error_integral[28:0]}]}
+	} ]]
+waveform format $id -radix %d -trace analogSampleAndHold
+waveform axis range $id -for default -min -65160 -max 16511040 -scale linear
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.error_proportional[28:0]}]}
+	} ]]
+waveform format $id -trace analogSampleAndHold
+waveform axis range $id -for default -min -4976640 -max 56609280 -scale linear
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.filter_out[35:0]}]}
+	} ]]
+waveform format $id -trace analogSampleAndHold
+waveform axis range $id -for default -min -5041800 -max 606427374 -scale linear
+
+waveform xview limits 0 28002.332621ns

@@ -1,0 +1,1 @@
+fine lock detected on      213592 ns

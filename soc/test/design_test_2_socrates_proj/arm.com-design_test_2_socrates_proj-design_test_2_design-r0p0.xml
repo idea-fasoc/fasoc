@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spirit:design xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009">
+  <spirit:vendor>arm.com</spirit:vendor>
+  <spirit:library>design_test_2_socrates_proj</spirit:library>
+  <spirit:name>design_test_2_design</spirit:name>
+  <spirit:version>r0p0</spirit:version>
+  <spirit:componentInstances>
+    <spirit:componentInstance>
+      <spirit:instanceName>i_ldo2</spirit:instanceName>
+      <spirit:componentRef spirit:vendor="IDEA_UofM_UV" spirit:library="IDEA" spirit:name="ldo2" spirit:version="1.00"/>
+    </spirit:componentInstance>
+    <spirit:componentInstance>
+      <spirit:instanceName>i_mem2</spirit:instanceName>
+      <spirit:componentRef spirit:vendor="IDEA_UofM_UV" spirit:library="IDEA" spirit:name="memory2" spirit:version="1.00"/>
+    </spirit:componentInstance>
+    <spirit:componentInstance>
+      <spirit:instanceName>i_pll2</spirit:instanceName>
+      <spirit:componentRef spirit:vendor="IDEA_UofM_UV" spirit:library="IDEA" spirit:name="pll2" spirit:version="1.00"/>
+    </spirit:componentInstance>
+    <spirit:componentInstance>
+      <spirit:instanceName>i_temp_sense2</spirit:instanceName>
+      <spirit:componentRef spirit:vendor="IDEA_UofM_UV" spirit:library="IDEA" spirit:name="temp_sense2" spirit:version="1.00"/>
+    </spirit:componentInstance>
+    <spirit:componentInstance>
+      <spirit:instanceName>u_apb_slave_mux2</spirit:instanceName>
+      <spirit:componentRef spirit:vendor="IDEA_UofM_UV" spirit:library="IDEA" spirit:name="cmsdk_apb_slave_mux2" spirit:version="1.00"/>
+      <spirit:configurableElementValues>
+        <spirit:configurableElementValue spirit:referenceId="PORT0_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT1_ENABLE">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT2_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT3_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT4_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT5_ENABLE">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT6_ENABLE">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT7_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT8_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT9_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT10_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT11_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT12_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT13_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT14_ENABLE">0</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT15_ENABLE">0</spirit:configurableElementValue>
+      </spirit:configurableElementValues>
+    </spirit:componentInstance>
+    <spirit:componentInstance>
+      <spirit:instanceName>u_ahb_to_apb2</spirit:instanceName>
+      <spirit:componentRef spirit:vendor="IDEA_UofM_UV" spirit:library="IDEA" spirit:name="cmsdk_ahb_to_apb2" spirit:version="1.00"/>
+      <spirit:configurableElementValues>
+        <spirit:configurableElementValue spirit:referenceId="ADDRWIDTH">16</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="REGISTER_RDATA">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="REGISTER_WDATA">0</spirit:configurableElementValue>
+      </spirit:configurableElementValues>
+    </spirit:componentInstance>
+    <spirit:componentInstance>
+      <spirit:instanceName>i_fasoc_m0mcu2</spirit:instanceName>
+      <spirit:componentRef spirit:vendor="IDEA_UofM_UV" spirit:library="IDEA" spirit:name="fasoc_m0mcu2" spirit:version="1.00"/>
+    </spirit:componentInstance>
+  </spirit:componentInstances>
+</spirit:design>

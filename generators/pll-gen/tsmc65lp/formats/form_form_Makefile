@@ -1,0 +1,34 @@
+#=======================================================================
+#  format for making form_Makefile
+#  This is the point of modification if any needed for Makefile
+#  make presim: generates model
+#=======================================================================
+
+@@ HOME_PATH= @hp
+@@ HSPICE_DIR= @sd
+
+
+clean_everything:
+	cd $(HOME_PATH)$(HSPICE_DIR)/NETLIST; rm *.sp
+	cd $(HOME_PATH)$(HSPICE_DIR)/TB; rm *.sp
+	cd $(HOME_PATH)$(HSPICE_DIR)/TBrf; rm *.sp
+	cd $(HOME_PATH)$(HSPICE_DIR)/DUMP_result; rm * 
+	cd $(HOME_PATH)$(HSPICE_DIR)/DUMPrf_result; rm * 
+
+clean_v:
+	cd ./VERILOG; rm synth_pll* 
+	cd ./VERILOG; rm spec* 
+apr_clean:
+	rm -f apr/*.apr.v
+
+###hspicesim:
+###@@#@@	@s2 @RA; hspice -mp @mp -i @TAtb_@mdring@mt_o@nt_FC@nf.sp
+	
+hspicesim:
+@@#@@	@s2 $(HOME_PATH)$(HSPICE_DIR)/DUMP_result; hspice -mp @mp -i ./../TB/tb_@mdring@mt_o@nt_FC@nf.sp
+
+#1 hspicerfsim:
+@@##@@	@s1 $(HOME_PATH)$(HSPICE_DIR)/DUMPrf_result; hspicerf -mp @rm -i ./../TBrf/tbrf_@rdring@mr_o@nr_fc@Nf.sp
+
+modeling:
+@@ 	cd $(HOME_PATH); python ./pymodules/MDL_GEN_@tn.py

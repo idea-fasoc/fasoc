@@ -1,0 +1,26 @@
+{
+  "schema_version": 0.1,
+  "simTool": "hspice",
+  "extractionTool": "calibre",
+  "netlistTool": "calibredrv",
+  "calibreRules": "/net/gaylord/l/yaswanth/Research/LDO_Automation/extraction/ruleFiles",
+  "socratesInstall": "/afs/eecs.umich.edu/cadre/projects/fasoc/soft/arm-socrates-1.3.0",
+  "socrates_DRC_config": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/socrates_DRC_config/CoherencyCheckConfiguration.config",
+  "platforms": {
+    "tsmc65lp": {
+      "nominal_voltage": 1.2,
+      "aux_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/aux_lib_tsmc65lp",
+      "model_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/model_tsmc65",
+      "calibreRules": "/net/gaylord/l/yaswanth/Research/LDO_Automation/extraction/ruleFiles",
+      "hspiceModels": "/afs/eecs.umich.edu/kits/TSMC/CRN65LP/2013.03/rf1p9m6x2z0u2ff2p5v/models/hspice",
+      "database": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database"
+    },
+    "gfbicmos8hp": {
+      "nominal_voltage": 1.2,
+      "aux_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/aux_lib_8hp",
+      "model_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/model_8hp",
+      "calibreRules": "/net/gaylord/l/yaswanth/forTutu/ruleFiles_8hp",
+      "hspiceModels": "/afs/eecs.umich.edu/kits/GF/130HPSIGE-8HP/V1.8_0.1HP/Models/HSPICE/models"
+    }
+  }
+}

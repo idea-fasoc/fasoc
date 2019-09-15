@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>samples</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+	<linkedResources>		
+		<link>
+			<name>APB.xml</name>
+			<type>1</type>
+			<location>SocratesInstallDir/etc/samples/ipxact1.5/APB.xml</location>
+		</link>
+		<link>
+			<name>APB_rtl.xml</name>
+			<type>1</type>
+			<location>SocratesInstallDir/etc/samples/ipxact1.5/APB_rtl.xml</location>
+		</link>
+		<link>
+			<name>UART_PL011_component.xml</name>
+			<type>1</type>
+			<location>SocratesInstallDir/etc/samples/ipxact1.5/UART_PL011_component.xml</location>
+		</link>
+	</linkedResources>
+</projectDescription>

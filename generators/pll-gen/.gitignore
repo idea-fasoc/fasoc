@@ -1,0 +1,4 @@
+pymodules/test*
+tsmc40gp/
+*.swp
+*.swo

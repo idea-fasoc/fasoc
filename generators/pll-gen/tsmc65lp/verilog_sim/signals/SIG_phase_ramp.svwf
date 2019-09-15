@@ -1,0 +1,148 @@
+
+#
+# Mnemonic Maps
+#
+mmap new -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+array unset createdGroup
+array set createdGroup {}
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.CLKREF_RETIMED}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.FCW_INT[5:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.FCW_FRAC[5:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.frequency_control_word[12:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.dco_phase_ramp[13:0]}]}
+	} ]]
+waveform format $id -radix %d -trace analogSampleAndHold
+waveform axis range $id -for default -min 0 -max 16331 -scale linear
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.ref_phase_ramp[13:0]}]}
+	} ]]
+waveform format $id -radix %d -trace analogSampleAndHold
+waveform axis range $id -for default -min 0 -max 16256 -scale linear
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.TDC_IN[5:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.tdc_round[6:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.COUNT_IN[6:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.phase_ramp_error_temp[14:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.phase_ramp_error[13:0]}]}
+	} ]]
+waveform format $id -radix %d -trace analogSampleAndHold
+waveform axis range $id -for default -min -30182.452202100001 -max -12743.206892300001 -scale linear
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.phase_ramp_error_true[13:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.DLF_FAST_KP[11:0]}]}
+	} ]]
+waveform format $id -radix %b
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.DLF_FAST_KI[11:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.filter_kp_d[16:0]}]}
+	} ]]
+waveform format $id -radix %b
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.filter_ki_d[16:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.error_integral[29:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.error_proportional[29:0]}]}
+	} ]]
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.filter_accum[37:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.filter_out_temp[38:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.filter_out[37:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.filter_out_int[24:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.dco_control_word[24:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.dco_ccw_filter[6:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.dco_fcw_filter[6:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.DCO_CCW_OUT[6:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.DCO_FCW_OUT[6:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.coarse_lock_controller.coarse_lock_region_lower_bound_fcw[6:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.coarse_lock_controller.coarse_lock_region_upper_bound_fcw[6:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.coarse_lock_controller.coarse_lock_accum_d[7:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.coarse_lock_controller.coarse_lock_threshold[6:0]}]}
+	} ]]
+waveform format $id -radix %d
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.coarse_lock_controller.coarse_lock_detect}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {TB_PLL_CONTROLLER_TDC_COUNTER.pll_controller_tdc_counter.pll_controller.fine_lock_detect}]}
+	} ]]
+
+waveform xview limits 40905.008415ns 40948.902973ns

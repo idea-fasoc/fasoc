@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<NBLFragment xmlns="http://www.duolog.com/2008/06/soc2">
+ <NBLDesignElement name="Project" typeName="PROJECT" module="Socrates Core" class="com.duolog.socrates.core.config.ConfigDesignElementType">
+   <NBLDesignElement name="Indexes" typeName="INDEXES" module="Socrates Core" class="com.duolog.socrates.core.index.IndexDesignElementType">
+     <NBLDesignElement name="RootIndex" typeName="INDEX" module="Socrates Core" class="com.duolog.socrates.core.index.IndexDesignElementType">
+       <NBLAttribute typeName="CLASS" module="Socrates Core" class="com.duolog.socrates.core.config.ConfigAttributeType">com.duolog.socrates.core.index.RootIndex</NBLAttribute>
+       <NBLAttribute typeName="NAME" module="Socrates Core" class="com.duolog.socrates.core.config.ConfigAttributeType">TGI_samples</NBLAttribute>
+       <NBLDesignElement name="Index" typeName="INDEX" module="Socrates Core" class="com.duolog.socrates.core.index.IndexDesignElementType">
+         <NBLAttribute typeName="CLASS" module="Socrates Core" class="com.duolog.socrates.core.config.ConfigAttributeType">com.duolog.socrates.core.index.FolderIndex</NBLAttribute>
+         <NBLAttribute typeName="NAME" module="Socrates Core" class="com.duolog.socrates.core.config.ConfigAttributeType">RootFolder</NBLAttribute>
+         <NBLDesignElement name="Configuration" typeName="CONFIGURATION" module="Socrates Core" class="com.duolog.socrates.core.config.ConfigDesignElementType">
+           <NBLDesignElement name="Entry" typeName="NAME_VALUE_PAIR" module="Socrates Core" class="com.duolog.socrates.core.config.ConfigDesignElementType">
+             <NBLAttribute typeName="NAME" module="Socrates Core" class="com.duolog.socrates.core.config.ConfigAttributeType">com.duolog.socrates.core.config.BasicConfigOptions#Files</NBLAttribute>
+             <NBLAttribute typeName="VALUES" module="Socrates Core" class="com.duolog.socrates.core.config.ConfigAttributeType">
+               <Value>/afs/eecs.umich.edu/vlsida/projects/FASoC/TSMC_65LP/fasoc/soc/test\TGI_samples</Value>
+             </NBLAttribute>
+           </NBLDesignElement>
+         </NBLDesignElement>
+       </NBLDesignElement>
+     </NBLDesignElement>
+   </NBLDesignElement>
+ </NBLDesignElement>
+</NBLFragment>

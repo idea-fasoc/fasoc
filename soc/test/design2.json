@@ -1,0 +1,681 @@
+{
+  "schema_version": 0.1,
+  "design_name": "design_test_2",
+  "tech": "tsmc65lp",
+  "strategy": "power",
+  "units": {
+    "vin": "V",
+    "imax": "A",
+    "power": "W",
+    "word_size": "bit",
+    "capacity": "bit",
+    "Fnom_min": "Hz",
+    "Fnom_max": "Hz",
+    "nominal frequency": "Hz",
+    "maximum frequency": "Hz",
+    "minimum frequency": "Hz",
+    "temperature": "C",
+    "area" : "um2"
+  },
+  "modules": [
+    {
+      "module_name": "ldo2",
+      "instance_name": "i_ldo2",
+      "generator": "ldo-gen",
+      "specifications": {
+        "vin": 0.7,
+        "imax": 0.001
+      }
+    },
+    {
+      "module_name": "memory2",
+      "instance_name": "i_mem2",
+      "generator": "memory-gen",
+      "specifications": {
+        "word_size": 32,
+        "capacity": 134672
+      }
+    },
+    {
+      "module_name": "pll2",
+      "instance_name": "i_pll2",
+      "generator": "pll-gen",
+      "specifications": {
+      	"Fnom_min":1.05e8,
+      	"Fnom_max":1.20e8,
+      	"FCR_min":1
+      }
+    },
+    {
+      "module_name": "temp_sense2",
+      "instance_name": "i_temp_sense2",
+      "generator": "temp-sense-gen",
+      "specifications": {
+        "temperature": {
+          "min": 0,
+          "max": 90},
+        "error": "",
+		    "power": "",
+        "area": "",
+        "optimization":"error",
+        "model" :"modelfile.csv"
+      }
+    },
+    {
+      "module_name": "cmsdk_apb_slave_mux2",
+      "instance_name": "u_apb_slave_mux2",
+      "generator": "cmsdk_apb_slave_mux_rtl",
+      "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/cmsdk_apb_slave_mux.v",
+      "parameters": {
+        "PORT0_ENABLE": 0,
+        "PORT1_ENABLE": 1,
+        "PORT2_ENABLE": 0,
+        "PORT3_ENABLE": 0,
+        "PORT4_ENABLE": 0,
+        "PORT5_ENABLE": 1,
+        "PORT6_ENABLE": 1,
+        "PORT7_ENABLE": 0,
+        "PORT8_ENABLE": 0,
+        "PORT9_ENABLE": 0,
+        "PORT10_ENABLE": 0,
+        "PORT11_ENABLE": 0,
+        "PORT12_ENABLE": 0,
+        "PORT13_ENABLE": 0,
+        "PORT14_ENABLE": 0,
+        "PORT15_ENABLE": 0
+      }
+    },
+    {
+      "module_name": "cmsdk_ahb_to_apb2",
+      "instance_name": "u_ahb_to_apb2",
+      "generator": "cmsdk_ahb_to_apb_rtl",
+      "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/cmsdk_ahb_to_apb.v",
+      "parameters": {
+        "ADDRWIDTH": 16,
+        "REGISTER_RDATA": 1,
+        "REGISTER_WDATA": 0
+      }
+    },
+    {
+      "module_name": "fasoc_m0mcu2",
+      "instance_name": "i_fasoc_m0mcu2",
+      "generator": "fasoc_m0mcu_rtl",
+      "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/fasoc_m0mcu.v"
+    }
+  ],
+  "connections": [
+    {
+      "type": "ahb",
+      "from": {
+        "instance": "i_fasoc_m0mcu",
+        "port": "M0MCU_AHBM"
+      },
+      "to": [
+        {
+          "instance": "u_ahb_to_apb",
+          "port": "AHB_S"
+        }
+      ]
+    },
+    {
+      "type": "apb",
+      "from": {
+        "instance": "u_ahb_to_apb",
+        "port": "APB_M"
+      },
+      "to": [
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "APBS"
+        }
+      ]
+    },
+    {
+      "type": "apb",
+      "from": {
+        "instance": "u_apb_slave_mux",
+        "port": "APBM4"
+      },
+      "to": [
+        {
+          "instance": "i_mem",
+          "port": "MEM_APBS"
+        }
+      ]
+    },
+    {
+      "type": "apb",
+      "from": {
+        "instance": "u_apb_slave_mux",
+        "port": "APBM5"
+      },
+      "to": [
+        {
+          "instance": "i_pll",
+          "port": "PLL_APBS"
+        }
+      ]
+    },
+    {
+      "type": "apb",
+      "from": {
+        "instance": "u_apb_slave_mux",
+        "port": "APBM6"
+      },
+      "to": [
+        {
+          "instance": "i_temp_sense",
+          "port": "TEMP_APBS"
+        }
+      ]
+    },
+    {
+      "type": "clock",
+      "from": {
+        "instance": "toplevel",
+        "port": "XTAL1"
+      },
+      "to": [
+        {
+          "instance": "i_fasoc_m0mcu",
+          "port": "XTAL1"
+        }
+      ]
+    },
+    {
+      "type": "clock",
+      "from": {
+        "instance": "i_fasoc_m0mcu",
+        "port": "XTAL2"
+      },
+      "to": [
+        {
+          "instance": "toplevel",
+          "port": "XTAL2"
+        }
+      ]
+    },
+    {
+      "type": "reset",
+      "from": {
+        "instance": "toplevel",
+        "port": "nTRST"
+      },
+      "to": [
+        {
+          "instance": "i_fasoc_m0mcu",
+          "port": "nTRST"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "range": {
+        "max": 15,
+        "min": 0
+      },
+      "from": {
+        "instance": "i_fasoc_m0mcu",
+        "port": "P0"
+      },
+      "to": [
+        {
+          "instance": "toplevel",
+          "port": "P0"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "range": {
+        "max": 15,
+        "min": 0
+      },
+      "from": {
+        "instance": "i_fasoc_m0mcu",
+        "port": "P1"
+      },
+      "to": [
+        {
+          "instance": "toplevel",
+          "port": "P1"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "from": {
+        "instance": "i_fasoc_m0mcu",
+        "port": "SWDIOTMS"
+      },
+      "to": [
+        {
+          "instance": "toplevel",
+          "port": "SWDIOTMS"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "from": {
+        "instance": "toplevel",
+        "port": "SWCLKTCK"
+      },
+      "to": [
+        {
+          "instance": "i_fasoc_m0mcu",
+          "port": "SWCLKTCK"
+        }
+      ]
+    },
+    {
+      "type": "clock",
+      "from": {
+        "instance": "toplevel",
+        "port": "SYSCLK"
+      },
+      "to": [
+        {
+          "instance": "i_fasoc_m0mcu",
+          "port": "ext_HCLK"
+        },
+        {
+          "instance": "u_ahb_to_apb",
+          "port": "HCLK"
+        }
+      ]
+    },
+    {
+      "type": "reset",
+      "from": {
+        "instance": "toplevel",
+        "port": "SYSRESETN"
+      },
+      "to": [
+        {
+          "instance": "i_fasoc_m0mcu",
+          "port": "ext_HRESETN"
+        }
+      ]
+    },
+    {
+      "type": "clock",
+      "from": {
+        "instance": "toplevel",
+        "port": "SYSCLKOUT"
+      },
+      "to": [
+        {
+          "instance": "i_pll",
+          "port": "CLKOUT"
+        }
+      ]
+    },
+    {
+      "type": "clock",
+      "from": {
+        "instance": "toplevel",
+        "port": "SYSCLK"
+      },
+      "to": [
+        {
+          "instance": "i_ldo",
+          "port": "PCLK"
+        },
+        {
+          "instance": "i_mem",
+          "port": "PCLK"
+        },
+        {
+          "instance": "i_pll",
+          "port": "PCLK"
+        },
+        {
+          "instance": "i_temp_sense",
+          "port": "PCLK"
+        },
+        {
+          "instance": "i_fasoc_m0mcu",
+          "port": "PCLK"
+        }
+      ]
+    },
+    {
+      "type": "reset",
+      "from": {
+        "instance": "toplevel",
+        "port": "SYSRESETN"
+      },
+      "to": [
+        {
+          "instance": "i_temp_sense",
+          "port": "PRESETN"
+        },
+        {
+          "instance": "i_pll",
+          "port": "PRESETN"
+        },
+        {
+          "instance": "i_ldo",
+          "port": "reset"
+        },
+        {
+          "instance": "u_ahb_to_apb",
+          "port": "HRESETN"
+        },
+        {
+          "instance": "i_fasoc_m0mcu",
+          "port": "ext_HRESETN"
+        },
+        {
+          "instance": "i_fasoc_m0mcu",
+          "port": "PRESETN"
+        },
+        {
+          "instance": "i_mem",
+          "port": "PRESETN"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "from": {
+        "instance": "i_fasoc_m0mcu",
+        "port": "APBACTIVE"
+      },
+      "to": [
+        {
+          "instance": "u_ahb_to_apb",
+          "port": "APBACTIVE"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "from": {
+        "instance": "u_ahb_to_apb",
+        "port": "PCLKEN"
+      },
+      "to": [
+        {
+          "instance": "i_fasoc_m0mcu",
+          "port": "PCLKEN"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "range": {
+        "max": 15,
+        "min": 12
+      },
+      "from": {
+        "instance": "u_ahb_to_apb",
+        "port": "PADDR"
+      },
+      "to": [
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "DECODE4BIT"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "range": {
+        "max": 11,
+        "min": 0
+      },
+      "from": {
+        "instance": "u_ahb_to_apb",
+        "port": "PADDR"
+      },
+      "to": [
+        {
+          "instance": "i_mem",
+          "port": "PADDR"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "range": {
+        "max": 11,
+        "min": 2
+      },
+      "from": {
+        "instance": "u_ahb_to_apb",
+        "port": "PADDR"
+      },
+      "to": [
+        {
+          "instance": "i_mem",
+          "port": "PADDR"
+        },
+        {
+          "instance": "i_temp_sense",
+          "port": "PADDR"
+        },
+        {
+          "instance": "i_pll",
+          "port": "PADDR"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "from": {
+        "instance": "u_ahb_to_apb",
+        "port": "PENABLE"
+      },
+      "to": [
+        {
+          "instance": "i_mem",
+          "port": "PENABLE"
+        },
+        {
+          "instance": "i_temp_sense",
+          "port": "PENABLE"
+        },
+        {
+          "instance": "i_pll",
+          "port": "PENABLE"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "from": {
+        "instance": "u_ahb_to_apb",
+        "port": "PWRITE"
+      },
+      "to": [
+        {
+          "instance": "i_mem",
+          "port": "PWRITE"
+        },
+        {
+          "instance": "i_temp_sense",
+          "port": "PWRITE"
+        },
+        {
+          "instance": "i_pll",
+          "port": "PWRITE"
+        }
+      ]
+    },
+    {
+      "type": "adhoc",
+      "from": {
+        "instance": "u_ahb_to_apb",
+        "port": "PWDATA"
+      },
+      "to": [
+        {
+          "instance": "i_mem",
+          "port": "PWDATA"
+        },
+        {
+          "instance": "i_temp_sense",
+          "port": "PWDATA"
+        },
+        {
+          "instance": "i_pll",
+          "port": "PWDATA"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": 1
+      },
+      "to": [
+        {
+          "instance": "u_ahb_to_apb",
+          "port": "HSEL"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": 1
+      },
+      "to": [
+        {
+          "instance": "u_ahb_to_apb",
+          "port": "HREADY"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": "open"
+      },
+      "to": [
+        {
+          "instance": "u_ahb_to_apb",
+          "port": "HREADYOUT"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": "open"
+      },
+      "to": [
+        {
+          "instance": "u_ahb_to_apb",
+          "port": "PSTRB"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": "open"
+      },
+      "to": [
+        {
+          "instance": "u_ahb_to_apb",
+          "port": "PPROT"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": 0
+      },
+      "to": [
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PSLVERR.*|PRDATA.*"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": "open"
+      },
+      "to": [
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PSEL.*"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": 1
+      },
+      "to": [
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY0"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY1"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY2"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY3"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY5"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY6"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY7"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY8"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY9"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY10"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY11"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY12"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY13"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY14"
+        },
+        {
+          "instance": "u_apb_slave_mux",
+          "port": "PREADY15"
+        }
+      ]
+    }
+  ]
+}

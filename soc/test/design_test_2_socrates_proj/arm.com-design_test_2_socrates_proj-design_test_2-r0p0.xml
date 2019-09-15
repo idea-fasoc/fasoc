@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spirit:component xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009">
+  <spirit:vendor>arm.com</spirit:vendor>
+  <spirit:library>design_test_2_socrates_proj</spirit:library>
+  <spirit:name>design_test_2</spirit:name>
+  <spirit:version>r0p0</spirit:version>
+  <spirit:model>
+    <spirit:views>
+      <spirit:view>
+        <spirit:name>Hierarchical</spirit:name>
+        <spirit:envIdentifier>::</spirit:envIdentifier>
+        <spirit:hierarchyRef spirit:vendor="arm.com" spirit:library="design_test_2_socrates_proj" spirit:name="design_test_2_design" spirit:version="r0p0"/>
+      </spirit:view>
+    </spirit:views>
+  </spirit:model>
+</spirit:component>

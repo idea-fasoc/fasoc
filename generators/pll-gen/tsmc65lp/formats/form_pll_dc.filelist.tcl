@@ -1,0 +1,2 @@
+@@ set SVERILOG_SOURCE_FILES "$::env(DESIGN_ROOT_DIR)/src/@DN.v $::env(DESIGN_ROOT_DIR)/src/synth_dco.v $::env(DESIGN_ROOT_DIR)/src/PLL_CONTROLLER_TDC_COUNTER.v $::env(DESIGN_ROOT_DIR)/src/PLL_CONTROLLER.v $::env(DESIGN_ROOT_DIR)/src/TDC_COUNTER.v $::env(DESIGN_ROOT_DIR)/src/dco_CC.v $::env(DESIGN_ROOT_DIR)/src/dco_FC.v $::env(DESIGN_ROOT_DIR)/src/synth_pll_dco_interp.v $::env(DESIGN_ROOT_DIR)/src/synth_pll_dco_outbuff.v $::env(DESIGN_ROOT_DIR)/src/FUNCTIONS.v"
+set NETLIST_SOURCE_FILES ""

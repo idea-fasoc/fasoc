@@ -1,0 +1,93 @@
+generators/clkdiv/work
+
+
+
+
+#### CADRE FLOW FILES FOLLOW
+#####################################
+
+# Design generated directories
+checkDesign/
+checkPoints/
+export/
+extLogDir/
+logs/
+ref_data/
+reports/
+results/
+vpath/
+*_dclib/
+*_mwlib/
+*_oalib/
+*.htmreports/
+*.htm/
+
+/memory/
+
+# Generated files
+tool_versions.txt
+doc_versions.txt
+sverilog_filelist_dc.txt
+ucli.key
+sdfAnnotateInfo
+*.cmd*
+*.log*
+*.lib_sh5p1cm
+*.rpt
+*.rpt.old
+*.dat
+.back
+*.vcd
+*.vpd
+*.antenna.lef
+*.gds.gz
+*.spef.gz
+
+# Foundation Flow generated scripts
+generated/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# python
+__pycache__/
+*.pyc
+
+# Vim
+*.swp
+*.swo
+*.swn
+
+# Gedit
+*~
+
+# svn
+.svn/
+.metadata/
+
+# Virtuoso
+.cadence/
+*.reflib
+cds.lib
+display.drf
+display.drf.orig
+rc_model.bin
+
+# Calibre
+.cgidrcdb
+DVEfiles
+
+# bsg_riscv will be created with symlinks to the dreslinskilab group dir
+bsg_riscv
+
+# VCS
+vcs_initreg_instance_name.txt
+vcs_initreg_random_value.txt
+
+# Rocket-specific VCS sim generated files
+dramsim2_ini
+
+
+
+snapshot_img_floorplan*

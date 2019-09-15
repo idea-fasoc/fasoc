@@ -1,0 +1,9 @@
+{
+"generator": "pll",
+"input_specifications": 
+   {
+"Fnom_min":1.05e8,
+"Fnom_max":1.20e8,
+"FCR_min":1
+   }
+}

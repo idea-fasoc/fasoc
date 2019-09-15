@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+//============================================================================
+//   The confidential and proprietary information contained in this file may
+//   only be used by a person authorised under and to the extent permitted
+//   by a subsisting licensing agreement from ARM Limited or its affiliates.
+//
+//          (C) COPYRIGHT 2015-2016 ARM Limited or its affiliates.
+//              ALL RIGHTS RESERVED
+//
+//   This entire notice must be reproduced on all copies of this file
+//   and copies of this file may only be made by a person if such person is
+//   permitted to do so under the terms of a subsisting license agreement
+//   from ARM Limited or its affiliates.
+//============================================================================
+-->
+<spirit:busDefinition xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:arm="http://www.arm.com/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009/index.xsd ">
+  <spirit:vendor>amba.com</spirit:vendor>
+  <spirit:library>AMBA4</spirit:library>
+  <spirit:name>APB4</spirit:name>
+  <spirit:version>r0p0_0</spirit:version>
+  <spirit:directConnection>true</spirit:directConnection>
+  <spirit:isAddressable>true</spirit:isAddressable>
+  <spirit:extends spirit:vendor="amba.com" spirit:library="AMBA3" spirit:name="APB" spirit:version="r2p0_0"/>
+  <spirit:description>The Advanced Peripheral Bus (APB) is part of the Advanced Microcontroller Bus Architecture (AMBA) protocol family. It defines a low-cost interface that is optimized for minimal power consumption and reduced interface complexity.The APB protocol is not pipelined, use it to connect to low-bandwidth peripherals that do not require the high performance of the AXI protocol. The APB protocol relates a signal transition to the rising edge of the clock, to simplify the integration of APB peripherals into any design flow. Every transfer takes at least two cycles. The APB can interface with: AMBA Advanced High-performance Bus (AHB), AMBA Advanced High-performance Bus Lite (AHB-Lite), AMBA Advanced Extensible Interface (AXI), AMBA Advanced Extensible Interface Lite (AXI4-Lite). You can use it to access the programmable control registers of peripheral devices.
+	  APB specification(Document: IHI0024C) can be obtained from :
+	  http://infocenter.arm.com
+	  AMBA FAQ's : 
+	  http://www.arm.com/support/AMBA.html
+  </spirit:description>
+  <spirit:vendorExtensions>
+    <arm:revision>3</arm:revision>
+  </spirit:vendorExtensions>
+</spirit:busDefinition>

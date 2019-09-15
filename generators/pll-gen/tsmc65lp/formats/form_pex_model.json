@@ -1,0 +1,8 @@
+{
+"pll_pex_model_constants": 
+   {
+@@	"mult_Con":@mo,
+@@	"mult_Coff":@mf,
+@@	"Iavg_const":@Ic
+   }
+}

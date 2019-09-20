@@ -1,0 +1,15 @@
+1. Testbench / script generation : parameters can be specified in "input_gen.py"
+make input
+
+2. netlist generation
+make net
+
+3. run simulation
+make run
+
+4. data sorting
+make data
+=> "result_sorted" file is generated
+
+5. clear
+clear

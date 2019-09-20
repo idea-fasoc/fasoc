@@ -1,0 +1,12 @@
+{
+    "instance_name": "tempsenseInst_power",
+    "generator": "temp-sense-gen",
+    "specifications": {
+    	"temperature": { "min": -20, "max": 100 },
+    	"power": "",
+    	"error": "",
+    	"area": "",
+    	"optimization":"power",
+    	"model" :"modelfile.csv"
+	}
+}

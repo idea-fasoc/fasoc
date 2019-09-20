@@ -1,0 +1,12 @@
+\rm -r *e-*
+\rm -r net_generated
+\rm -r run_dir
+\rm log
+\rm run_sim
+\rm *log*
+\rm result_gen
+\rm result_sorted
+\rm *.cdl
+\rm *temp
+\rm dac*
+\rm netlist_gen

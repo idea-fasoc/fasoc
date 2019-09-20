@@ -1,0 +1,127 @@
+.SUBCKT sar_logic 
++ @value_reverse
++ @result_out_reverse
++ clk_sar en sample cmp cmp_clk
++ VDD VSS 
+
+Xmask_reg_0_ netsm_3 VDD VDD VSS VSS clk_sar netsm_47 DFFQN_X3M_A9TR 
+Xstate_reg_0_ netsm_2 VDD VDD VSS VSS clk_sar netsm_45 DFFQN_X3M_A9TR 
+Xstate_reg_1_ state_1_ VDD VDD VSS VSS netsm_1 netsm_112 clk_sar 
++ A2DFFQ_X4M_A9TR 
+Xmask_reg_6_ netsm_8 VDD VDD VSS VSS clk_sar netsm_38 DFFQN_X3M_A9TR 
+Xmask_reg_5_ netsm_9 VDD VDD VSS VSS clk_sar netsm_39 DFFQN_X3M_A9TR 
+Xmask_reg_4_ netsm_10 VDD VDD VSS VSS clk_sar netsm_40 DFFQN_X3M_A9TR 
+Xmask_reg_3_ netsm_11 VDD VDD VSS VSS clk_sar netsm_41 DFFQN_X3M_A9TR 
+Xmask_reg_2_ netsm_12 VDD VDD VSS VSS clk_sar netsm_42 DFFQN_X3M_A9TR 
+Xmask_reg_1_ netsm_13 VDD VDD VSS VSS clk_sar netsm_43 DFFQN_X3M_A9TR 
+Xresult_reg_7_ result<7> VDD VDD VSS VSS clk_sar netsm_30 DFFQ_X4M_A9TR 
+Xresult_reg_6_ result<6> VDD VDD VSS VSS clk_sar netsm_31 DFFQ_X4M_A9TR 
+Xresult_reg_5_ result<5> VDD VDD VSS VSS clk_sar netsm_32 DFFQ_X4M_A9TR 
+Xresult_reg_4_ result<4> VDD VDD VSS VSS clk_sar netsm_33 DFFQ_X4M_A9TR 
+Xresult_reg_3_ result<3> VDD VDD VSS VSS clk_sar netsm_34 DFFQ_X4M_A9TR 
+Xresult_reg_1_ result<1> VDD VDD VSS VSS clk_sar netsm_36 DFFQ_X4M_A9TR 
+Xresult_reg_0_ result<0> VDD VDD VSS VSS clk_sar netsm_37 DFFQ_X4M_A9TR 
+XI_1 netlg_61 VDD VDD VSS VSS clk_sar INV_X16B_A9TR 
+Xresult_out_reg_7_ netsm_104 VDD VDD VSS VSS en result<7> DFFNQ_X2M_A9TR 
+Xresult_out_reg_6_ netsm_105 VDD VDD VSS VSS netsm_52 result<6> DFFNQ_X2M_A9TR 
+Xresult_out_reg_5_ netsm_106 VDD VDD VSS VSS en result<5> DFFNQ_X2M_A9TR 
+Xresult_out_reg_4_ netsm_107 VDD VDD VSS VSS netsm_52 result<4> DFFNQ_X2M_A9TR 
+Xresult_out_reg_3_ netsm_108 VDD VDD VSS VSS en result<3> DFFNQ_X2M_A9TR 
+Xresult_out_reg_2_ netsm_109 VDD VDD VSS VSS netsm_52 result<2> DFFNQ_X2M_A9TR 
+Xresult_out_reg_1_ netsm_110 VDD VDD VSS VSS en result<1> DFFNQ_X2M_A9TR 
+Xresult_out_reg_0_ netsm_111 VDD VDD VSS VSS netsm_52 result<0> DFFNQ_X2M_A9TR 
+Xmask_reg_7_ netsm_7 VDD VDD VSS VSS netsm_50 netsm_44 clk_sar A2DFFQN_X3M_A9TR 
+Xresult_reg_2_ result<2> VDD VDD VSS VSS netsm_50 netsm_51 clk_sar 
++ A2DFFQN_X3M_A9TR 
+Xvalue_rst_reg_0_ netsm_4 VDD VDD VSS VSS netsm_50 netsm_46 clk_sar 
++ A2DFFQN_X3M_A9TR 
+XU52 netsm_52 VDD VDD VSS VSS netsm_56 INV_X7P5M_A9TR 
+XU53 netsm_87 VDD VDD VSS VSS netlg_61 netsm_52 NAND2_X8M_A9TR 
+XU54 netsm_92 VDD VDD VSS VSS state_1_ netsm_2 netsm_55 NOR3_X1A_A9TR 
+XU55 netsm_93 VDD VDD VSS VSS netsm_92 cmp NAND2_X1A_A9TR 
+XU56 netsm_94 VDD VDD VSS VSS netsm_92 INV_X1M_A9TR 
+XU57 netsm_51 VDD VDD VSS VSS netsm_98 netsm_55 netsm_12 netsm_93 
++ OA22_X0P5M_A9TR 
+XU58 netsm_48 VDD VDD VSS VSS en netlg_58 NAND2_X0P5M_A9TR 
+XU59 netsm_44 VDD VDD VSS VSS netsm_7 netsm_95 netsm_48 OAI21_X0P5M_A9TR 
+XU60 netsm_49 VDD VDD VSS VSS netsm_3 state_1_ netsm_2 netsm_52 
++ OAI31_X0P5M_A9TR 
+XU61 netsm_45 VDD VDD VSS VSS state_1_ netsm_2 netsm_49 AOI21_X0P5M_A9TR 
+XU62 netsm_50 VDD VDD VSS VSS TIEHI_X1M_A9TR 
+XU63 cmp_clk VDD VDD VSS VSS netsm_87 INV_X16B_A9TR 
+XU64 netsm_54 VDD VDD VSS VSS netsm_53 INV_X4M_A9TR 
+XU65 netsm_53 VDD VDD VSS VSS netsm_4 INV_X4M_A9TR 
+XU66 netsm_56 VDD VDD VSS VSS en INV_X13M_A9TR 
+XU67 netsm_86 VDD VDD VSS VSS netsm_3 netsm_4 netsm_96 AND3_X2M_A9TR 
+XU68 netsm_47 VDD VDD VSS VSS netsm_3 netsm_95 netsm_13 netsm_94 OAI22_X1M_A9TR 
+XU69 netsm_43 VDD VDD VSS VSS netsm_13 netsm_95 netsm_12 netsm_94 
++ OAI22_X1M_A9TR 
+XU70 netsm_83 VDD VDD VSS VSS netsm_10 netsm_54 netsm_100 NAND3_X2M_A9TR 
+XU71 netsm_33 VDD VDD VSS VSS netsm_10 netsm_93 netsm_55 netsm_100 
++ OAI22_X1M_A9TR 
+XU72 netsm_80 VDD VDD VSS VSS netsm_13 netsm_4 netsm_97 NAND3_X2M_A9TR 
+XU73 netsm_34 VDD VDD VSS VSS netsm_11 netsm_93 netsm_55 netsm_99 
++ OAI22_X1M_A9TR 
+XU74 netsm_30 VDD VDD VSS VSS netsm_7 netsm_93 netsm_55 netsm_103 
++ OAI22_X1M_A9TR 
+XU75 netsm_41 VDD VDD VSS VSS netsm_11 netsm_95 netsm_10 netsm_94 
++ OAI22_X1M_A9TR 
+XU76 netsm_31 VDD VDD VSS VSS netsm_8 netsm_93 netsm_55 netsm_102 
++ OAI22_X1M_A9TR 
+XU77 netsm_38 VDD VDD VSS VSS netsm_8 netsm_95 netsm_7 netsm_94 OAI22_X1M_A9TR 
+XU78 netsm_36 VDD VDD VSS VSS netsm_13 netsm_93 netsm_55 netsm_97 
++ OAI22_X1M_A9TR 
+XU79 netsm_39 VDD VDD VSS VSS netsm_9 netsm_95 netsm_8 netsm_94 OAI22_X1M_A9TR 
+XU80 netsm_32 VDD VDD VSS VSS netsm_9 netsm_93 netsm_56 netsm_101 
++ OAI22_X1M_A9TR 
+XU81 netsm_81 VDD VDD VSS VSS netsm_12 netsm_4 netsm_98 NAND3_X2M_A9TR 
+XU82 netsm_88 VDD VDD VSS VSS netsm_7 netsm_54 netsm_103 NAND3_X2M_A9TR 
+XU83 netsm_82 VDD VDD VSS VSS netsm_11 netsm_54 netsm_99 NAND3_X2M_A9TR 
+XU84 netsm_84 VDD VDD VSS VSS netsm_9 netsm_54 netsm_101 NAND3_X2M_A9TR 
+XU85 netsm_42 VDD VDD VSS VSS netsm_12 netsm_95 netsm_11 netsm_94 
++ OAI22_X1M_A9TR 
+XU86 netsm_40 VDD VDD VSS VSS netsm_10 netsm_95 netsm_9 netsm_94 OAI22_X1M_A9TR 
+XU87 netsm_85 VDD VDD VSS VSS netsm_8 netsm_54 netsm_102 NAND3_X2M_A9TR 
+XU88 netsm_37 VDD VDD VSS VSS netsm_3 netsm_93 netsm_96 netsm_55 OAI22_X1M_A9TR 
+XU89 netsm_99 VDD VDD VSS VSS result<3> INV_X1M_A9TR 
+XU90 netlg_58 VDD VDD VSS VSS netsm_2 state_1_ NOR2B_X2M_A9TR 
+XU91 netsm_100 VDD VDD VSS VSS result<4> INV_X1M_A9TR 
+XU92 netsm_97 VDD VDD VSS VSS result<1> INV_X1M_A9TR 
+XU93 netsm_102 VDD VDD VSS VSS result<6> INV_X1M_A9TR 
+XU94 netsm_101 VDD VDD VSS VSS result<5> INV_X1M_A9TR 
+XU95 netsm_103 VDD VDD VSS VSS result<7> INV_X1M_A9TR 
+XU96 netsm_98 VDD VDD VSS VSS result<2> INV_X1M_A9TR 
+XU97 netsm_96 VDD VDD VSS VSS result<0> INV_X1M_A9TR 
+XU98 netsm_55 VDD VDD VSS VSS en INV_X1M_A9TR 
+XU99 netsm_57 VDD VDD VSS VSS netsm_111 INV_X0P5B_A9TR 
+XU100 result_out<0> VDD VDD VSS VSS netsm_57 INV_X16M_A9TR 
+XU101 netsm_59 VDD VDD VSS VSS netsm_110 INV_X0P5B_A9TR 
+XU102 result_out<1> VDD VDD VSS VSS netsm_59 INV_X16M_A9TR 
+XU103 netsm_61 VDD VDD VSS VSS netsm_109 INV_X0P5B_A9TR 
+XU104 result_out<2> VDD VDD VSS VSS netsm_61 INV_X16M_A9TR 
+XU105 netsm_63 VDD VDD VSS VSS netsm_108 INV_X0P5B_A9TR 
+XU106 result_out<3> VDD VDD VSS VSS netsm_63 INV_X16M_A9TR 
+XU107 netsm_65 VDD VDD VSS VSS netsm_107 INV_X0P5B_A9TR 
+XU108 result_out<4> VDD VDD VSS VSS netsm_65 INV_X16M_A9TR 
+XU109 netsm_67 VDD VDD VSS VSS netsm_106 INV_X0P5B_A9TR 
+XU110 result_out<5> VDD VDD VSS VSS netsm_67 INV_X16M_A9TR 
+XU111 netsm_69 VDD VDD VSS VSS netsm_105 INV_X0P5B_A9TR 
+XU112 result_out<6> VDD VDD VSS VSS netsm_69 INV_X16M_A9TR 
+XU113 netsm_71 VDD VDD VSS VSS netsm_104 INV_X0P5B_A9TR 
+XU114 result_out<7> VDD VDD VSS VSS netsm_71 INV_X16M_A9TR 
+XU115 value<0> VDD VDD VSS VSS netsm_86 INV_X16M_A9TR 
+XU116 value<1> VDD VDD VSS VSS netsm_80 BUF_X16M_A9TR 
+XU117 value<2> VDD VDD VSS VSS netsm_81 BUF_X16M_A9TR 
+XU118 value<3> VDD VDD VSS VSS netsm_82 BUF_X16M_A9TR 
+XU119 value<4> VDD VDD VSS VSS netsm_83 BUF_X16M_A9TR 
+XU120 value<5> VDD VDD VSS VSS netsm_84 BUF_X16M_A9TR 
+XU121 value<6> VDD VDD VSS VSS netsm_85 BUF_X16M_A9TR 
+XU122 value<7> VDD VDD VSS VSS netsm_88 BUF_X16M_A9TR 
+XU123 sample VDD VDD VSS VSS netsm_90 INV_X16M_A9TR 
+XU124 netsm_90 VDD VDD VSS VSS netlg_58 INV_X4M_A9TR 
+XU125 netsm_46 VDD VDD VSS VSS netlg_58 netsm_4 netsm_52 OAI21_X0P5M_A9TR 
+XU126 netsm_95 VDD VDD VSS VSS state_1_ netsm_52 NAND2_X0P5M_A9TR 
+XU127 netsm_1 VDD VDD VSS VSS netsm_3 netsm_2 state_1_ OAI21B_X1M_A9TR 
+XU128 netsm_112 VDD VDD VSS VSS en BUFH_X1M_A9TR 
+
+.ENDS

@@ -1,0 +1,9 @@
+input:
+	python input_gen.py tbSar.sp
+net:
+	netlist_gen
+run:
+	run_sim
+data:
+	result_gen
+

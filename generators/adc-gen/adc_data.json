@@ -1,0 +1,10 @@
+{
+    "instance_name": "adcInst",
+    "generator": "adc-gen",
+    "specifications": {
+    	"fsampling": 1000000,
+    	"target enob": 6.8,
+    	"optimization":"area",
+    	"model" :"modelfile.csv"
+	}
+}

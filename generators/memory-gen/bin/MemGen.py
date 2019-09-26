@@ -430,19 +430,19 @@ class MemGen():
                                         sys.exit(1)  
                        #Results JSON file generation
                        self.config['results'] = {'platform': p_options['PDK']}
-                       mem_x = 310.05e-6 ; #In meters
-                       mem_y = 198.06e-6 ; #In meters
-                       BLOCK_OFFSET = 10e-06
+                       mem_x = 310.05 ; #Was in meters, changing the units to micro meters as per the top-level requirements. Sumanth, 9/26/2019
+                       mem_y = 198.06 ; #Was in meters, changing the units to micro meters as per the top-level requirements. Sumanth, 9/26/2019
+                       BLOCK_OFFSET = 10 ;#Was in meters, changing the units to micro meters as per the top-level requirements. Sumanth, 9/26/2019
                        nofbanks = self.no_banks                         ; # Gets the number of 2KB SRAM memory instances in the top SRAM.
                        cols = nofbanks/2                                  ; # No of 2KB SRAM macro coulmns in the top SRAM.
                        rows=2                                           ; # No of 2KB SRAM macro rows in the top SRAM. Fixed for 2 now.
                        MACROS_WIDTH =  cols*(BLOCK_OFFSET+mem_x+BLOCK_OFFSET) ; 
                        MACROS_HEIGHT = rows*(BLOCK_OFFSET+mem_y+BLOCK_OFFSET) ; # Overall multi-bank macro height.
                        CORE_WIDTH = MACROS_WIDTH
-                       CORE_HEIGHT = MACROS_HEIGHT+50e-6
+                       CORE_HEIGHT = MACROS_HEIGHT+50 ;#Was in meters, Changing the units to micro meters as per the top-level requirements. Sumanth, 9/26/2019
                        mem_area =  CORE_WIDTH*CORE_HEIGHT
                        mem_ar = CORE_WIDTH/CORE_HEIGHT
-                       mem_power =  nofbanks*100e-9*1.2 ;#Approximate Value In watts. 
+                       mem_power =  nofbanks*100e-6*1.2 ;#Was in watts, changing the units to milli watts as per with top-level requirements. Sumanth, 9/26/2019 
                        self.config['results'].update({'area': mem_area}) 
                        self.config['results'].update({'AspectRatio': mem_ar})
                        self.config['results'].update({'Power': mem_power})
@@ -518,19 +518,19 @@ class MemGen():
                        #Results JSON file generation
                        self.config['results'] = {'platform': p_options['PDK']}
                        #self.config['results'].update({'area': self.designArea})
-                       mem_x = 310.05e-6 ; #In meters
-                       mem_y = 198.06e-6 ; #In meters
-                       BLOCK_OFFSET = 10e-06
+                       mem_x = 310.05 ;#Was in meters, changing the units to micro meters as per the top-level requirements. Sumanth, 9/26/2019
+                       mem_y = 198.06 ;#Was in meters, changing the units to micro meters as per the top-level requirements. Sumanth, 9/26/2019
+                       BLOCK_OFFSET = 10 ;#Was in meters, changing the units to micro meters as per the top-level requirements. Sumanth, 9/26/2019
                        nofbanks = self.no_banks                         ; # Gets the number of 2KB SRAM memory instances in the top SRAM.
                        cols = nofbanks/2                                  ; # No of 2KB SRAM macro coulmns in the top SRAM.
                        rows=2                                           ; # No of 2KB SRAM macro rows in the top SRAM. Fixed for 2 now.
                        MACROS_WIDTH =  cols*(BLOCK_OFFSET+mem_x+BLOCK_OFFSET) ;
                        MACROS_HEIGHT = rows*(BLOCK_OFFSET+mem_y+BLOCK_OFFSET) ; # Overall multi-bank macro height.
                        CORE_WIDTH = MACROS_WIDTH
-                       CORE_HEIGHT = MACROS_HEIGHT+50e-6
+                       CORE_HEIGHT = MACROS_HEIGHT+50 ; #Was in meters, changing the units to micro meters as per the top-level requirements. Sumanth, 9/26/2019
                        mem_Area =  CORE_WIDTH*CORE_HEIGHT
                        mem_ar = CORE_WIDTH/CORE_HEIGHT
-                       mem_power =  nofbanks*100e-9*1.2 ;#Approximate Value In watts.
+                       mem_power =  nofbanks*100e-6*1.2 ;#Was in watts, changing the units to milli watts as per the top-level requirements. Sumanth, 9/26/2019
                        self.config['results'].update({'area': mem_area})
                        self.config['results'].update({'AspectRatio': mem_ar})
                        self.config['results'].update({'Power': mem_power})

@@ -12,6 +12,13 @@ The provided generators can generate fully synthesizable verilog products using 
 ### Setup instructions
 1. Ensure your machine has the correct python version and all of the python modules required to run through the FASoC flow. 
     - Requirements: Python 3.6/3.7 (packages getopt, math, numpy, os, re, shutil, subprocess, sys, smtplib, datetime, logging, matplotlib). Python 3 is not supported.
+    
+1. Ensure you have ssh keys setup for github
+
+1. Clone the FASoC repository
+    ```bash
+    git clone git@github.com:idea-fasoc/fasoc.git
+    ```
 
 ## Macro/Full Generation Mode
 The macro generation mode will generate hard macros in addition to the verilog. These hard macros are synthesized and implemented versions of the verilog output using recommended constraints and physical guidance. This mode will require the commercial tools, access to the standard/cells, PDK and other tools. It will also require an automated flow (cadre flow) as well as several private files that are restricted due to NDA requirements.

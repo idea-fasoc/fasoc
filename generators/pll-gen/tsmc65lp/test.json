@@ -3,7 +3,7 @@
 "module_name": "test_synth_pll",
 "specifications": 
    {
-"Fnom_min":8.40e8,
-"Fnom_max":8.60e8
+"Fnom_min":9.40e8,
+"Fnom_max":9.60e8
    }
 }

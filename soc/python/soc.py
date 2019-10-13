@@ -52,6 +52,8 @@ parser.add_argument('--fasoc_config', default=os.path.join(fasoc_dir, "config/fa
                     help='SoC tool configuration json file path')
 parser.add_argument('--platform_config', default=os.path.join(fasoc_dir, "config/platform_config.json"),
                     help='Platform configuration json file path')
+parser.add_argument('--mode', default="verilog",
+                    help='Run Mode')
 args = parser.parse_args()
 
 
@@ -182,11 +184,11 @@ for module in designJson["modules"]:
           cmd1 = os.path.join(fasoc_dir,configJson["generators"][module["generator"]]["path"])
         except KeyError:
           print("Please specify path for module: " + module["module_name"] + "instance: " + module["instance_name"])
-        cmd = cmd1 + " --specfile " + specFilePath + " --output " + outputDir + " --platform " + args.platform
+        cmd = cmd1 + " --specfile " + specFilePath + " --output " + outputDir + " --platform " + args.platform + "--mode" + args.mode
         print("Launching: ", cmd)
         
         try:
-          ret = subprocess.check_call([cmd1,"--specfile",specFilePath,"--output",outputDir,"--platform",args.platform])
+          ret = subprocess.check_call([cmd1,"--specfile",specFilePath,"--output",outputDir,"--platform",args.platform,"--mode",args.mode])
           if ret:
             print("Error: Command returned error " + error)
             sys.exit(1)

@@ -330,13 +330,19 @@ if outMode=='macro' or outMode=='full':
 	p.wait()
 
 
+
 #if pexVerify==0:
 if outMode!='full': #public
+	#== calculate estimated area ==
+	A_dco=1.5*(A_CC*Ncc*Nstg+A_FC*Nfc*Nstg)
+	A_pll=A_dco*1.5	
 	jsonSpec['results']={'platform': 'tsmc65lp'}
 	jsonSpec['results'].update({'nominal frequency':Fnom_mdl})
 	jsonSpec['results'].update({'minimum frequency':Fmin_mdl})
 	jsonSpec['results'].update({'maximum frequency':Fmax_mdl})
 	jsonSpec['results'].update({'power':Pwr_mdl})
+	jsonSpec['results'].update({'area':A_pll})
+	jsonSpec['results'].update({'aspect ratio':'1:1'})
 	if outMode=='macro' or outMode=='full':
 		jsonSpec['results'].update({'area':A_core})
 	print("model predicted specs generated on "+outputDir+'/'+designName+'.json')

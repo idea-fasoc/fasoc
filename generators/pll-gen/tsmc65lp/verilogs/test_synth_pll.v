@@ -28,7 +28,7 @@ module test_synth_pll(
 
 	// DCO design parameters - km
 	parameter NSTG = 8; 
-	parameter NDRIV = 10;
+	parameter NDRIV = 20;
 	parameter NFC = 30;
 	parameter NCC = 10;
 		parameter Nintrp = 2;

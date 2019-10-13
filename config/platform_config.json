@@ -13,7 +13,7 @@
       "model_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/model_tsmc65",
       "calibreRules": "/net/gaylord/l/yaswanth/Research/LDO_Automation/extraction/ruleFiles",
       "hspiceModels": "/afs/eecs.umich.edu/kits/TSMC/CRN65LP/2013.03/rf1p9m6x2z0u2ff2p5v/models/hspice",
-      "database": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database"
+      "database": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database3"
     },
     "gfbicmos8hp": {
       "nominal_voltage": 1.2,

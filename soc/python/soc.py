@@ -97,6 +97,7 @@ designName = designJson['design_name']
 socrates_installDir = platformJson["socratesInstall"]
 ipXactDir = os.path.join(design_dir,'ipxact')
 rubiDir = os.path.join(soc_dir,'..','rubi')
+jsnDir = os.path.join(design_dir,'json')
 
 try:
   os.mkdir(ipXactDir)
@@ -107,6 +108,16 @@ except FileExistsError:
   if len(os.listdir(ipXactDir)) != 0:
     for file in os.listdir(ipXactDir):
       os.remove(os.path.join(ipXactDir,file))
+
+try:
+  os.mkdir(jsnDir)
+  print("Directory " , jsnDir ,  " Created ") 
+except FileExistsError:
+  print("Directory " , jsnDir ,  " already exists")
+  print("Cleaning ipxact directory ...")
+  if len(os.listdir(jsnDir)) != 0:
+    for file in os.listdir(jsnDir):
+      os.remove(os.path.join(jsnDir,file))
 
 try:
   units = designJson["units"]
@@ -174,26 +185,13 @@ for module in designJson["modules"]:
         cmd = cmd1 + " --specfile " + specFilePath + " --output " + outputDir + " --platform " + args.platform
         print("Launching: ", cmd)
         
-        if module["generator"] == 'pll-gen':
-          try:
-            #ret = subprocess.check_call(["python",cmd1,"--specfile",specFilePath,"--output",outputDir,"--platform",args.platform], shell=True)
-            ret = subprocess.check_call([cmd1,"--specfile",specFilePath,"--output",outputDir,"--platform",args.platform,"--pex_verify",'0','--run_vsim','0'])
-            if ret:
-              print("Error: Command returned error " + error)
-              sys.exit(1)
-          except:
-            print ("Error/Exception occurred while running command:", sys.exc_info()[0])
-        else:
-          try:
-            #ret = subprocess.check_call(["python",cmd1,"--specfile",specFilePath,"--output",outputDir,"--platform",args.platform], shell=True)
-            ret = subprocess.check_call([cmd1,"--specfile",specFilePath,"--output",outputDir,"--platform",args.platform])
-            if ret:
-              print("Error: Command returned error " + error)
-              sys.exit(1)
-          except:
-            print ("Error/Exception occurred while running command:", sys.exc_info()[0])
-
-        #os.chdir(cwd)
+        try:
+          ret = subprocess.check_call([cmd1,"--specfile",specFilePath,"--output",outputDir,"--platform",args.platform])
+          if ret:
+            print("Error: Command returned error " + error)
+            sys.exit(1)
+        except:
+          print ("Error/Exception occurred while running command:", sys.exc_info()[0])
 
         for output_file in os.listdir(outputDir):
           output_file_name = (output_file.split('.'))[0]
@@ -236,12 +234,13 @@ for module in designJson["modules"]:
 
       
 #---------------------------------------------------------------------------------------       
-# Check if generator and database are done and make ipxact
+# Check if generator and database are done and make ipxact, and add json files to json folder
       jsonXmlGenerator(configJson["generators"][module["generator"]],module,units,outputDir,ipXactDir)
       postfixes = ['.db','.gds.gz','.json','.lef','.lib','.spi','.v','.cdl','.xml']
       for postfix in postfixes:
         if not os.path.exists(os.path.join(outputDir,module["module_name"] + postfix)):
           print(module["module_name"] + postfix + " does not exist")
+      shutil.copy(os.path.join(outputDir,module["module_name"]+'.json'),jsnDir)
 #---------------------------------------------------------------------------------------      
 
 #---------------------------------------------------------------------------------------     
@@ -267,7 +266,60 @@ for module in designJson["modules"]:
     shutil.copy(os.path.join(ipXactDir,moduleJson['module_name'] + '.xml'),os.path.join(ipXactDir,moduleJson['instance_name'] + '.xml'))
 #---------------------------------------------------------------------------------------
 
-# STEP 6: Call Socrates for stitching
+# STEP 6: Check constraints and close the loop
+# ==============================================================================
+total_power_constraint = 0
+total_area_constraint = 0
+max_power_constraint = ['init',-1]
+max_area_constraint = ['init',-1]
+
+for jsonFile_constraint in os.listdir(jsnDir):
+  with open(os.path.join(jsnDir,jsonFile_constraint)) as f_constraint:
+    generator_element_constraint = json.load(f_constraint)
+  if "Power" in generator_element_constraint["results"]:
+    del generator_element_constraint["results"]["Power"]
+  if "area" not in generator_element_constraint["results"]:
+    generator_element_constraint["results"]["area"] = 100000
+  if "power" not in generator_element_constraint["results"]:
+    generator_element_constraint["results"]["power"] = 0
+  if "area" in generator_element_constraint["results"] and isinstance(generator_element_constraint["results"]["area"],str):
+    generator_element_constraint["results"]["area"] = 100000
+  with open(os.path.join(jsnDir,jsonFile_constraint), "w") as new_json_constraint:
+          json.dump(generator_element_constraint, new_json_constraint, indent=True)
+
+for jsonFile_constraint in os.listdir(jsnDir):
+  with open(os.path.join(jsnDir,jsonFile_constraint)) as f_constraint:
+    generator_element_constraint = json.load(f_constraint)
+  power_constraint = generator_element_constraint["results"]["power"]
+  area_constraint = generator_element_constraint["results"]["area"]
+
+  if power_constraint > max_power_constraint[1]:
+    max_power_constraint[0] = generator_element_constraint['module_name']
+    max_power_constraint[1] = power_constraint
+  if area_constraint > max_area_constraint[1]:
+    max_area_constraint[0] = generator_element_constraint['module_name']
+    max_area_constraint[1] = area_constraint
+
+  total_power_constraint = total_power_constraint + power_constraint
+  total_area_constraint = total_area_constraint + area_constraint
+
+target_power_constraint = designJson["constraints"]["power"]
+target_area_constraint = designJson["constraints"]["area"]
+
+if target_area_constraint < total_area_constraint:
+  print("area is not satisfied")
+  print('target_modification for area: ' + max_area_constraint[0])
+  sys.exit(1)
+else:
+  print("area is satisfied")
+if target_power_constraint < total_power_constraint:
+  print("power is not satisfied")
+  print('target_modification for power: ' + max_power_constraint[0])
+  sys.exit(1)
+else:
+  print("power is satisfied")
+
+# STEP 7: Call Socrates for stitching
 # ==============================================================================
 workplaceDir = design_dir
 projectName = designName + '_socrates_proj'

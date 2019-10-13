@@ -15,6 +15,12 @@ connect(component, :instance1 => "i_fasoc_m0mcu2", :interface1 => "M0MCU_AHBM",
 connect(component, :instance1 => "u_ahb_to_apb2", :interface1 => "APB_M",
                    :instance2 => "u_apb_slave_mux2", :interface2 => "APBS",
                    :exclude_logical_ports1 => "PCLK|PRESETn")
+connect(component, :instance1 => "u_apb_slave_mux2", :interface1 => "APBM4",
+                   :instance2 => "i_mem2", :interface2 => "MEM_APBS",
+                   :exclude_logical_ports1 => "PCLK|PRESETn")
+connect(component, :instance1 => "u_apb_slave_mux2", :interface1 => "APBM5",
+                   :instance2 => "i_pll2", :interface2 => "PLL_APBS",
+                   :exclude_logical_ports1 => "PCLK|PRESETn")
 export(component, :instance => "i_fasoc_m0mcu2", :port => "XTAL1",
 :exported_port_name => "XTAL1")
 export(component, :instance => "i_fasoc_m0mcu2", :port => "XTAL2",
@@ -35,10 +41,18 @@ export(component, :instance => "u_ahb_to_apb2", :port => "HCLK",
 :exported_port_name => "SYSCLK")
 export(component, :instance => "i_fasoc_m0mcu2", :port => "ext_HRESETN",
 :exported_port_name => "SYSRESETN")
+export(component, :instance => "i_pll2", :port => "CLKOUT",
+:exported_port_name => "SYSCLKOUT")
 export(component, :instance => "i_ldo2", :port => "PCLK",
+:exported_port_name => "SYSCLK")
+export(component, :instance => "i_mem2", :port => "pclk",
+:exported_port_name => "SYSCLK")
+export(component, :instance => "i_pll2", :port => "PCLK",
 :exported_port_name => "SYSCLK")
 export(component, :instance => "i_fasoc_m0mcu2", :port => "PCLK",
 :exported_port_name => "SYSCLK")
+export(component, :instance => "i_pll2", :port => "PRESETn",
+:exported_port_name => "SYSRESETN")
 export(component, :instance => "i_ldo2", :port => "reset",
 :exported_port_name => "SYSRESETN")
 export(component, :instance => "u_ahb_to_apb2", :port => "HRESETn",
@@ -47,16 +61,46 @@ export(component, :instance => "i_fasoc_m0mcu2", :port => "ext_HRESETn",
 :exported_port_name => "SYSRESETN")
 export(component, :instance => "i_fasoc_m0mcu2", :port => "PRESETn",
 :exported_port_name => "SYSRESETN")
+export(component, :instance => "i_mem2", :port => "presetn",
+:exported_port_name => "SYSRESETN")
 connect(component, :instance1 => "i_fasoc_m0mcu2", :port1 => "APBACTIVE",
                    :instance2 => "u_ahb_to_apb2", :port2 => "APBACTIVE")
 connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PCLKEN",
                    :instance2 => "i_fasoc_m0mcu2", :port2 => "PCLKEN")
 connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PADDR[15:12]",
                    :instance2 => "u_apb_slave_mux2", :port2 => "DECODE4BIT[15:12]")
+connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PADDR[11:0]",
+                   :instance2 => "i_mem2", :port2 => "paddr[11:0]")
+connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PADDR[11:2]",
+                   :instance2 => "i_mem2", :port2 => "paddr[11:2]")
+connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PADDR[11:2]",
+                   :instance2 => "i_pll2", :port2 => "PADDR[11:2]")
+connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PENABLE",
+                   :instance2 => "i_mem2", :port2 => "penable")
+connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PENABLE",
+                   :instance2 => "i_pll2", :port2 => "PENABLE")
+connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PWRITE",
+                   :instance2 => "i_mem2", :port2 => "pwrite")
+connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PWRITE",
+                   :instance2 => "i_pll2", :port2 => "PWRITE")
+connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PWDATA",
+                   :instance2 => "i_mem2", :port2 => "pwdata")
+connect(component, :instance1 => "u_ahb_to_apb2", :port1 => "PWDATA",
+                   :instance2 => "i_pll2", :port2 => "PWDATA")
 tieOff(component, :instance => "u_ahb_to_apb2", :port => "HSEL",
                   :value => "1")
 tieOff(component, :instance => "u_ahb_to_apb2", :port => "HREADY",
                   :value => "1")
+tieOff(component, :instance => "i_fasoc_m0mcu2", :port => "ext_HREADY",
+                  :value => "1")
+tieOff(component, :instance => "i_fasoc_m0mcu2", :port => "NRST",
+                  :value => "1")
+tieOff(component, :instance => "i_fasoc_m0mcu2", :port => "TDI",
+                  :value => "1")
+tieOff(component, :instance => "i_fasoc_m0mcu2", :port => "TDO",
+                  :value => "open")
+tieOff(component, :instance => "i_fasoc_m0mcu2", :port => "PCLKG",
+                  :value => "open")
 tieOff(component, :instance => "u_ahb_to_apb2", :port => "HREADYOUT",
                   :value => "open")
 tieOff(component, :instance => "u_ahb_to_apb2", :port => "PSTRB",
@@ -74,6 +118,8 @@ tieOff(component, :instance => "u_apb_slave_mux2", :port => "PREADY1",
 tieOff(component, :instance => "u_apb_slave_mux2", :port => "PREADY2",
                   :value => "1")
 tieOff(component, :instance => "u_apb_slave_mux2", :port => "PREADY3",
+                  :value => "1")
+tieOff(component, :instance => "u_apb_slave_mux2", :port => "PREADY4",
                   :value => "1")
 tieOff(component, :instance => "u_apb_slave_mux2", :port => "PREADY5",
                   :value => "1")

@@ -17,14 +17,18 @@
     "temperature": "C",
     "area" : "um2"
   },
+  "constraints":{
+    "power" : 0.3,
+    "area" : 900000
+  },
   "modules": [
     {
       "module_name": "ldo2",
       "instance_name": "i_ldo2",
       "generator": "ldo-gen",
       "specifications": {
-        "vin": 0.7,
-        "imax": 0.001
+        "vin": 1.2,
+        "imax": 0.003
       }
     },
     {
@@ -33,7 +37,7 @@
       "generator": "memory-gen",
       "specifications": {
         "word_size": 32,
-        "capacity": 134672
+        "nowords": 4096
       }
     },
     {
@@ -41,31 +45,15 @@
       "instance_name": "i_pll2",
       "generator": "pll-gen",
       "specifications": {
-      	"Fnom_min":1.05e8,
-      	"Fnom_max":1.20e8,
-      	"FCR_min":1
-      }
-    },
-    {
-      "module_name": "temp_sense2",
-      "instance_name": "i_temp_sense2",
-      "generator": "temp-sense-gen",
-      "specifications": {
-        "temperature": {
-          "min": 0,
-          "max": 90},
-        "error": "",
-		    "power": "",
-        "area": "",
-        "optimization":"error",
-        "model" :"modelfile.csv"
+        "Fnom_min":8.4e8,
+        "Fnom_max":8.6e8
       }
     },
     {
       "module_name": "cmsdk_apb_slave_mux2",
       "instance_name": "u_apb_slave_mux2",
       "generator": "cmsdk_apb_slave_mux_rtl",
-      "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/cmsdk_apb_slave_mux.v",
+      "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/cmsdk_apb_slave_mux.v",
       "parameters": {
         "PORT0_ENABLE": 0,
         "PORT1_ENABLE": 1,
@@ -89,7 +77,7 @@
       "module_name": "cmsdk_ahb_to_apb2",
       "instance_name": "u_ahb_to_apb2",
       "generator": "cmsdk_ahb_to_apb_rtl",
-      "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/cmsdk_ahb_to_apb.v",
+      "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/cmsdk_ahb_to_apb.v",
       "parameters": {
         "ADDRWIDTH": 16,
         "REGISTER_RDATA": 1,
@@ -100,19 +88,19 @@
       "module_name": "fasoc_m0mcu2",
       "instance_name": "i_fasoc_m0mcu2",
       "generator": "fasoc_m0mcu_rtl",
-      "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/fasoc_m0mcu.v"
+      "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/fasoc_m0mcu.v"
     }
   ],
   "connections": [
     {
       "type": "ahb",
       "from": {
-        "instance": "i_fasoc_m0mcu",
+        "instance": "i_fasoc_m0mcu2",
         "port": "M0MCU_AHBM"
       },
       "to": [
         {
-          "instance": "u_ahb_to_apb",
+          "instance": "u_ahb_to_apb2",
           "port": "AHB_S"
         }
       ]
@@ -120,12 +108,12 @@
     {
       "type": "apb",
       "from": {
-        "instance": "u_ahb_to_apb",
+        "instance": "u_ahb_to_apb2",
         "port": "APB_M"
       },
       "to": [
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "APBS"
         }
       ]
@@ -133,12 +121,12 @@
     {
       "type": "apb",
       "from": {
-        "instance": "u_apb_slave_mux",
+        "instance": "u_apb_slave_mux2",
         "port": "APBM4"
       },
       "to": [
         {
-          "instance": "i_mem",
+          "instance": "i_mem2",
           "port": "MEM_APBS"
         }
       ]
@@ -146,26 +134,13 @@
     {
       "type": "apb",
       "from": {
-        "instance": "u_apb_slave_mux",
+        "instance": "u_apb_slave_mux2",
         "port": "APBM5"
       },
       "to": [
         {
-          "instance": "i_pll",
+          "instance": "i_pll2",
           "port": "PLL_APBS"
-        }
-      ]
-    },
-    {
-      "type": "apb",
-      "from": {
-        "instance": "u_apb_slave_mux",
-        "port": "APBM6"
-      },
-      "to": [
-        {
-          "instance": "i_temp_sense",
-          "port": "TEMP_APBS"
         }
       ]
     },
@@ -177,7 +152,7 @@
       },
       "to": [
         {
-          "instance": "i_fasoc_m0mcu",
+          "instance": "i_fasoc_m0mcu2",
           "port": "XTAL1"
         }
       ]
@@ -185,7 +160,7 @@
     {
       "type": "clock",
       "from": {
-        "instance": "i_fasoc_m0mcu",
+        "instance": "i_fasoc_m0mcu2",
         "port": "XTAL2"
       },
       "to": [
@@ -203,7 +178,7 @@
       },
       "to": [
         {
-          "instance": "i_fasoc_m0mcu",
+          "instance": "i_fasoc_m0mcu2",
           "port": "nTRST"
         }
       ]
@@ -215,7 +190,7 @@
         "min": 0
       },
       "from": {
-        "instance": "i_fasoc_m0mcu",
+        "instance": "i_fasoc_m0mcu2",
         "port": "P0"
       },
       "to": [
@@ -232,7 +207,7 @@
         "min": 0
       },
       "from": {
-        "instance": "i_fasoc_m0mcu",
+        "instance": "i_fasoc_m0mcu2",
         "port": "P1"
       },
       "to": [
@@ -245,7 +220,7 @@
     {
       "type": "adhoc",
       "from": {
-        "instance": "i_fasoc_m0mcu",
+        "instance": "i_fasoc_m0mcu2",
         "port": "SWDIOTMS"
       },
       "to": [
@@ -263,7 +238,7 @@
       },
       "to": [
         {
-          "instance": "i_fasoc_m0mcu",
+          "instance": "i_fasoc_m0mcu2",
           "port": "SWCLKTCK"
         }
       ]
@@ -276,11 +251,11 @@
       },
       "to": [
         {
-          "instance": "i_fasoc_m0mcu",
+          "instance": "i_fasoc_m0mcu2",
           "port": "ext_HCLK"
         },
         {
-          "instance": "u_ahb_to_apb",
+          "instance": "u_ahb_to_apb2",
           "port": "HCLK"
         }
       ]
@@ -293,7 +268,7 @@
       },
       "to": [
         {
-          "instance": "i_fasoc_m0mcu",
+          "instance": "i_fasoc_m0mcu2",
           "port": "ext_HRESETN"
         }
       ]
@@ -306,7 +281,7 @@
       },
       "to": [
         {
-          "instance": "i_pll",
+          "instance": "i_pll2",
           "port": "CLKOUT"
         }
       ]
@@ -319,23 +294,19 @@
       },
       "to": [
         {
-          "instance": "i_ldo",
+          "instance": "i_ldo2",
           "port": "PCLK"
         },
         {
-          "instance": "i_mem",
+          "instance": "i_mem2",
+          "port": "pclk"
+        },
+        {
+          "instance": "i_pll2",
           "port": "PCLK"
         },
         {
-          "instance": "i_pll",
-          "port": "PCLK"
-        },
-        {
-          "instance": "i_temp_sense",
-          "port": "PCLK"
-        },
-        {
-          "instance": "i_fasoc_m0mcu",
+          "instance": "i_fasoc_m0mcu2",
           "port": "PCLK"
         }
       ]
@@ -348,44 +319,40 @@
       },
       "to": [
         {
-          "instance": "i_temp_sense",
-          "port": "PRESETN"
+          "instance": "i_pll2",
+          "port": "PRESETn"
         },
         {
-          "instance": "i_pll",
-          "port": "PRESETN"
-        },
-        {
-          "instance": "i_ldo",
+          "instance": "i_ldo2",
           "port": "reset"
         },
         {
-          "instance": "u_ahb_to_apb",
-          "port": "HRESETN"
+          "instance": "u_ahb_to_apb2",
+          "port": "HRESETn"
         },
         {
-          "instance": "i_fasoc_m0mcu",
-          "port": "ext_HRESETN"
+          "instance": "i_fasoc_m0mcu2",
+          "port": "ext_HRESETn"
         },
         {
-          "instance": "i_fasoc_m0mcu",
-          "port": "PRESETN"
+          "instance": "i_fasoc_m0mcu2",
+          "port": "PRESETn"
         },
         {
-          "instance": "i_mem",
-          "port": "PRESETN"
+          "instance": "i_mem2",
+          "port": "presetn"
         }
       ]
     },
     {
       "type": "adhoc",
       "from": {
-        "instance": "i_fasoc_m0mcu",
+        "instance": "i_fasoc_m0mcu2",
         "port": "APBACTIVE"
       },
       "to": [
         {
-          "instance": "u_ahb_to_apb",
+          "instance": "u_ahb_to_apb2",
           "port": "APBACTIVE"
         }
       ]
@@ -393,12 +360,12 @@
     {
       "type": "adhoc",
       "from": {
-        "instance": "u_ahb_to_apb",
+        "instance": "u_ahb_to_apb2",
         "port": "PCLKEN"
       },
       "to": [
         {
-          "instance": "i_fasoc_m0mcu",
+          "instance": "i_fasoc_m0mcu2",
           "port": "PCLKEN"
         }
       ]
@@ -410,12 +377,12 @@
         "min": 12
       },
       "from": {
-        "instance": "u_ahb_to_apb",
+        "instance": "u_ahb_to_apb2",
         "port": "PADDR"
       },
       "to": [
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "DECODE4BIT"
         }
       ]
@@ -427,13 +394,13 @@
         "min": 0
       },
       "from": {
-        "instance": "u_ahb_to_apb",
+        "instance": "u_ahb_to_apb2",
         "port": "PADDR"
       },
       "to": [
         {
-          "instance": "i_mem",
-          "port": "PADDR"
+          "instance": "i_mem2",
+          "port": "paddr"
         }
       ]
     },
@@ -444,20 +411,16 @@
         "min": 2
       },
       "from": {
-        "instance": "u_ahb_to_apb",
+        "instance": "u_ahb_to_apb2",
         "port": "PADDR"
       },
       "to": [
         {
-          "instance": "i_mem",
-          "port": "PADDR"
+          "instance": "i_mem2",
+          "port": "paddr"
         },
         {
-          "instance": "i_temp_sense",
-          "port": "PADDR"
-        },
-        {
-          "instance": "i_pll",
+          "instance": "i_pll2",
           "port": "PADDR"
         }
       ]
@@ -465,20 +428,16 @@
     {
       "type": "adhoc",
       "from": {
-        "instance": "u_ahb_to_apb",
+        "instance": "u_ahb_to_apb2",
         "port": "PENABLE"
       },
       "to": [
         {
-          "instance": "i_mem",
-          "port": "PENABLE"
+          "instance": "i_mem2",
+          "port": "penable"
         },
         {
-          "instance": "i_temp_sense",
-          "port": "PENABLE"
-        },
-        {
-          "instance": "i_pll",
+          "instance": "i_pll2",
           "port": "PENABLE"
         }
       ]
@@ -486,20 +445,16 @@
     {
       "type": "adhoc",
       "from": {
-        "instance": "u_ahb_to_apb",
+        "instance": "u_ahb_to_apb2",
         "port": "PWRITE"
       },
       "to": [
         {
-          "instance": "i_mem",
-          "port": "PWRITE"
+          "instance": "i_mem2",
+          "port": "pwrite"
         },
         {
-          "instance": "i_temp_sense",
-          "port": "PWRITE"
-        },
-        {
-          "instance": "i_pll",
+          "instance": "i_pll2",
           "port": "PWRITE"
         }
       ]
@@ -507,20 +462,16 @@
     {
       "type": "adhoc",
       "from": {
-        "instance": "u_ahb_to_apb",
+        "instance": "u_ahb_to_apb2",
         "port": "PWDATA"
       },
       "to": [
         {
-          "instance": "i_mem",
-          "port": "PWDATA"
+          "instance": "i_mem2",
+          "port": "pwdata"
         },
         {
-          "instance": "i_temp_sense",
-          "port": "PWDATA"
-        },
-        {
-          "instance": "i_pll",
+          "instance": "i_pll2",
           "port": "PWDATA"
         }
       ]
@@ -532,7 +483,7 @@
       },
       "to": [
         {
-          "instance": "u_ahb_to_apb",
+          "instance": "u_ahb_to_apb2",
           "port": "HSEL"
         }
       ]
@@ -544,8 +495,44 @@
       },
       "to": [
         {
-          "instance": "u_ahb_to_apb",
+          "instance": "u_ahb_to_apb2",
           "port": "HREADY"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": 1
+      },
+      "to": [
+        {
+          "instance": "i_fasoc_m0mcu2",
+          "port": "ext_HREADY"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": 1
+      },
+      "to": [
+        {
+          "instance": "i_fasoc_m0mcu2",
+          "port": "NRST"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": 1
+      },
+      "to": [
+        {
+          "instance": "i_fasoc_m0mcu2",
+          "port": "TDI"
         }
       ]
     },
@@ -556,7 +543,31 @@
       },
       "to": [
         {
-          "instance": "u_ahb_to_apb",
+          "instance": "i_fasoc_m0mcu2",
+          "port": "TDO"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": "open"
+      },
+      "to": [
+        {
+          "instance": "i_fasoc_m0mcu2",
+          "port": "PCLKG"
+        }
+      ]
+    },
+    {
+      "type": "tieoff",
+      "from": {
+        "value": "open"
+      },
+      "to": [
+        {
+          "instance": "u_ahb_to_apb2",
           "port": "HREADYOUT"
         }
       ]
@@ -568,7 +579,7 @@
       },
       "to": [
         {
-          "instance": "u_ahb_to_apb",
+          "instance": "u_ahb_to_apb2",
           "port": "PSTRB"
         }
       ]
@@ -580,7 +591,7 @@
       },
       "to": [
         {
-          "instance": "u_ahb_to_apb",
+          "instance": "u_ahb_to_apb2",
           "port": "PPROT"
         }
       ]
@@ -592,7 +603,7 @@
       },
       "to": [
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PSLVERR.*|PRDATA.*"
         }
       ]
@@ -604,7 +615,7 @@
       },
       "to": [
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PSEL.*"
         }
       ]
@@ -616,63 +627,67 @@
       },
       "to": [
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY0"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY1"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY2"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY3"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
+          "port": "PREADY4"
+        },
+        {
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY5"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY6"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY7"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY8"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY9"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY10"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY11"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY12"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY13"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY14"
         },
         {
-          "instance": "u_apb_slave_mux",
+          "instance": "u_apb_slave_mux2",
           "port": "PREADY15"
         }
       ]

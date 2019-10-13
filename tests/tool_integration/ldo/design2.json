@@ -23,8 +23,8 @@
       "instance_name": "i_ldo2",
       "generator": "ldo-gen",
       "specifications": {
-        "vin": 0.7,
-        "imax": 0.001
+        "vin": 1.2,
+        "imax": 0.003
       }
     },
     {

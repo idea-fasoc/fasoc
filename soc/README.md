@@ -10,6 +10,6 @@ These are steps for running SoC integration:
 
 The below loop will start after running make soc:
 
-![](docs/Flow.jpg)
+![](docs/flow.jpg)
 
 For more information about how SoC Integration works you can go to [here](https://github.com/idea-fasoc/fasoc/blob/master/doc/SoC%20Integrator%20Walkthrough.pdf)

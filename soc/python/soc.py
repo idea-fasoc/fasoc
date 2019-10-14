@@ -343,7 +343,9 @@ subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'-
 '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/CLI_04_Generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical',designName)])
 
 with open (os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'r') as socrates_verilog:
- soc_ver=socrates_verilog.read()
+  soc_ver=socrates_verilog.read()
+with open(args.design) as fdesign:
+  designJson = json.load(fdesign)
 for module in designJson["modules"]:
   soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
 with open(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'w') as socrates_verilog:

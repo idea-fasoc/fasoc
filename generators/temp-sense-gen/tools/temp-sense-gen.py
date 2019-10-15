@@ -63,7 +63,7 @@ if os.path.isdir(simDir + '/run'):
 if os.path.isdir(extDir + '/run'):
    shutil.rmtree(extDir + '/run', ignore_errors=True)
 
-#if (args.clean):
+# if (args.clean):
 # print('Workspace cleaning done. Exiting the flow.')
 # sys.exit(0)
 
@@ -504,7 +504,6 @@ file_name = designName+'.sp'
 for i in range(0, len(stage_var)):
    for j in range(0, len(header_var)):
       os.mkdir(genDir + "./%s/inv%d_header%d"%(simDir+'/run/', stage_var[i], header_var[j]))
-#      TEMP_netlist.gen_temp_netlist(dir_name, stage_var[i], header_var[j])
       for t in range(0, len(temp_var)):
          w_file0 = open(genDir + "./%s/inv%d_header%d/%s_%d.sp"%(simDir+'/run/', stage_var[i], header_var[j], designName, temp_var[t]), "w")
          for line in lines:
@@ -749,24 +748,30 @@ else:
    except OSError:
       print('Unable to create the output directory')
 
+cwd1=os.getcwd()
+print(cwd1)
+
+print(flowDir)
+print(genDir)
+
 #shutil.copytree(flow + '/export', args.outputDir)
-p = sp.Popen(['cp', flowDir+'/export/'+designName+'.gds.gz', \
-        args.outputDir+'/'+designName+'.gds.gz'])
+p = sp.Popen(['cp', './flow/export/'+designName+'.gds.gz', \
+        '../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.gds.gz'])
 p.wait()
-p = sp.Popen(['cp', flowDir+'/export/'+designName+'.lef', \
-        args.outputDir+'/'+designName+'.lef'])
+p = sp.Popen(['cp', './flow/export/'+designName+'.lef', \
+        '../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lef'])
 p.wait()
-p = sp.Popen(['cp', flowDir+'/export/'+designName+'_min.lib', \
-        args.outputDir+'/'+designName+'.lib'])
+p = sp.Popen(['cp', './flow/export/'+designName+'_min.lib', \
+         '../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lib'])
 p.wait()
-p = sp.Popen(['cp', flowDir+'/export/'+designName+'_min.db', \
-         args.outputDir+'/'+designName+'.db'])
+p = sp.Popen(['cp', './flow/export/'+designName+'_min.db', \
+          '../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.db'])
 p.wait()
-p = sp.Popen(['cp', flowDir+'/export/'+designName+'.lvs.v', \
-         args.outputDir+'/'+designName+'.v'])
+p = sp.Popen(['cp', './flow/export/'+designName+'.lvs.v', \
+          '../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.v'])
 p.wait()
-p = sp.Popen(['cp', extDir+'/sch/'+designName+'.spi', \
-         args.outputDir+'/'+designName+'.spi'])
+p = sp.Popen(['cp', 'extraction/sch/'+designName+'.spi', \
+          '../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.spi'])
 p.wait()
 
 jsonSpec['results'] = {'platform': args.platform}
@@ -776,6 +781,9 @@ jsonSpec['results'].update({'power': value_p})
 
 with open(args.outputDir + '/' + designName + '.json', 'w') as resultSpecfile:
    json.dump(jsonSpec, resultSpecfile, indent=True)
+
+p = sp.Popen(['cp', args.outputDir+'/'+designName+'.json', \
+          '../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.json'])
 
 print('Generator completed successfully ! \n')
 

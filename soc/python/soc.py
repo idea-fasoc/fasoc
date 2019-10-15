@@ -194,11 +194,6 @@ for module in designJson["modules"]:
             sys.exit(1)
         except:
           print ("Error/Exception occurred while running command:", sys.exc_info()[0])
-
-        for output_file in os.listdir(outputDir):
-          output_file_name = (output_file.split('.'))[0]
-          postfix = (output_file.split(output_file_name))[-1]
-          os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,module['module_name'] + postfix))
 #---------------------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------------------
@@ -347,11 +342,17 @@ subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'-
 '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/CLI_03_Report.rb?arg1='+designName+'&arg2='+projectDir+'/Design_Report.txt',
 '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/CLI_04_Generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical',designName)])
 
+with open (os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'r') as socrates_verilog:
+  soc_ver=socrates_verilog.read()
+with open(args.design) as fdesign:
+  designJson = json.load(fdesign)
+for module in designJson["modules"]:
+  soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
+with open(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'w') as socrates_verilog:
+  socrates_verilog.write(soc_ver)
 # STEP 7: Assemble SoC run chip level Cadre Flow
 # ==============================================================================
 
 
 # STEP 8: Run chip level Cadre Flow
 # ==============================================================================
-
-

@@ -59,14 +59,14 @@ Ensure that your machine has all of the required tools setup and have access to 
     - Folder path containing the calibre pex rule files.
     
     __hspiceModels__
-    - Folder path containing the hspice models of the technology node.
+    - Folder path containing the spice models of the technology node.
    
 1. Run the test script from `ldo-gen` folder to ensure the generator tool and the model tool are correctly setup
     ```bash
     make gen_65lp (for TSMC65lp) or
     make gen_8hp  (for GFBICMOS8HP)
     ``` 
-    The ldo gen tool is successfully setup if the the builds generates `generators/ldo-gen/work/*.gds.gz` at the end of the run. 
+    The ldo gen tool is successfully setup if the the builds generates `generators/ldo-gen/work/*.v` at the end of the run. 
 
 
 # Running the tools

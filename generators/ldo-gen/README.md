@@ -91,9 +91,13 @@ Ensure that your machine has all of the required tools setup and have access to 
     
     __specifications__
     - _vin_
-      - Input Voltage of the LDO. Currently only supports `vin` from the set [0.6, 0.7, 0.8, 0.9, 1.0].
+      - Input Voltage of the LDO. 
+      - `vin` values from the set [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3] are supported for TSMC65lp PDK 
+      - `vin` values from the set [0.6, 0.7, 0.8, 0.9, 1.0] are supported for GFBiCMOS8HP PDK.
     - _imax_
-      - Maximum Output Load Current. Currently only supports `imax` in the range [0.5e-03, 1.5e-03].
+      - Maximum Output Load Current. 
+      - `imax` values in the range [0.5e-03, 25e-03] are supported for TSMC65lp PDK.
+      - `imax` values in the range [0.5e-03, 1.5e-03] are supported for GFBiCMOS8HP PDK.
 
 1. Running the LDO generator. 
    To run the LDO generator, execute the below command from any location.

@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import argparse
 import json
 import glob
+import datetime
 
 #------------------------------------------------------------------------------
 # Get the folder/file paths
@@ -103,7 +104,7 @@ except KeyError as e:
    print('Error: \"' + args.platform + '\" config not available')
    sys.exit(1)
 
-mFile = platformConfig['model_lib'] + '/ldo.model'
+mFile = platformConfig['model_lib'] + '/ldoModel.json'
 
 calibreRulesDir = platformConfig['calibreRules']
 
@@ -167,9 +168,12 @@ cfg.ldo_model_dg_flow_cfg(args.platform, platformConfig['aux_lib'], flowDir)
 # Initialize the local variables
 #------------------------------------------------------------------------------
 results = []
+areaValues = []
 numIter = 0
+startDT = datetime.datetime.now()
 for arrSize in [2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, \
-                100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]:
+                100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, \
+                220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 500]:
    print('#---------------------------------------------------------------' + \
          '------')
    print('# Running the sim loop for array size = %s...' % arrSize)
@@ -212,6 +216,7 @@ for arrSize in [2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, \
    #---------------------------------------------------------------------------
    print('# Array Size %s - Running Synthesis and APR...' % arrSize)
    designArea = rdf.run_synth_n_apr(args.platform, designName, flowDir)
+   p = sp.Popen(['cp',flowDir+'/reports/innovus/'+designName+'.main.htm.ascii',simDir+'/run/'])
    print('# Array Size %s - Synthesis and APR finished' % arrSize)
 
    #---------------------------------------------------------------------------
@@ -252,6 +257,8 @@ for arrSize in [2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, \
    simResult.close()
    numIter = numIter + 1
    results.sort(key=lambda x: x[0])
+
+   areaValues.append([int(arrSize), float(designArea)])
    print('# Array Size %s - Sim Results Parsed' % arrSize)
 
 #------------------------------------------------------------------------------
@@ -260,23 +267,41 @@ for arrSize in [2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, \
 print('#---------------------------------------------------------------------')
 print('# Generating the Model File...')
 print('#---------------------------------------------------------------------')
-model = []
+jsonModel = {}
+jsonModel['Iload,max'] = {}
+jsonModel['area'] = []
+jsonModel['power'] = {}
 labels = []
-f = open(mFile, 'w')
+
+# Iload,max Model
 for i in range(len(results)):
-   model.append([results[i][0]])
-   f.write('%s: ' % str(results[i][0]))
+   jsonModel['Iload,max'][results[i][0]] = []
    x = [item[1] for item in results[i][1:]]
    y = [item[0] for item in results[i][1:]]
    xt = [float(1000000)*item for item in x]
    plt.semilogx(y, xt)
    labels.append('Vin = %s' % results[i][0])
    z = np.polyfit(x,y,8)
-   model[i].extend(z)
    for item in z:
-      f.write('\t%s' % item)
-   f.write('\n')
-f.close()
+      jsonModel['Iload,max'][results[i][0]].append(item)
+
+# Area Model
+print(areaValues)
+x = [item[0] for item in areaValues[0:]]
+y = [item[1] for item in areaValues[0:]]
+print(x)
+print(y)
+z = np.polyfit(x,y,8)
+for item in z:
+   jsonModel['area'].append(item)
+
+# Dump the model into a json file
+with open(mFile, 'w') as file:
+   json.dump(jsonModel, file, indent=2)
+
+endDT = datetime.datetime.now()
+print('Start Time - ' + str(startDT))
+print('End Time - ' + str(endDT))
 
 plt.xlim(results[0][1][0], results[0][numIter][0])
 plt.legend(labels, loc='upper left')

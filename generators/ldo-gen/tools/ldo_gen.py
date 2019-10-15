@@ -139,8 +139,8 @@ except KeyError as e:
    print('Error: \"' + args.platform + '\" config not available')
    sys.exit(1)
 
-mFile = platformConfig['model_lib'] + '/ldo.model'
-mFilePublic = genDir + '/models/' + args.platform + '.model'
+mFile = platformConfig['model_lib'] + '/ldoModel.json'
+mFilePublic = genDir + '/models/' + args.platform + '_model.json'
 
 if args.mode == 'full':
    calibreRulesDir = platformConfig['calibreRules']
@@ -195,8 +195,8 @@ if args.mode != 'verilog':
       print('Extraction Directory - \"' + extDir  + '\"')
 print('LDO Instance Name - \"' + designName + '\"')
 
-# Define the internal variables used
-designArea = 'fake'
+# Define the output variables
+designArea = 0
 iMaxOut    = imax 
 
 #------------------------------------------------------------------------------
@@ -276,19 +276,31 @@ try:
 except ValueError as e:
    print('Model file creation failed')
    sys.exit(1)
+f.close()
+
+try:
+   with open(mFile, 'r') as file:
+      jsonModel = json.load(file)
+except ValueError as e:
+   print('Error: ldoModel.json file has an invalid format. %s' % str(e))
+   sys.exit(1)
 
 N = 0
 imax_t = 1.3*imax
-for line in f.readlines():
-   words = line.split()
-   if (str(vin) + ':' == words[0]):
-      for i in range(len(words[1:])):
-         z = words[i+1]
-         N = N + (float(z)*pow(imax_t, (len(words[1:])-i-1)))
-      N = int(math.ceil(N))
-f.close()
+coefLength = len(jsonModel['Iload,max'][str(vin)])
+for i in range(coefLength):
+   z = jsonModel['Iload,max'][str(vin)][i]
+   N = N + (float(z)*pow(imax_t, (coefLength-i-1)))
+N = int(math.ceil(N))
 arrSize = N
 print('# LDO - Power Transistor array Size = ' + str(arrSize))
+
+# Get the estimate of the area
+coefLength = len(jsonModel['area'])
+for i in range(coefLength):
+   z = jsonModel['area'][i]
+   designArea = designArea + (float(z)*pow(arrSize, (coefLength-i-1)))
+print('# LDO - Design Area Estimate = ' + str(designArea))
 
 #------------------------------------------------------------------------------
 # Generate the Behavioral Verilog
@@ -392,6 +404,7 @@ if args.mode != 'verilog':
 
 jsonSpec['results'] = {'platform': args.platform}
 jsonSpec['results'].update({'area': designArea})
+jsonSpec['results'].update({'power': 0.0009})
 jsonSpec['results'].update({'vin': vin})
 jsonSpec['results'].update({'imax': iMaxOut})
 

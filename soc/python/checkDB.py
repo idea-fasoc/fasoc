@@ -29,6 +29,7 @@ from modifyDBFiles import modifyDBFiles
 def checkDB(moduleJson,databaseDir,outputDir,ipXactDir):
     genJson = moduleJson['generator']
     searchDir = os.path.join(databaseDir,'JSN',genJson)
+    excluded_name = ['LDO_CONTROLLER','decoder_3to8','mux_8to1','ANALOG_CORE','bu_dco_8stg','dco_8stg','dco_10drv_10cc_30fc_18stg','dco_CC','dco_FC','DCO_MODEL','FUNCTIONS','PLL_CONTROLLER','PLL_CONTROLLER_TDC_COUNTER','SSC_GENERATOR','synth_dco','synth_pll_dco_interp','synth_pll_dco_outbuff','TB_synth_pll','TDC_COUNTER','test_synth_pll']
     if 'specifications' in moduleJson:
         target_specsJson = moduleJson['specifications']
 
@@ -113,9 +114,12 @@ def checkDB(moduleJson,databaseDir,outputDir,ipXactDir):
                                 for output_file in os.listdir(outputDir):
                                     output_file_name = (output_file.split('.'))[0]
                                     postfix = (output_file.split(output_file_name))[-1]
-                                    os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,moduleJson['module_name'] + postfix))
-                                    modifyDBFiles(os.path.join(outputDir,moduleJson['module_name'] + postfix),postfix,moduleJson['module_name'],srchJson["module_name"])
-                                #shutil.copy(os.path.join(outputDir,moduleJson['module_name'] + '.xml'),ipXactDir)
+                                    #if (not postfix == '.v') or (postfix == '.v' and not (output_file_name == 'LDO_CONTROLLER' or output_file_name == 'decoder_3to8' or output_file_name == 'mux_8to1' or output_file_name == 'ANALOG_CORE' or output_file_name == 'bu_dco_8stg' or output_file_name == 'dco_8stg' or output_file_name == )):
+                                    if (not postfix == '.v') or (postfix == '.v' and output_file_name not in excluded_name):
+                                        print('salaam1')
+                                        print(os.path.join(outputDir,moduleJson['module_name'] + postfix))
+                                        os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,moduleJson['module_name'] + postfix))
+                                        modifyDBFiles(os.path.join(outputDir,moduleJson['module_name'] + postfix),postfix,moduleJson['module_name'],srchJson["module_name"])
                                 return True
                             else:#When there is no zipfile it means search was unsuccessfull
                                 return False
@@ -141,9 +145,12 @@ def checkDB(moduleJson,databaseDir,outputDir,ipXactDir):
                     for output_file in os.listdir(outputDir):
                         output_file_name = (output_file.split('.'))[0]
                         postfix = (output_file.split(output_file_name))[-1]
-                        os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,moduleJson['module_name'] + postfix))
-                        modifyDBFiles(os.path.join(outputDir,moduleJson['module_name'] + postfix),postfix,moduleJson['module_name'],srchJson["module_name"])
-                    #shutil.copy(os.path.join(outputDir,moduleJson['module_name'] + '.xml'),ipXactDir)
+                        #if (not postfix == '.v') or (postfix == '.v' and not (output_file_name == 'LDO_CONTROLLER' or output_file_name == 'decoder_3to8' or output_file_name == 'mux_8to1')):
+                        if (not postfix == '.v') or (postfix == '.v' and output_file_name not in excluded_name):
+                            print('salaam2')
+                            print(os.path.join(outputDir,moduleJson['module_name'] + postfix))
+                            os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,moduleJson['module_name'] + postfix))
+                            modifyDBFiles(os.path.join(outputDir,moduleJson['module_name'] + postfix),postfix,moduleJson['module_name'],srchJson["module_name"])
                     return True
                 else:#When there is no zipfile it means search was unsuccessfull
                     return False

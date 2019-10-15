@@ -51,7 +51,7 @@ def modifyDBFiles(file,postfix,new_module_name,old_module_name):
 				fdata = fdata.replace('.SUBCKT ' + old_module_name + ' ', '.SUBCKT ' + new_module_name + ' ')
 
 			elif postfix == '.v' or postfix == '.lvs.v':
-				fdata = fdata.replace('module ' + old_module_name  + ' ', 'module ' + new_module_name + ' ')
+				fdata = fdata.replace('module ' + old_module_name, 'module ' + new_module_name)
 				fdata = fdata.replace('#  Design:            ' + old_module_name, '#  Design:            ' + new_module_name)
 
 			with open(file, 'w') as f:

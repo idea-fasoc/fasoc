@@ -50,7 +50,7 @@ Ensure that your machine has all of the required tools setup and have access to 
     ```
     
     __model_lib__
-    - Folder path containing the `ldo.model` file.
+    - Folder path containing the `ldoModel.json` file.
     
     __sram_2kb_lib__
     - This parameter is not required for ldo-gen tool.

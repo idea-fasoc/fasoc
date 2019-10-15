@@ -13,7 +13,7 @@ The provided generators can generate fully synthesizable verilog products using 
 1. Ensure your machine has the correct python version and all of the python modules required to run through the FASoC flow. 
     - Requirements: Python 3.6/3.7 (packages getopt, math, numpy, os, re, shutil, subprocess, sys, smtplib, datetime, logging, matplotlib). Python versions below 3.6 are not supported.
     
-1. Ensure you have ssh keys setup for github
+1. Ensure you have ssh keys setup for github. Instructions for generating and adding ssh keys can be found [here](https://help.github.com/en/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
 1. Clone the FASoC repository
     ```bash
@@ -43,7 +43,7 @@ The macro generation mode will generate hard macros in addition to the verilog. 
 
 1. Ensure you have access to the required private repository for FASoC. Please contact ajayi@umich.edu if you need access
 
-1. Ensure you have ssh keys setup for github
+1. Ensure you have ssh keys setup for github. Instructions for generating and adding ssh keys can be found [here](https://help.github.com/en/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
 1. Clone the FASoC repository
     ```bash

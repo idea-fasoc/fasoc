@@ -24,7 +24,7 @@ Ensure that your machine has all of the required tools setup and have access to 
 
 
 # Tool Setup
-1. Add the Auxiliary library and Model directory paths to the [`fasoc/config/platform_config.json`](https://github.com/idea-fasoc/fasoc/blob/public/config/platform_config.json) file under the corresponding technology node. `ldo-gen` currently supports tsmc65lp and gfbicmos8hp nodes. An example of the platform config with the variable descriptions is provided below.
+1. Add the Auxiliary library and Model directory paths to the [`fasoc/config/platform_config.json`](https://github.com/idea-fasoc/fasoc/blob/master/config/platform_config.json) file under the corresponding technology node. `ldo-gen` currently supports tsmc65lp and gfbicmos8hp nodes. An example of the platform config with the variable descriptions is provided below.
     ```bash
     "tsmc65lp": {
       "nominal_voltage": 1.2,

@@ -11,7 +11,7 @@ The provided generators can generate fully synthesizable verilog products using 
 
 ### Setup instructions
 1. Ensure your machine has the correct python version and all of the python modules required to run through the FASoC flow. 
-    - Requirements: Python 3.6/3.7 (packages getopt, math, numpy, os, re, shutil, subprocess, sys, smtplib, datetime, logging, matplotlib). Python 3 is not supported.
+    - Requirements: Python 3.6/3.7 (packages getopt, math, numpy, os, re, shutil, subprocess, sys, smtplib, datetime, logging, matplotlib). Python versions below 3.6 are not supported.
     
 1. Ensure you have ssh keys setup for github
 

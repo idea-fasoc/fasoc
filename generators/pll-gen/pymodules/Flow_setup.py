@@ -37,6 +37,9 @@ def pll_flow_setup(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,n
 #		with open(flowDir+'src/'+designName+'.v','w') as w_pll_v2:
 #			for line in lines:
 #				nm1.printline(line,w_pll_v2)	
+	#remove generated pll file
+	os.remove(genDir+'verilogs/'+designName+'.v')
+
 	
 	# write include.mk 
 	nm1=HSPICE_mds.netmap()

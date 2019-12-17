@@ -347,10 +347,6 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 			if "from" in connection:
 				if "port" in connection["from"]:
 
-					# if connection["from"]["port"] == "SYSCLKOUT":
-					# 	tag_top_pll_SYSCLKOUT = True
-					# 	connection_top_pll_SYSCLKOUT = connection
-
 					if connection["from"]["port"] == "SYSRESETN":
 						tag_top_SYSRESETN = True
 						connection_top_SYSRESETN = connection
@@ -591,31 +587,6 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 			connection_top_pll_SYSCLKOUT["to"] = connection_to_top_pll_CLKOUT_list
 			connections.append(connection_top_pll_SYSCLKOUT)
 
-			# if not tag_top_pll_SYSCLKOUT:
-			# 	connection_top_pll_SYSCLKOUT = {}
-			# 	connection_top_pll_SYSCLKOUT["type"] = "clock"
-
-			# 	connection_from_top_pll_SYSCLKOUT = {}
-			# 	connection_from_top_pll_SYSCLKOUT["instance"] = "toplevel"
-			# 	connection_from_top_pll_SYSCLKOUT["port"] = "SYSCLKOUT"
-			# 	connection_top_pll_SYSCLKOUT["from"] = connection_from_top_pll_SYSCLKOUT
-
-			# 	connection_to_top_pll_CLKOUT_list = []
-			# 	connection_to_top_pll_CLKOUT_dict = {}
-			# 	connection_to_top_pll_CLKOUT_dict["instance"] = instance
-			# 	connection_to_top_pll_CLKOUT_dict["port"] = "CLKOUT"
-			# 	connection_to_top_pll_CLKOUT_list.append(connection_to_top_pll_CLKOUT_dict)
-			# 	connection_top_pll_SYSCLKOUT["to"] = connection_to_top_pll_CLKOUT_list
-			# 	connections.append(connection_top_pll_SYSCLKOUT)
-			# else:
-			# 	connection_to_top_pll_CLKOUT_list = connection_top_pll_SYSCLKOUT["to"]
-			# 	connection_to_top_pll_CLKOUT_dict = {}
-			# 	connection_to_top_pll_CLKOUT_dict["instance"] = instance
-			# 	connection_to_top_pll_CLKOUT_dict["port"] = "CLKOUT"
-			# 	connection_to_top_pll_CLKOUT_list.append(connection_to_top_pll_CLKOUT_dict)
-			# 	connection_top_pll_SYSCLKOUT["to"] = connection_to_top_pll_CLKOUT_list
-			# 	connections.append(connection_top_pll_SYSCLKOUT)
-
 
 
 			if tag_top_SYSCLK:
@@ -756,14 +727,6 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 	else:
 		return
 
-	# SYSRESETN_index = []
-	# SYSCLK_index = []
-	# PADDR_index = []
-	# PENABLE_index = []
-	# PWRITE_index = []
-	# PWDATA_index = []
-	# SYSCLKOUT_index = []
-
 	last_SYSRESETN = -1
 	last_SYSCLK = -1
 	last_PADDR = -1
@@ -808,127 +771,6 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 		if i not in last:
 			del(connections[i - counter])
 			counter += 1
-
-
-
-
-	# for connection in connections:
-	# 	if "from" in connection:
-	# 		if "port" in connection["from"]:
-	# 			if connection["from"]["port"] == "SYSRESETN":
-	# 				SYSRESETN_index.append(counter)
-	# 	counter += 1
-
-	# print('SYSRESETN_index')
-	# print(SYSRESETN_index)
-
-	# counter = 0
-	# if len(SYSRESETN_index) > 1:
-	# 	for i in range(0,len(SYSRESETN_index) -1):
-	# 		del(connections[SYSRESETN_index[i] - counter])
-	# 		counter += 1
-
-	# counter = 0
-	# for connection in connections:
-	# 	if "from" in connection:
-	# 		if "port" in connection["from"]:
-	# 			if connection["from"]["port"] == "SYSCLK":
-	# 				SYSCLK_index.append(counter)
-	# 	counter += 1
-
-	# print('SYSCLK_index')
-	# print(SYSCLK_index)
-
-	# counter = 0
-	# if len(SYSCLK_index) > 1:
-	# 	for i in range(0,len(SYSCLK_index) -1):
-	# 		del(connections[SYSCLK_index[i] - counter])
-	# 		counter += 1
-
-	# counter = 0
-	# for connection in connections:
-	# 	if "from" in connection:
-	# 		if "port" in connection["from"]:
-	# 			if connection["from"]["port"] == "PADDR" and connection["range"]["max"] == 11 and connection["range"]["min"] == 8:
-	# 				PADDR_index.append(counter)
-	# 	counter += 1
-
-	# print('PADDR_index')
-	# print(PADDR_index)
-
-	# counter = 0
-	# if len(PADDR_index) > 1:
-	# 	for i in range(0,len(PADDR_index) -1):
-	# 		del(connections[PADDR_index[i] - counter])
-	# 		counter += 1
-
-	# counter = 0
-	# for connection in connections:
-	# 	if "from" in connection:
-	# 		if "port" in connection["from"]:
-	# 			if connection["from"]["port"] == "PENABLE":
-	# 				PENABLE_index.append(counter)
-	# 	counter += 1
-
-	# print('PENABLE_index')
-	# print(PENABLE_index)
-
-	# counter = 0
-	# if len(PENABLE_index) > 1:
-	# 	for i in range(0,len(PENABLE_index) -1):
-	# 		del(connections[PENABLE_index[i] - counter])
-	# 		counter += 1
-
-	# counter = 0
-	# for connection in connections:
-	# 	if "from" in connection:
-	# 		if "port" in connection["from"]:
-	# 			if connection["from"]["port"] == "PWRITE":
-	# 				PWRITE_index.append(counter)
-	# 	counter += 1
-
-	# print('PWRITE_index')
-	# print(PWRITE_index)
-
-	# counter = 0
-	# if len(PWRITE_index) > 1:
-	# 	for i in range(0,len(PWRITE_index) -1):
-	# 		del(connections[PWRITE_index[i] - counter])
-	# 		counter += 1
-
-	# counter = 0
-	# for connection in connections:
-	# 	if "from" in connection:
-	# 		if "port" in connection["from"]:
-	# 			if connection["from"]["port"] == "PWDATA":
-	# 				PWDATA_index.append(counter)
-	# 	counter += 1
-
-	# print('PWDATA_index')
-	# print(PWDATA_index)
-
-	# counter = 0
-	# if len(PWDATA_index) > 1:
-	# 	for i in range(0,len(PWDATA_index) -1):
-	# 		del(connections[PWDATA_index[i] - counter])
-	# 		counter += 1
-
-	# counter = 0
-	# for connection in connections:
-	# 	if "from" in connection:
-	# 		if "port" in connection["from"]:
-	# 			if connection["from"]["port"] == "SYSCLKOUT":
-	# 				SYSCLKOUT_index.append(counter)
-	# 	counter += 1
-
-	# print('SYSCLKOUT_index')
-	# print(SYSCLKOUT_index)
-
-	# counter = 0
-	# if len(SYSCLKOUT_index) > 1:
-	# 	for i in range(0,len(SYSCLKOUT_index) -1):
-	# 		del(connections[SYSCLKOUT_index[i] - counter])
-	# 		counter += 1
 
 
 

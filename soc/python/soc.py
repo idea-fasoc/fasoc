@@ -33,7 +33,6 @@ import zipfile
 from subprocess import call
 from collections import OrderedDict
 
-from checkDB import checkDB
 from jsonXmlGenerator import jsonXmlGenerator
 from rtlXmlGenerator import rtlXmlGenerator
 from analogGen import analogGen

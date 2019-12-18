@@ -1,6 +1,6 @@
 {
 "generator": "pll-gen",
-"module_name": "test_synth_pll",
+"module_name": "pll1",
 "specifications": 
    {
 "Fnom_min":9.40e8,

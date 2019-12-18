@@ -113,11 +113,8 @@ def checkDB(moduleJson,databaseDir,outputDir,ipXactDir):
                                 zip_ref.close()
                                 for output_file in os.listdir(outputDir):
                                     output_file_name = (output_file.split('.'))[0]
-                                    postfix = (output_file.split(output_file_name))[-1]
-                                    #if (not postfix == '.v') or (postfix == '.v' and not (output_file_name == 'LDO_CONTROLLER' or output_file_name == 'decoder_3to8' or output_file_name == 'mux_8to1' or output_file_name == 'ANALOG_CORE' or output_file_name == 'bu_dco_8stg' or output_file_name == 'dco_8stg' or output_file_name == )):
+                                    postfix = (output_file.split(output_file_name))[-1] 
                                     if (not postfix == '.v') or (postfix == '.v' and output_file_name not in excluded_name):
-                                        print('salaam1')
-                                        print(os.path.join(outputDir,moduleJson['module_name'] + postfix))
                                         os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,moduleJson['module_name'] + postfix))
                                         modifyDBFiles(os.path.join(outputDir,moduleJson['module_name'] + postfix),postfix,moduleJson['module_name'],srchJson["module_name"])
                                 return True
@@ -145,10 +142,7 @@ def checkDB(moduleJson,databaseDir,outputDir,ipXactDir):
                     for output_file in os.listdir(outputDir):
                         output_file_name = (output_file.split('.'))[0]
                         postfix = (output_file.split(output_file_name))[-1]
-                        #if (not postfix == '.v') or (postfix == '.v' and not (output_file_name == 'LDO_CONTROLLER' or output_file_name == 'decoder_3to8' or output_file_name == 'mux_8to1')):
                         if (not postfix == '.v') or (postfix == '.v' and output_file_name not in excluded_name):
-                            print('salaam2')
-                            print(os.path.join(outputDir,moduleJson['module_name'] + postfix))
                             os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,moduleJson['module_name'] + postfix))
                             modifyDBFiles(os.path.join(outputDir,moduleJson['module_name'] + postfix),postfix,moduleJson['module_name'],srchJson["module_name"])
                     return True

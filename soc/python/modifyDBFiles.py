@@ -25,7 +25,6 @@
 import os
 import json
 
-#def renameDB(file,postfix):
 def modifyDBFiles(file,postfix,new_module_name,old_module_name):
 	if postfix != '.db' and postfix != '.gds.gz':
 

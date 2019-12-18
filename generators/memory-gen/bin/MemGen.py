@@ -78,9 +78,10 @@ class MemGen():
                         genParentdir = os.path.split(genDir)[0]
                         genParentdirName = os.path.split(genParentdir)[1]
                         Fasocdir = os.path.split(genParentdir)[0]
+                        self.Fasocdir = Fasocdir
                         self.digitalflowdir = os.path.join(Fasocdir, 'private', genParentdirName, genName, 'apr')
                         self.digitalflowsrcdir = os.path.join(self.digitalflowdir, 'src')
-                       	self.ConfigParser()
+                        self.ConfigParser()
                         self.SRAMConfig()
                         self.VerilogGen()
                         log.info("Successfully generated the SRAM verilog files")
@@ -331,7 +332,7 @@ class MemGen():
                # Load json config file
                log.info('Loading platform_config file...')
                try:
-                     with open('../../config/platform_config.json') as file:
+                     with open(self.Fasocdir+'/config/platform_config.json') as file:
                           platformConfig = json.load(file)
                except ValueError as e:
                      log.error('Error occurred opening or loading json file.')

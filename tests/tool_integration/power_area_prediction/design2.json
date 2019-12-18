@@ -1,0 +1,37 @@
+{
+ "schema_version": 0.1,
+ "design_name": "design_test_2",
+ "tech": "tsmc65lp",
+ "strategy": "power",
+ "units": {
+  "vin": "V",
+  "imax": "A",
+  "power": "W",
+  "word_size": "bit",
+  "capacity": "bit",
+  "Fnom_min": "Hz",
+  "Fnom_max": "Hz",
+  "nominal frequency": "Hz",
+  "maximum frequency": "Hz",
+  "minimum frequency": "Hz",
+  "temperature": "C",
+  "area": "um2"
+ },
+ "constraints": {
+  "power": 0.3,
+  "area": 500000
+ },
+ "modules": [
+  {
+   "module_name": "pll0",
+   "instance_name": "i_pll1",
+   "generator": "memory-gen",
+   "specifications": {
+    "word_size": 32,
+    "nowords": 4096,
+    "Fnom_min": 240000000.0,
+    "Fnom_max": 270000000.0
+   }
+  }
+ ]
+}

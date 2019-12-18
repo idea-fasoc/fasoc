@@ -41,5 +41,5 @@ pex_modeling:
 # --pex_verify 1: runs pex simulation on generated oscillator for analog performance verification. this will take more that a day with 4 cores( output file contains model predicted spec too)
 # --pex_verify 0: uses expected spec from model for analog performance verification. Error rate of the model is less than 5%. this outputs spec_out.json immediately after the design
 pll_gen:
-	$(PY_DIR)/PLL_GEN.py --specfile test.json --output ./work --platform tsmc65lp --mode verilog 
+	$(PY_DIR)/PLL_GEN.py --specfile test.json --output ./work --platform tsmc65lp --mode macro 
 

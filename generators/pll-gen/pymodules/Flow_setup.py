@@ -23,8 +23,12 @@ def pll_flow_setup(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,n
 		for line in lines:
 			nm1.printline(line,w_pll_v)
 	if outMode=='macro' or outMode=='full':
-		p = sp.Popen(['cp',genDir+'./verilogs/*',flowDir+'src/']) 
-		p.wait()
+		vsrcs=os.listdir(genDir+'./verilogs/')
+		for vsrc in vsrcs:
+			full_vsrc=os.path.join(genDir+'./verilogs/',vsrc)
+			if os.path.isfile(full_vsrc):
+				shutil.copy(full_vsrc,flowDir+'src/')
+		print(outMode,'mode: verilog sources are generated in ',flowDir,'src/')
 	elif outMode=='verilog':
 		vsrcs=os.listdir(genDir+'./verilogs/')
 		for vsrc in vsrcs:

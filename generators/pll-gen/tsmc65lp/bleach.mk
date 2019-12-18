@@ -7,6 +7,7 @@ bleach_pll:
 	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/checkDesign	
 	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/checkPoints
 	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/logs
+	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/src/*
 	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/*dclib
 	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/results
 	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/vpath
@@ -45,6 +46,7 @@ bleach_work:
 	
 bleach_all:
 	rm -f work/*
+	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/src/*
 	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/blocks	
 	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/checkDesign	
 	rm -rf ./../../../private/generators/pll-gen/tsmc65lp/flow_pll/checkPoints

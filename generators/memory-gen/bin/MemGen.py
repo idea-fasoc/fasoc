@@ -339,7 +339,7 @@ class MemGen():
                      log.error('Exception: %s' % str(e))
                      sys.exit(1)
                digitalflowexprdir=os.path.join(self.digitalflowdir,'blocks/SRAM_2KB/export')
-               SRAM_2KB_dir=os.path.join(platformConfig["platforms"][p_options["PDK"]]["aux_lib"],'SRAM_2KB')
+               SRAM_2KB_dir=os.path.join(platformConfig["platforms"][p_options["PDK"]]["aux_lib"],'SRAM_2KB/latest')
                if not os.path.isdir(digitalflowexprdir):
                      os.makedirs(digitalflowexprdir)
                log.info("Copying the SRAM_2KB macro related files to %s dir "%digitalflowexprdir)
@@ -529,7 +529,7 @@ class MemGen():
                        MACROS_HEIGHT = rows*(BLOCK_OFFSET+mem_y+BLOCK_OFFSET) ; # Overall multi-bank macro height.
                        CORE_WIDTH = MACROS_WIDTH
                        CORE_HEIGHT = MACROS_HEIGHT+50 ; #Was in meters, changing the units to micro meters as per the top-level requirements. Sumanth, 9/26/2019
-                       mem_Area =  CORE_WIDTH*CORE_HEIGHT
+                       mem_area =  CORE_WIDTH*CORE_HEIGHT
                        mem_ar = CORE_WIDTH/CORE_HEIGHT
                        mem_power =  nofbanks*100e-6*1.2 ;#Was in watts, changing the units to milli watts as per the top-level requirements. Sumanth, 9/26/2019
                        self.config['results'].update({'area': mem_area})

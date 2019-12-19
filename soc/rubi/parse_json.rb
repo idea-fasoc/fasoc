@@ -1,3 +1,25 @@
+# MIT License
+
+# Copyright (c) 2018 The University of Michigan
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 def parse_json(infile, design, outfile_hier, outfile_conn)
 
 infile = File.open(infile, 'r')
@@ -27,7 +49,6 @@ outfile.write("require 'IPXACT2009API'\n\n")
 outfile.write("component = findComponent(:name => \"" +design+"\")\n\n")
 outfile.write("loadBusDefinitions(:name => \"APB4\")\n\n")
 outfile.write("loadBusDefinitions(:name => \"AHBLite\")\n\n")
-#top_name = my_hash['design_name']
 top_name = design
 outfile0.write("component = createComponent(:name => \"#{top_name}\")\n\n")
 
@@ -93,21 +114,26 @@ for conn in conn_array
   conn_type = ""
   from_inst = ""
   from_port = ""
-  range_def = "false"
-  range = ""
-  msb = ""
-  lsb = ""
+  from_range_def = "false"
+  to_range_def = Array.new
+  from_range = ""
+  from_msb = ""
+  from_lsb = ""
+  to_range = Array.new
+  to_msb = Array.new
+  to_lsb = Array.new
   value = ""
   for key in conn.keys
     if key == "type"
       type = conn['type']
-    elsif key == "range"
-      range_def = "true"
-      msb = conn['range']['max']
-      lsb = conn['range']['min']
     elsif key == "from"
       from_inst = conn['from']['instance']
       from_port = conn['from']['port']
+      if conn['from']['range']
+        from_range_def = "true"
+        from_msb = conn['from']['range']['max']
+        from_lsb = conn['from']['range']['min']
+      end
       if conn['from']['value']
         value = conn['from']['value']
       end
@@ -115,6 +141,12 @@ for conn in conn_array
       for i in 0..(conn[key].length-1)
         to_insts[to_index] = conn[key][i]['instance']
         to_ports[to_index] = conn[key][i]['port']
+        to_range_def[to_index] = "false"
+        if conn[key][i]['range']
+          to_range_def[to_index] = "true"
+          to_msb[i] = conn[key][i]['range']['max']
+          to_lsb[i] = conn[key][i]['range']['min']
+        end
         to_index += 1
       end
     end
@@ -135,29 +167,39 @@ for conn in conn_array
     end
   else
     for i in 0..(to_index-1)
-      if range_def == "true"
-        range = "[#{msb}:#{lsb}]"
+      if from_range_def == "true"
+        from_range = "[#{from_msb}:#{from_lsb}]"
+      else
+        from_range = ""
+      end
+      if to_range_def[i] == "true"
+        to_range = "[#{to_msb[i]}:#{to_lsb[i]}]"
+      else
+        to_range = ""
       end
       if from_inst == "toplevel"
-        outfile.write("export(component, :instance => \"#{to_insts[i]}\", :port => \"#{to_ports[i]}\",\n")
+        outfile.write("export(component, :instance => \"#{to_insts[i]}\", :port => \"#{to_ports[i]}#{to_range}\",\n")
         outfile.write(":exported_port_name => \"#{from_port}\")\n")
       elsif to_insts[i] == "toplevel"
-        outfile.write("export(component, :instance => \"#{from_inst}\", :port => \"#{from_port}\",\n")
+        outfile.write("export(component, :instance => \"#{from_inst}\", :port => \"#{from_port}#{from_range}\",\n")
         outfile.write(":exported_port_name => \"#{to_ports[i]}\")\n")
       else
-        outfile.write("connect(component, :instance1 => \"#{from_inst}\", :port1 => \"#{from_port}#{range}\",\n")
-        outfile.write("                   :instance2 => \"#{to_insts[i]}\", :port2 => \"#{to_ports[i]}#{range}\")\n")
+        outfile.write("connect(component, :instance1 => \"#{from_inst}\", :port1 => \"#{from_port}#{from_range}\",\n")
+        outfile.write("                   :instance2 => \"#{to_insts[i]}\", :port2 => \"#{to_ports[i]}#{to_range}\")\n")
       end
     end
   end
 end
 
 outfile0.write("\nsaveDesignElement(component, :force_overwrite => true)\n")
+outfile.write("tieOff(component, :instance => \".*\", :port => \".*\", :direction => :in,\n")
+outfile.write("                  :value => \"0\")\n")
+outfile.write("tieOff(component, :instance => \".*\", :port => \".*\", :direction => :out,\n")
+outfile.write("                  :value => \"open\")\n")
 outfile.write("\nsaveDesignElement(component, :force_overwrite => true)\n")
 
 tmpfilename = File.dirname(__FILE__) + "/tmp_resolved_design.json"
 system("rm '#{tmpfilename}'")
 outfile0.close
 outfile.close
-
 end

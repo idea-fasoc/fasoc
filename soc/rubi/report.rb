@@ -20,10 +20,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-INCLUDE_ADCGEN = 0
-INCLUDE_CDCGEN = 0
-INCLUDE_DCDCGEN = 0
-INCLUDE_LDOGEN = 1
-INCLUDE_MEMGEN = 1
-INCLUDE_PLLGEN = 1
-INCLUDE_TEMPGEN = 1
+require 'IPXACT2009API'
+rubiDir = getConfigItem("arg1", :default => ("arg1"))
+load("#{rubiDir}/Status_utilities.rb")
+load("#{rubiDir}/VE_utilities.rb")
+
+design_name =  getConfigItem("arg2", :default => ("arg2"))
+component = findComponent(:name => design_name)
+design = findDesign(:component => component, :stop_when_nil => true)
+
+#connStatus(component, :mode => :port, :filter => ".*", :sort_by => :instance)
+outfile = getConfigItem("arg3", :default => ("arg3"))
+
+insts = design.element("ComponentInstances").elements("ComponentInstance")
+f = File.open(outfile, "w")
+# Generate connectivity status report
+f.printf("#{connStatus(component, :mode => :port, :filter => ".*", :sort_by => :instance)}")
+# Generate Vendor Extensions report
+f.printf("Vendor Extensions Report\n\n")
+insts.each do |inst|
+  comp = findComponent(:name => "#{inst.element("ComponentRef").get("Name")}")
+  if !(comp.element("VendorExtensions").nil?)
+    f.printf("#{getIDEA_VE(comp, :VE => "all")}")
+  end
+end
+f.close

@@ -145,19 +145,22 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 
 		connection_m0_top_P0 = {}
 		connection_m0_top_P0["type"] = "adhoc"
-		connection_m0_top_P0["range"] = {}
-		connection_m0_top_P0["range"]["max"] = 15
-		connection_m0_top_P0["range"]["min"] = 0
 
 		connection_from_m0_top_P0 = {}
 		connection_from_m0_top_P0["instance"] = instance_m0
 		connection_from_m0_top_P0["port"] = "P0"
+		connection_from_m0_top_P0["range"] = {}
+		connection_from_m0_top_P0["range"]["max"] = 15
+		connection_from_m0_top_P0["range"]["min"] = 0
 		connection_m0_top_P0["from"] = connection_from_m0_top_P0
 
 		connection_to_m0_top_P0_list = []
 		connection_to_m0_top_P0_dict = {}
 		connection_to_m0_top_P0_dict["instance"] = "toplevel"
 		connection_to_m0_top_P0_dict["port"] = "P0"
+		connection_to_m0_top_P0_dict["range"] = {}
+		connection_to_m0_top_P0_dict["range"]["max"] = 15
+		connection_to_m0_top_P0_dict["range"]["min"] = 0
 		connection_to_m0_top_P0_list.append(connection_to_m0_top_P0_dict)
 		connection_m0_top_P0["to"] = connection_to_m0_top_P0_list
 		connections.append(connection_m0_top_P0)
@@ -166,19 +169,22 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 
 		connection_m0_top_P1 = {}
 		connection_m0_top_P1["type"] = "adhoc"
-		connection_m0_top_P1["range"] = {}
-		connection_m0_top_P1["range"]["max"] = 15
-		connection_m0_top_P1["range"]["min"] = 0
 
 		connection_from_m0_top_P1 = {}
 		connection_from_m0_top_P1["instance"] = instance_m0
 		connection_from_m0_top_P1["port"] = "P1"
+		connection_from_m0_top_P1["range"] = {}
+		connection_from_m0_top_P1["range"]["max"] = 15
+		connection_from_m0_top_P1["range"]["min"] = 0
 		connection_m0_top_P1["from"] = connection_from_m0_top_P1
 
 		connection_to_m0_top_P1_list = []
 		connection_to_m0_top_P1_dict = {}
 		connection_to_m0_top_P1_dict["instance"] = "toplevel"
 		connection_to_m0_top_P1_dict["port"] = "P1"
+		connection_to_m0_top_P1_dict["range"] = {}
+		connection_to_m0_top_P1_dict["range"]["max"] = 15
+		connection_to_m0_top_P1_dict["range"]["min"] = 0
 		connection_to_m0_top_P1_list.append(connection_to_m0_top_P1_dict)
 		connection_m0_top_P1["to"] = connection_to_m0_top_P1_list
 		connections.append(connection_m0_top_P1)
@@ -313,19 +319,22 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 
 		connection_ahp_slave_PADDR = {}
 		connection_ahp_slave_PADDR["type"] = "adhoc"
-		connection_ahp_slave_PADDR["range"] = {}
-		connection_ahp_slave_PADDR["range"]["max"] = 15
-		connection_ahp_slave_PADDR["range"]["min"] = 12
 
 		connection_from_ahp_slave_PADDR = {}
 		connection_from_ahp_slave_PADDR["instance"] = instance_ahp
 		connection_from_ahp_slave_PADDR["port"] = "PADDR"
+		connection_from_ahp_slave_PADDR["range"] = {}
+		connection_from_ahp_slave_PADDR["range"]["max"] = 15
+		connection_from_ahp_slave_PADDR["range"]["min"] = 12
 		connection_ahp_slave_PADDR["from"] = connection_from_ahp_slave_PADDR
 
 		connection_to_ahp_slave_DECODE4BIT_list = []
 		connection_to_ahp_slave_DECODE4BIT_dict = {}
 		connection_to_ahp_slave_DECODE4BIT_dict["instance"] = instance_slave
 		connection_to_ahp_slave_DECODE4BIT_dict["port"] = "DECODE4BIT"
+		connection_to_ahp_slave_DECODE4BIT_dict["range"] = {}
+		connection_to_ahp_slave_DECODE4BIT_dict["range"]["max"] = 3
+		connection_to_ahp_slave_DECODE4BIT_dict["range"]["min"] = 0
 		connection_to_ahp_slave_DECODE4BIT_list.append(connection_to_ahp_slave_DECODE4BIT_dict)
 		connection_ahp_slave_PADDR["to"] = connection_to_ahp_slave_DECODE4BIT_list
 		connections.append(connection_ahp_slave_PADDR)
@@ -367,9 +376,9 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 						tag_ahp_PWDATA = True
 						connection_ahp_PWDATA = connection
 
-					elif "range" in connection:
-						if "max" in connection["range"] and "min" in connection["range"]:
-							if  connection["from"]["port"] == "PADDR" and connection["range"]["max"] == 11 and connection["range"]["min"] == 8:
+					elif "range" in connection["from"]:
+						if "max" in connection["from"]["range"] and "min" in connection["from"]["range"]:
+							if  connection["from"]["port"] == "PADDR" and connection["from"]["range"]["max"] == 11 and connection["from"]["range"]["min"] == 8:
 								tag_ahp_PADDR_11_8 = True
 								connection_ahp_PADDR_11_8 = connection
 
@@ -440,19 +449,22 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 			if not tag_ahp_PADDR_11_8:
 				connection_ahp_PADDR_11_8 = {}
 				connection_ahp_PADDR_11_8["type"] = "adhoc"
-				connection_ahp_PADDR_11_8["range"] = {}
-				connection_ahp_PADDR_11_8["range"]["max"] = 11
-				connection_ahp_PADDR_11_8["range"]["min"] = 8
 
 				connection_from_ahp_PADDR_11_8 = {}
 				connection_from_ahp_PADDR_11_8["instance"] = instance_ahp
 				connection_from_ahp_PADDR_11_8["port"] = "PADDR"
+				connection_from_ahp_PADDR_11_8["range"] = {}
+				connection_from_ahp_PADDR_11_8["range"]["max"] = 11
+				connection_from_ahp_PADDR_11_8["range"]["min"] = 8
 				connection_ahp_PADDR_11_8["from"] = connection_from_ahp_PADDR_11_8
 
 				connection_to_ahp_PADDR_11_8_list = []
 				connection_to_ahp_PADDR_11_8_dict = {}
 				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
 				connection_to_ahp_PADDR_11_8_dict["port"] = "paddr"
+				connection_to_ahp_PADDR_11_8_dict["range"] = {}
+				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
+				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
 				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
 				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
 				connections.append(connection_ahp_PADDR_11_8)
@@ -462,6 +474,9 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 				connection_to_ahp_PADDR_11_8_dict = {}
 				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
 				connection_to_ahp_PADDR_11_8_dict["port"] = "paddr"
+				connection_to_ahp_PADDR_11_8_dict["range"] = {}
+				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
+				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
 				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
 				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
 				connections.append(connection_ahp_PADDR_11_8)
@@ -614,19 +629,22 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 			if not tag_ahp_PADDR_11_8:
 				connection_ahp_PADDR_11_8 = {}
 				connection_ahp_PADDR_11_8["type"] = "adhoc"
-				connection_ahp_PADDR_11_8["range"] = {}
-				connection_ahp_PADDR_11_8["range"]["max"] = 11
-				connection_ahp_PADDR_11_8["range"]["min"] = 8
 
 				connection_from_ahp_PADDR_11_8 = {}
 				connection_from_ahp_PADDR_11_8["instance"] = instance_ahp
 				connection_from_ahp_PADDR_11_8["port"] = "PADDR"
+				connection_from_ahp_PADDR_11_8["range"] = {}
+				connection_from_ahp_PADDR_11_8["range"]["max"] = 11
+				connection_from_ahp_PADDR_11_8["range"]["min"] = 8
 				connection_ahp_PADDR_11_8["from"] = connection_from_ahp_PADDR_11_8
 
 				connection_to_ahp_PADDR_11_8_list = []
 				connection_to_ahp_PADDR_11_8_dict = {}
 				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
 				connection_to_ahp_PADDR_11_8_dict["port"] = "PADDR"
+				connection_to_ahp_PADDR_11_8_dict["range"] = {}
+				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
+				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
 				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
 				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
 				connections.append(connection_ahp_PADDR_11_8)
@@ -636,6 +654,9 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 				connection_to_ahp_PADDR_11_8_dict = {}
 				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
 				connection_to_ahp_PADDR_11_8_dict["port"] = "PADDR"
+				connection_to_ahp_PADDR_11_8_dict["range"] = {}
+				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
+				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
 				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
 				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
 				connections.append(connection_ahp_PADDR_11_8)
@@ -750,7 +771,7 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 				elif connection["from"]["port"] == "SYSCLK":
 					index.append(counter)
 					last_SYSCLK = counter
-				elif connection["from"]["port"] == "PADDR" and connection["range"]["max"] == 11 and connection["range"]["min"] == 8:
+				elif connection["from"]["port"] == "PADDR" and connection["from"]["range"]["max"] == 11 and connection["from"]["range"]["min"] == 8:
 					index.append(counter)
 					last_PADDR = counter
 				elif connection["from"]["port"] == "PENABLE":

@@ -1,6 +1,6 @@
 {
  "schema_version": 0.1,
- "design_name": "design_test_2",
+ "design_name": "3ldo_2pll_1mem_1m0",
  "tech": "tsmc65lp",
  "strategy": "power",
  "units": {
@@ -117,5 +117,5 @@
    "generator": "fasoc_m0mcu_rtl",
    "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/fasoc_m0mcu.v"
   }
- ]
+ ],
 }

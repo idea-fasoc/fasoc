@@ -316,7 +316,9 @@ shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMB
 shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4_rtl.xml'), projectDir)
 shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite.xml'), projectDir)
 shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite_rtl.xml'), projectDir)
-shutil.copy(platformJson["socrates_DRC_config"], workplaceDir)
+for file in os.listdir(platformJson["socrates_DRC_config"]):
+  shutil.copy(os.path.join(platformJson["socrates_DRC_config"],file), workplaceDir)
+#shutil.copy(platformJson["socrates_DRC_config"], workplaceDir)
 
 subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'--project', projectName,
 '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/clean.rb?arg1='+designName,
@@ -326,7 +328,7 @@ subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'-
 '--check',
 '--result', projectDir+'/DRC.log',
 '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/report.rb?arg1='+rubiDir+'&arg2='+designName+'&arg3='+projectDir+'/Design_Report.txt',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical',designName)+'&arg3='+workplaceDir])
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical')])
 
 with open (os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'r') as socrates_verilog:
   soc_ver=socrates_verilog.read()

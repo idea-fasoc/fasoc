@@ -1,0 +1,121 @@
+{
+ "schema_version": 0.1,
+ "design_name": "3ldo_2pll_1mem_1m0",
+ "tech": "tsmc65lp",
+ "strategy": "power",
+ "units": {
+  "vin": "V",
+  "imax": "A",
+  "power": "W",
+  "word_size": "bit",
+  "capacity": "bit",
+  "Fnom_min": "Hz",
+  "Fnom_max": "Hz",
+  "nominal frequency": "Hz",
+  "maximum frequency": "Hz",
+  "minimum frequency": "Hz",
+  "temperature": "C",
+  "area": "um2"
+ },
+ "constraints": {
+  "power": 0.3,
+  "area": 500000
+ },
+ "modules": [
+  {
+   "module_name": "ldo1",
+   "instance_name": "i_ldo1",
+   "generator": "ldo-gen",
+   "specifications": {
+    "vin": 1.2,
+    "imax": 0.015
+   }
+  },
+  {
+   "module_name": "ldo2",
+   "instance_name": "i_ldo2",
+   "generator": "ldo-gen",
+   "specifications": {
+    "vin": 1.2,
+    "imax": 0.003
+   }
+  },
+  {
+   "module_name": "ldo3",
+   "instance_name": "i_ldo3",
+   "generator": "ldo-gen",
+   "specifications": {
+    "vin": 1.2,
+    "imax": 0.025
+   }
+  },
+  {
+   "module_name": "memory2",
+   "instance_name": "i_mem2",
+   "generator": "memory-gen",
+   "specifications": {
+    "word_size": 32,
+    "nowords": 4096
+   }
+  },
+  {
+   "module_name": "pll1",
+   "instance_name": "i_pll1",
+   "generator": "pll-gen",
+   "specifications": {
+    "Fnom_min": 835000000.0,
+    "Fnom_max": 855000000.0
+   }
+  },
+  {
+   "module_name": "pll2",
+   "instance_name": "i_pll2",
+   "generator": "pll-gen",
+   "specifications": {
+    "Fnom_min": 840000000.0,
+    "Fnom_max": 860000000.0
+   }
+  },
+  {
+   "module_name": "cmsdk_apb_slave_mux2",
+   "instance_name": "u_apb_slave_mux2",
+   "generator": "cmsdk_apb_slave_mux_rtl",
+   "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/cmsdk_apb_slave_mux.v",
+   "parameters": {
+    "PORT0_ENABLE": 0,
+    "PORT1_ENABLE": 1,
+    "PORT2_ENABLE": 0,
+    "PORT3_ENABLE": 0,
+    "PORT4_ENABLE": 0,
+    "PORT5_ENABLE": 1,
+    "PORT6_ENABLE": 1,
+    "PORT7_ENABLE": 0,
+    "PORT8_ENABLE": 0,
+    "PORT9_ENABLE": 0,
+    "PORT10_ENABLE": 0,
+    "PORT11_ENABLE": 0,
+    "PORT12_ENABLE": 0,
+    "PORT13_ENABLE": 0,
+    "PORT14_ENABLE": 0,
+    "PORT15_ENABLE": 0
+   }
+  },
+  {
+   "module_name": "cmsdk_ahb_to_apb2",
+   "instance_name": "u_ahb_to_apb2",
+   "generator": "cmsdk_ahb_to_apb_rtl",
+   "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/cmsdk_ahb_to_apb.v",
+   "parameters": {
+    "ADDRWIDTH": 16,
+    "REGISTER_RDATA": 1,
+    "REGISTER_WDATA": 0
+   }
+  },
+  {
+   "module_name": "fasoc_m0mcu2",
+   "instance_name": "i_fasoc_m0mcu2",
+   "generator": "fasoc_m0mcu_rtl",
+   "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/fasoc_m0mcu.v"
+  }
+ ]
+}

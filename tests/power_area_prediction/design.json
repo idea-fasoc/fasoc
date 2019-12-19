@@ -1,6 +1,6 @@
 {
  "schema_version": 0.1,
- "design_name": "design_test_2",
+ "design_name": "multiple_pll",
  "tech": "tsmc65lp",
  "strategy": "power",
  "units": {

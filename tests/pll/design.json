@@ -1,6 +1,6 @@
 {
  "schema_version": 0.1,
- "design_name": "3ldo_2pll_1mem_1m0",
+ "design_name": "1mem",
  "tech": "tsmc65lp",
  "strategy": "power",
  "units": {
@@ -23,57 +23,12 @@
  },
  "modules": [
   {
-   "module_name": "ldo1",
-   "instance_name": "i_ldo1",
-   "generator": "ldo-gen",
-   "specifications": {
-    "vin": 1.2,
-    "imax": 0.015
-   }
-  },
-  {
-   "module_name": "ldo2",
-   "instance_name": "i_ldo2",
-   "generator": "ldo-gen",
-   "specifications": {
-    "vin": 1.2,
-    "imax": 0.003
-   }
-  },
-  {
-   "module_name": "ldo3",
-   "instance_name": "i_ldo3",
-   "generator": "ldo-gen",
-   "specifications": {
-    "vin": 1.2,
-    "imax": 0.025
-   }
-  },
-  {
-   "module_name": "memory2",
-   "instance_name": "i_mem2",
-   "generator": "memory-gen",
-   "specifications": {
-    "word_size": 32,
-    "nowords": 4096
-   }
-  },
-  {
    "module_name": "pll1",
    "instance_name": "i_pll1",
    "generator": "pll-gen",
    "specifications": {
     "Fnom_min": 835000000.0,
     "Fnom_max": 855000000.0
-   }
-  },
-  {
-   "module_name": "pll2",
-   "instance_name": "i_pll2",
-   "generator": "pll-gen",
-   "specifications": {
-    "Fnom_min": 840000000.0,
-    "Fnom_max": 860000000.0
    }
   },
   {
@@ -117,5 +72,5 @@
    "generator": "fasoc_m0mcu_rtl",
    "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/fasoc_m0mcu.v"
   }
- ],
+ ]
 }

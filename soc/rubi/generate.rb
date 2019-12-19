@@ -29,5 +29,6 @@ system 'mkdir #{LOGICAL_DIR}/#{design_name}'
 system 'mkdir #{VERILOG_OUTPUT_DIR}'
 VERILOG_OUTPUT_DIR = "#{LOGICAL_DIR}/#{design_name}/verilog"
 
-workplaceDir = getConfigItem("arg3", :default => ("arg3"))
+runDRC(component, :checks => "IDEA_Checks")
+system "mv #{LOGICAL_DIR}/../../CheckResults.log #{LOGICAL_DIR}/../DRC.log"
 generateVerilog(component, :od => VERILOG_OUTPUT_DIR, :gen_leaf => true)

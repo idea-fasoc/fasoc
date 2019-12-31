@@ -23,13 +23,13 @@
  },
  "modules": [
   {
-   "module_name": "pll1",
-   "instance_name": "i_pll1",
+   "module_name": "pll17",
    "generator": "pll-gen",
    "specifications": {
-    "Fnom_min": 835000000.0,
-    "Fnom_max": 855000000.0
-   }
+    "Fnom_min": 940000000.0,
+    "Fnom_max": 960000000.0
+   },
+   "instance_name": "i_pll18"
   },
   {
    "module_name": "cmsdk_apb_slave_mux2",

@@ -30,13 +30,14 @@ import re  # regular expressiosn
 import json  # json parsing
 import subprocess  # process
 import zipfile
+import numpy as np
 from subprocess import call
 from collections import OrderedDict
 
 from jsonXmlGenerator import jsonXmlGenerator
 from rtlXmlGenerator import rtlXmlGenerator
 from analogGen import analogGen
-
+from ML_model import ML_model
 
 # Parse and validate arguments
 # ==============================================================================
@@ -197,18 +198,28 @@ for module in designJson["modules"]:
 # ==============================================================================
 target_power_constraint = designJson["constraints"]["power"]
 target_area_constraint = designJson["constraints"]["area"]
+#previous_inputs = []
+previous_inputs = {'ldo-gen':[],'pll-gen':[],'mem-gen':[]}
 
 total_power_constraint = target_power_constraint + 1
 total_area_constraint = target_area_constraint + 1
 iterate_count = 0
+number_iteration = 20
 connection_done_flag = True
+updated_designJsn = ['None'] * (number_iteration + 1)
+abs_output_diff = ['None'] * (number_iteration + 1)
+updated_designJsn[0] = designJson
 
-while (target_power_constraint < total_power_constraint or target_area_constraint < total_area_constraint) and iterate_count < 1:
+while (target_power_constraint < total_power_constraint or target_area_constraint < total_area_constraint) and iterate_count < number_iteration:
   iterate_count += 1
+  updated_designJsn[iterate_count] = updated_designJsn[iterate_count -1]
+
   total_power_constraint = 0
   total_area_constraint = 0
-  max_power_constraint = ['init',-1]
-  max_area_constraint = ['init',-1]
+  # max_power_constraint = ['init',-1]
+  # max_area_constraint = ['init',-1]
+  modules_power_list = []
+  modules_area_list = []
 
   for jsonFile_constraint in os.listdir(jsnDir):
     with open(os.path.join(jsnDir,jsonFile_constraint)) as f_constraint:
@@ -231,113 +242,161 @@ while (target_power_constraint < total_power_constraint or target_area_constrain
     power_constraint = generator_element_constraint["results"]["power"]
     area_constraint = generator_element_constraint["results"]["area"]
 
-    if power_constraint > max_power_constraint[1]:
-      max_power_constraint[0] = generator_element_constraint['module_name']
-      max_power_constraint[1] = power_constraint
-    if area_constraint > max_area_constraint[1]:
-      max_area_constraint[0] = generator_element_constraint['module_name']
-      max_area_constraint[1] = area_constraint
+    # if power_constraint > max_power_constraint[1]:
+    #   max_power_constraint[0] = generator_element_constraint['module_name']
+    #   max_power_constraint[1] = power_constraint
+    # if area_constraint > max_area_constraint[1]:
+    #   max_area_constraint[0] = generator_element_constraint['module_name']
+    #   max_area_constraint[1] = area_constraint
+
+    modules_power_list.append([generator_element_constraint['module_name'],power_constraint])
+    modules_area_list.append([generator_element_constraint['module_name'],area_constraint])
 
     total_power_constraint = total_power_constraint + power_constraint
     total_area_constraint = total_area_constraint + area_constraint
 
-  if target_area_constraint < total_area_constraint:
+  def sortRegSecond(elem):
+    return elem[1]
+  modules_power_list.sort(key=sortRegSecond,reverse=True)
+  modules_area_list.sort(key=sortRegSecond,reverse=True)
+
+  abs_output_diff[iterate_count -1] = (abs(total_area_constraint-target_area_constraint)/target_area_constraint)**2 + (abs(total_power_constraint-target_power_constraint)/target_power_constraint)**2
+  print('total_power_constraint = ' + str(total_power_constraint))
+  print('total_area_constraint = ' + str(total_area_constraint))
+
+  if target_area_constraint < total_area_constraint and target_power_constraint < total_power_constraint:
+    print("both area and power are not satisfied")
+    if (target_area_constraint - total_area_constraint)/target_area_constraint > (target_power_constraint - total_power_constraint)/target_power_constraint:
+      #max_constraint = max_area_constraint
+      modules_constraint_list = modules_area_list
+      target_constraont = 'area'
+      print('area has more priority')
+      #print('target_modification for area: ' + max_constraint[0])
+    else:
+      #max_constraint = max_power_constraint
+      modules_constraint_list = modules_power_list
+      target_constraont = 'power'
+      print('power has more priority')
+      #print('target_modification for power: ' + max_power_constraint[0])  
+
+  elif target_area_constraint < total_area_constraint:
+    #max_constraint = max_area_constraint
+    modules_constraint_list = modules_area_list
+    target_constraont = 'area'
     print("area is not satisfied")
-    print('target_modification for area: ' + max_area_constraint[0])
-    print(module["module_name"] + " is going to be regenerate")
+    #print('target_modification for area: ' + max_area_constraint[0])
 
-    for diff_module in designJson["modules"]:
-      if diff_module["module_name"] == max_area_constraint[0]:
-        diff_module["specifications"]["nowords"] = 2048
-        module = diff_module
-        break
-
-    outputDir = os.path.join(design_dir, module["module_name"], "export")
-    print("Cleaning output directory:" + outputDir + " ...")
-    for output_file in os.listdir(outputDir):
-      os.remove(os.path.join(outputDir,output_file))
-
-    inputDir = os.path.join(design_dir, module["module_name"], "import")
-    print("Cleaning input directory:" + inputDir + " ...")
-    for file in os.listdir(inputDir):
-      os.remove(os.path.join(inputDir,file))
-
-    analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args.platform,args.mode,args.database,units,module_number,designJson,args.design,connection_done_flag)
-
-  else:
-    print("area is satisfied")
-
-  if target_power_constraint < total_power_constraint:
+  elif target_power_constraint < total_power_constraint:
+    #max_constraint = max_power_constraint
+    modules_constraint_list = modules_power_list
+    target_constraont = 'power'
     print("power is not satisfied")
-    print('target_modification for power: ' + max_power_constraint[0])
-    print(module["module_name"] + " is going to be regenerate")
+    #print('target_modification for power: ' + max_power_constraint[0])
 
-    for diff_module in designJson["modules"]:
-      if diff_module["module_name"] == max_power_constraint[0]:
-        diff_module["specifications"]["nowords"] = 2048
-        module = diff_module
-        break
-
-    outputDir = os.path.join(design_dir, module["module_name"], "export")
-    print("Cleaning output directory:" + outputDir + " ...")
-    for output_file in os.listdir(outputDir):
-      os.remove(os.path.join(outputDir,output_file))
-
-    inputDir = os.path.join(design_dir, module["module_name"], "import")
-    print("Cleaning input directory:" + inputDir + " ...")
-    for file in os.listdir(inputDir):
-      os.remove(os.path.join(inputDir,file))
-
-    moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args.platform,args.mode,args.database,units,module_number,designJson,args.design,connection_done_flag)
   else:
-    print("power is satisfied")
+    print("Both power and area are satisfied")
+    break
 
-print(iterate_count)
-if iterate_count < 100:
-  print("Both power and area are satisfied")
-else:
+  feasibility_counter = 0
+  while feasibility_counter < len(modules_constraint_list):
+    for diff_module in designJson["modules"]:
+      module_constraint = modules_constraint_list[feasibility_counter]
+      #if diff_module["module_name"] == max_constraint[0]:
+      if diff_module["module_name"] == module_constraint[0]:
+        print(diff_module["module_name"] + " is going to be regenerate")
+        outputDir = os.path.join(design_dir, diff_module["module_name"], "export")
+        module,previous_input,feasible = ML_model(diff_module,platformJson["platforms"]["tsmc65lp"]["socModel"],outputDir,target_area_constraint-total_area_constraint,target_power_constraint-total_power_constraint,previous_inputs)
+        
+        if feasible:
+          print("Cleaning output directory:" + outputDir + " ...")
+          for output_file in os.listdir(outputDir):
+            os.remove(os.path.join(outputDir,output_file))
+          inputDir = os.path.join(design_dir, module["module_name"], "import")
+          print("Cleaning input directory:" + inputDir + " ...")
+          for file in os.listdir(inputDir):
+            os.remove(os.path.join(inputDir,file))
+          moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args.platform,args.mode,args.database,units,module_number,designJson,args.design,connection_done_flag)
+
+          for updated_module_counter,updated_module in enumerate(updated_designJsn[iterate_count]["modules"]):
+            #if updated_module["module_name"] == max_constraint[0]:
+            if updated_module["module_name"] == module_constraint[0]:
+              updated_designJsn[iterate_count]["modules"][updated_module_counter] = module
+              with open(os.path.join(design_dir,'updated_desin.json'), "w") as updatedJsnFile:
+                json.dump(updated_designJsn[iterate_count], updatedJsnFile, indent=True)
+
+          feasibility_counter = len(modules_constraint_list)
+          break
+
+        else:
+          feasibility_counter += 1
+          break
+
+print('Total number of iteration is: ' + str(iterate_count))
+
+total_power_constraint = 0
+total_area_constraint = 0
+for jsonFile_constraint in os.listdir(jsnDir):
+  with open(os.path.join(jsnDir,jsonFile_constraint)) as f_constraint:
+    generator_element_constraint = json.load(f_constraint)
+  power_constraint = generator_element_constraint["results"]["power"]
+  area_constraint = generator_element_constraint["results"]["area"]
+  total_power_constraint = total_power_constraint + power_constraint
+  total_area_constraint = total_area_constraint + area_constraint
+
+abs_output_diff[iterate_count] = (abs(total_area_constraint-target_area_constraint)/target_area_constraint)**2 + (abs(total_power_constraint-target_power_constraint)/target_power_constraint)**2
+del abs_output_diff[iterate_count +1:number_iteration + 1]
+
+if target_power_constraint < total_power_constraint or target_area_constraint < total_area_constraint:
   print("We could not satisfy both power and area")
+
+  optimized_func_list = np.where(abs_output_diff == np.amin(abs_output_diff))
+  optimized_func_index = optimized_func_list[0][0]
+  with open(os.path.join(design_dir,'updated_desin.json'), "w") as updatedJsnFile:
+    json.dump(updated_designJsn[optimized_func_index], updatedJsnFile, indent=True)
+  
+else:
+  print("Both power and area are satisfied")
 
 # STEP 7: Call Socrates for stitching
 # ==============================================================================
 
 
 
-workplaceDir = design_dir
-projectName = designName + '_socrates_proj'
-projectDir = os.path.join(workplaceDir,projectName)
+# workplaceDir = design_dir
+# projectName = designName + '_socrates_proj'
+# projectDir = os.path.join(workplaceDir,projectName)
 
-subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,
-'--project', projectName,'--flow', 'AddNewProject'])
+# subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,
+# '--project', projectName,'--flow', 'AddNewProject'])
 
-for file in os.listdir(ipXactDir):
-  shutil.copy(os.path.join(ipXactDir,file), projectDir)
-shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4.xml'), projectDir)
-shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4_rtl.xml'), projectDir)
-shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite.xml'), projectDir)
-shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite_rtl.xml'), projectDir)
-for file in os.listdir(platformJson["socrates_DRC_config"]):
-  shutil.copy(os.path.join(platformJson["socrates_DRC_config"],file), workplaceDir)
-#shutil.copy(platformJson["socrates_DRC_config"], workplaceDir)
+# for file in os.listdir(ipXactDir):
+#   shutil.copy(os.path.join(ipXactDir,file), projectDir)
+# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4.xml'), projectDir)
+# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4_rtl.xml'), projectDir)
+# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite.xml'), projectDir)
+# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite_rtl.xml'), projectDir)
+# for file in os.listdir(platformJson["socrates_DRC_config"]):
+#   shutil.copy(os.path.join(platformJson["socrates_DRC_config"],file), workplaceDir)
+# #shutil.copy(platformJson["socrates_DRC_config"], workplaceDir)
 
-subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'--project', projectName,
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/clean.rb?arg1='+designName,
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/convert_json.rb?arg1='+args.design+'&arg2='+designName+'&arg3='+rubiDir+'&arg4='+rubiDir+'/create_Hier.rb&arg5='+rubiDir+'/connect.rb',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/create_Hier.rb',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/connect.rb',
-'--check',
-'--result', projectDir+'/DRC.log',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/report.rb?arg1='+rubiDir+'&arg2='+designName+'&arg3='+projectDir+'/Design_Report.txt',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical')])
+# subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'--project', projectName,
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/clean.rb?arg1='+designName,
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/convert_json.rb?arg1='+args.design+'&arg2='+designName+'&arg3='+rubiDir+'&arg4='+rubiDir+'/create_Hier.rb&arg5='+rubiDir+'/connect.rb',
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/create_Hier.rb',
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/connect.rb',
+# '--check',
+# '--result', projectDir+'/DRC.log',
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/report.rb?arg1='+rubiDir+'&arg2='+designName+'&arg3='+projectDir+'/Design_Report.txt',
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical')])
 
-with open (os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'r') as socrates_verilog:
-  soc_ver=socrates_verilog.read()
-with open(args.design) as fdesign:
-  designJson = json.load(fdesign)
-for module in designJson["modules"]:
-  soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
-with open(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'w') as socrates_verilog:
-  socrates_verilog.write(soc_ver)
+# with open (os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'r') as socrates_verilog:
+#   soc_ver=socrates_verilog.read()
+# with open(args.design) as fdesign:
+#   designJson = json.load(fdesign)
+# for module in designJson["modules"]:
+#   soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
+# with open(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'w') as socrates_verilog:
+#   socrates_verilog.write(soc_ver)
 
 
 # STEP 7: Assemble SoC run chip level Cadre Flow

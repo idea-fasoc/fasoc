@@ -90,7 +90,7 @@ if "connections" in designJson:
 
 rubi_clean_tag = False
 for file in os.listdir(rubiDir):
-	if file == 'connect.rb' or file == 'creat_Hier.rb':
+	if file == 'connect.rb' or file == 'create_Hier.rb':
 		os.remove(os.path.join(rubiDir,file))
 		rubi_clean_tag = True
 	if rubi_clean_tag:

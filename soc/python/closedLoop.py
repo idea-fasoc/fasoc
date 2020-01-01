@@ -23,6 +23,7 @@
 # SOFTWARE.
 import os  # filesystem manipulation
 import json  # json parsing
+import numpy as np
 
 from ML_model import ML_model
 from analogGen import analogGen
@@ -31,12 +32,12 @@ def closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,
   
   target_power_constraint = designJson["constraints"]["power"]
   target_area_constraint = designJson["constraints"]["area"]
-  previous_inputs = {'ldo-gen':[],'pll-gen':[],'mem-gen':[]}
+  previous_inputs = {'ldo-gen':[],'pll-gen':[],'memory-gen':[]}
 
   total_power_constraint = target_power_constraint + 1
   total_area_constraint = target_area_constraint + 1
   iterate_count = 0
-  number_iteration = 20
+  number_iteration = 100
   connection_done_flag = True
   updated_designJsn = ['None'] * (number_iteration + 1)
   abs_output_diff = ['None'] * (number_iteration + 1)
@@ -120,7 +121,7 @@ def closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,
         if diff_module["module_name"] == module_constraint[0]:
           print(diff_module["module_name"] + " is going to be regenerate")
           outputDir = os.path.join(design_dir, diff_module["module_name"], "export")
-          module,previous_input,feasible = ML_model(diff_module,platformJson["platforms"]["tsmc65lp"]["socModel"],outputDir,target_area_constraint-total_area_constraint,target_power_constraint-total_power_constraint,previous_inputs)
+          module,previous_inputs,feasible = ML_model(diff_module,platformJson["platforms"]["tsmc65lp"]["socModel"],outputDir,target_area_constraint-total_area_constraint,target_power_constraint-total_power_constraint,previous_inputs)
           
           if feasible:
             print("Cleaning output directory:" + outputDir + " ...")

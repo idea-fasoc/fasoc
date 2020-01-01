@@ -52,8 +52,8 @@ def ML_model(original_module,csv_path,outputDir,margin_area,margin_power,previou
 		target_power = current_power + margin_power
 		target_area = current_area + margin_area
 
-		# -------------------------------------------------------------------------------------
-		# Regarding Functionality
+# -------------------------------------------------------------------------------------
+# Regarding Functionality
 
 		acceptable_vin_list = []
 		acceptable_imax_list = []
@@ -129,7 +129,8 @@ def ML_model(original_module,csv_path,outputDir,margin_area,margin_power,previou
 		previous_inputs['ldo-gen'].append([optimized_func_vin,optimized_func_imax])
 		return outGenJson , previous_inputs , True
 
-		# -------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------
+
 	elif original_module['generator'] == 'pll-gen':
 		df = pd.read_csv(os.path.join(csv_path,'pll.csv'))
 		fnom_csv = df['fnom']
@@ -151,8 +152,8 @@ def ML_model(original_module,csv_path,outputDir,margin_area,margin_power,previou
 		target_power = current_power + margin_power
 		target_area = current_area + margin_area
 
-		# -------------------------------------------------------------------------------------
-		# Regarding Functionality
+# -------------------------------------------------------------------------------------
+# Regarding Functionality
 
 		satisfied_list = []
 		results_list = []
@@ -243,3 +244,75 @@ def ML_model(original_module,csv_path,outputDir,margin_area,margin_power,previou
 
 		previous_inputs['pll-gen'].append(optimized_func_fnom)
 		return outGenJson , previous_inputs , True
+
+# -------------------------------------------------------------------------------------
+
+	elif original_module['generator'] == 'memory-gen':
+		df = pd.read_csv(os.path.join(csv_path,'memory.csv'))
+		multi_csv = df['multiplication']
+		area_csv = df['area']
+		power_csv = df['power']
+
+		with open(os.path.join(outputDir,original_module['module_name']+'.json')) as outGenFile:
+			outGenJson = json.load(outGenFile)
+
+		current_word_size = outGenJson['specifications']['word_size']
+		current_nowords = outGenJson['specifications']['nowords']
+		current_power = outGenJson['results']['Power']
+		current_area = outGenJson['results']['area']
+		current_multipli = current_word_size * current_nowords
+		original_word_size = original_module['specifications']['word_size']
+		original_nowords = original_module['specifications']['nowords']
+		target_power = current_power + margin_power
+		target_area = current_area + margin_area
+
+# -------------------------------------------------------------------------------------
+# Regarding Functionality
+
+		optimized_func_word_size = current_word_size
+		optimized_func_nowords = current_nowords
+	
+		while optimized_func_word_size * optimized_func_nowords in previous_inputs['memory-gen'] or previous_inputs['memory-gen'] == []:
+
+			if optimized_func_word_size * optimized_func_nowords >= 2 * 16384:
+				if optimized_func_word_size >= optimized_func_nowords and optimized_func_word_size >= 2:
+					optimized_func_word_size = round(optimized_func_word_size/2)
+					previous_inputs['memory-gen'].append('junk')
+				elif optimized_func_nowords >= optimized_func_word_size and optimized_func_nowords >= 2:
+					optimized_func_nowords = round(optimized_func_nowords/2)
+					previous_inputs['memory-gen'].append('junk')
+				else:
+					break
+			break
+
+		new_previous_inputs = []
+		for elem in previous_inputs['memory-gen']:
+			if elem != 'junk':
+				new_previous_inputs.append(elem)
+		previous_inputs['memory-gen'] = new_previous_inputs
+
+		if (optimized_func_word_size == current_word_size and optimized_func_nowords == current_nowords) or optimized_func_word_size * optimized_func_nowords in previous_inputs['memory-gen']:
+			print(original_module['module_name'] + " cannot be optimized more than this")
+			return outGenJson , previous_inputs , False
+
+		else:
+			print(original_module['module_name'] + " has been optimized for one step")
+			optimized_func_multipli = optimized_func_word_size * optimized_func_nowords
+			optimized_func_area = 70503.80482990188 + 4.891463 * optimized_func_multipli
+			optimized_func_power = 0.00010545470969408155 + 7.316895e-09 * optimized_func_multipli 
+
+			print("new specifications:")
+			print("word_size:")
+			print(optimized_func_word_size)
+			print("nowords:")
+			print(optimized_func_nowords)
+			print("area:")
+			print(optimized_func_area)
+			print("power:")
+			print(optimized_func_power)
+			outGenJson["specifications"]["word_size"] = optimized_func_word_size
+			outGenJson["specifications"]["nowords"] = optimized_func_nowords
+			outGenJson.pop('results', None)
+
+			previous_inputs['memory-gen'].append(optimized_func_multipli)
+			return outGenJson , previous_inputs , True

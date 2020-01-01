@@ -36,7 +36,18 @@ parser.add_argument('--design', required=True,
                     help='Resolved design description json file path')
 parser.add_argument('--platform_config', default=os.path.join(fasoc_dir, "config/platform_config.json"),
                     help='Platform configuration json file path')
+parser.add_argument('--connection', default="remove",
+                    help='whether removal connection in design file')
 args = parser.parse_args()
+
+print("Loading design: ", args.design)
+try:
+  with open(args.design) as f:
+    designJson = json.load(f)
+except ValueError as e:
+  print("Error occurred opening or loading design json file: ", args.design)
+  print("Exception: ", str(e))
+  sys.exit(1)
 
 print("Loading platform Config: ", args.platform_config)
 try:
@@ -50,6 +61,7 @@ except ValueError as e:
 
 designDir = os.path.dirname(args.design)
 databaseDir = platformJson["platforms"]["tsmc65lp"]["database"]
+rubiDir = os.path.join(soc_dir,'..','rubi')
 
 print("Cleaning design directory ...")
 for file in os.listdir(designDir):
@@ -69,3 +81,17 @@ for file in os.listdir(designDir):
 if  os.path.isdir(databaseDir):
 	print("Cleaning database directory ...")
 	shutil.rmtree(databaseDir)
+
+if "connections" in designJson:
+	print("Cleaning design connection ...")
+	del designJson["connections"]
+	with open(args.design, "w") as f:
+		json.dump(designJson, f, indent=True)
+
+rubi_clean_tag = False
+for file in os.listdir(rubiDir):
+	if file == 'connect.rb' or file == 'creat_Hier.rb':
+		os.remove(os.path.join(rubiDir,file))
+		rubi_clean_tag = True
+	if rubi_clean_tag:
+		print("Cleaning rubi directory ...")

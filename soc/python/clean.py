@@ -72,6 +72,8 @@ for file in os.listdir(designDir):
 		shutil.rmtree(os.path.join(designDir,file))
 		postfix = 'N/A'
 
+	if file == 'updated_desin.json':
+		os.remove(os.path.join(designDir,file))
 	if not (postfix == '.json' or file == 'Makefile' or 'postfix' == 'N/A'):
 		if os.path.isfile(os.path.join(designDir,file)):
 			os.remove(os.path.join(designDir,file))

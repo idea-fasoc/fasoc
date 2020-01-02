@@ -33,6 +33,7 @@ import zipfile
 import numpy as np
 from subprocess import call
 from collections import OrderedDict
+import webbrowser as wb
 
 from jsonXmlGenerator import jsonXmlGenerator
 from rtlXmlGenerator import rtlXmlGenerator
@@ -204,42 +205,52 @@ closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,ipXa
 
 
 
-# workplaceDir = design_dir
-# projectName = designName + '_socrates_proj'
-# projectDir = os.path.join(workplaceDir,projectName)
+workplaceDir = design_dir
+projectName = designName + '_socrates_proj'
+projectDir = os.path.join(workplaceDir,projectName)
+design_vendor =  'arm.com'
+#design_library = designName + '_library'
+design_library = projectName
+design_version = 'r0p0'
+subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,
+'--project', projectName,'--flow', 'AddNewProject'])
 
-# subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,
-# '--project', projectName,'--flow', 'AddNewProject'])
+for file in os.listdir(ipXactDir):
+  shutil.copy(os.path.join(ipXactDir,file), projectDir)
+shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4.xml'), projectDir)
+shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4_rtl.xml'), projectDir)
+shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite.xml'), projectDir)
+shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite_rtl.xml'), projectDir)
+for file in os.listdir(platformJson["socrates_DRC_config"]):
+  shutil.copy(os.path.join(platformJson["socrates_DRC_config"],file), workplaceDir)
 
-# for file in os.listdir(ipXactDir):
-#   shutil.copy(os.path.join(ipXactDir,file), projectDir)
-# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4.xml'), projectDir)
-# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4_rtl.xml'), projectDir)
-# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite.xml'), projectDir)
-# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite_rtl.xml'), projectDir)
-# for file in os.listdir(platformJson["socrates_DRC_config"]):
-#   shutil.copy(os.path.join(platformJson["socrates_DRC_config"],file), workplaceDir)
-# #shutil.copy(platformJson["socrates_DRC_config"], workplaceDir)
+subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'--project', projectName,
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/clean.rb?arg1='+designName,
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/convert_json.rb?arg1='+args.design+'&arg2='+designName+'&arg3='+rubiDir+'&arg4='+rubiDir+'/create_Hier.rb&arg5='+rubiDir+'/connect.rb',
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/create_Hier.rb',
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/connect.rb',
+'--check',
+'--result', projectDir+'/DRC.log',
+'--set', "IDEA_Checks",
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/report.rb?arg1='+rubiDir+'&arg2='+designName+'&arg3='+projectDir+'/Design_Report.txt',
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical'),
+'--flow', 'PrintIpxactSchematic', 'Vendor='+design_vendor, 'Library='+design_library, 'Name='+designName, 'Version='+design_version, 'FileType=pdf', 'Filter=Connections', 'OutputDir='+os.path.join(projectDir,'logical','Schematic')])
 
-# subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'--project', projectName,
-# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/clean.rb?arg1='+designName,
-# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/convert_json.rb?arg1='+args.design+'&arg2='+designName+'&arg3='+rubiDir+'&arg4='+rubiDir+'/create_Hier.rb&arg5='+rubiDir+'/connect.rb',
-# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/create_Hier.rb',
-# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/connect.rb',
-# '--check',
-# '--result', projectDir+'/DRC.log',
-# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/report.rb?arg1='+rubiDir+'&arg2='+designName+'&arg3='+projectDir+'/Design_Report.txt',
-# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical')])
+# Unifying names
+with open (os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'r') as socrates_verilog:
+  soc_ver=socrates_verilog.read()
+with open(args.design) as fdesign:
+  designJson = json.load(fdesign)
+for module in designJson["modules"]:
+  soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
+with open(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'w') as socrates_verilog:
+  socrates_verilog.write(soc_ver)
 
-# with open (os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'r') as socrates_verilog:
-#   soc_ver=socrates_verilog.read()
-# with open(args.design) as fdesign:
-#   designJson = json.load(fdesign)
-# for module in designJson["modules"]:
-#   soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
-# with open(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'w') as socrates_verilog:
-#   socrates_verilog.write(soc_ver)
-
+# Opening Socrates outputs 
+wb.open_new(os.path.join(projectDir,'logical','Schematic','schematic_Connections_'+designName+'_'+design_version+'.pdf'))
+wb.open_new(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'))
+wb.open_new(os.path.join(projectDir,'arm.com-'+projectName+'-'+designName+'_design-'+design_version+'.xml'))
+wb.open_new(os.path.join(projectDir,'arm.com-'+projectName+'-'+designName+'-'+design_version+'.xml'))
 
 # STEP 7: Assemble SoC run chip level Cadre Flow
 # ==============================================================================

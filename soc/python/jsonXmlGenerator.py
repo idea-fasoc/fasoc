@@ -152,7 +152,7 @@ def jsonXmlGenerator(configJson,designJson,units,outputDir,ipXactDir):
     view_language.appendChild(root.createTextNode('Verilog'))
     model_view.appendChild(view_language)
     view_modelname=root.createElement('spirit:modelName')
-    view_modelname.appendChild(root.createTextNode(designGen))#What is this
+    view_modelname.appendChild(root.createTextNode(designGen))
     model_view.appendChild(view_modelname)
     view_filesetref=root.createElement('spirit:fileSetRef')
     model_view.appendChild(view_filesetref)
@@ -181,11 +181,7 @@ def jsonXmlGenerator(configJson,designJson,units,outputDir,ipXactDir):
                     else:
                         jsns_interface_logical_port=jsn_interface_map[jsn_port_instreface_map]
 
-                    # print(jsn_abstraction_mode)
-                    # print(jsn_abstraction_name)
-                    # print('*************')
                     if jsn_abstraction_mode =='master' and jsn_abstraction_name == 'ahb' and (jsns_interface_logical_port == "HREADYOUT" or jsns_interface_logical_port == "HSELx"):
-                        #print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
                         pass
                     else:
                         model_port=root.createElement('spirit:port')
@@ -273,7 +269,7 @@ def jsonXmlGenerator(configJson,designJson,units,outputDir,ipXactDir):
     fileset_filetype=root.createElement('spirit:fileType')
     fileset_filetype.appendChild(root.createTextNode('verilogSource'))
     fileset_file.appendChild(fileset_filetype)
-    fileset_logicalname=root.createElement('spirit:logicalName')#what is this?
+    fileset_logicalname=root.createElement('spirit:logicalName')
     fileset_logicalname.appendChild(root.createTextNode('verilog_output'))
     fileset_file.appendChild(fileset_logicalname)
 

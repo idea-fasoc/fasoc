@@ -20,10 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-INCLUDE_ADCGEN = 0
-INCLUDE_CDCGEN = 0
-INCLUDE_DCDCGEN = 0
-INCLUDE_LDOGEN = 1
-INCLUDE_MEMGEN = 1
-INCLUDE_PLLGEN = 1
-INCLUDE_TEMPGEN = 1
+require 'IPXACT2009API'
+
+design_name = getConfigItem("arg1", :default => ("arg1"))
+component = findComponent(:name => design_name)
+LOGICAL_DIR = getConfigItem("arg2", :default => ("arg2"))
+system 'mkdir #{LOGICAL_DIR}/#{design_name}'
+system 'mkdir #{VERILOG_OUTPUT_DIR}'
+VERILOG_OUTPUT_DIR = "#{LOGICAL_DIR}/#{design_name}/verilog"
+
+runDRC(component, :checks => "IDEA_Checks")
+system "mv #{LOGICAL_DIR}/../../CheckResults.log #{LOGICAL_DIR}/../DRC.log"
+generateVerilog(component, :od => VERILOG_OUTPUT_DIR, :gen_leaf => true)

@@ -30,13 +30,16 @@ import re  # regular expressiosn
 import json  # json parsing
 import subprocess  # process
 import zipfile
+import numpy as np
 from subprocess import call
 from collections import OrderedDict
+import webbrowser as wb
 
-from checkDB import checkDB
-from rtlcheckDB import rtlcheckDB
 from jsonXmlGenerator import jsonXmlGenerator
 from rtlXmlGenerator import rtlXmlGenerator
+from analogGen import analogGen
+#from ML_model import ML_model
+from closedLoop import closedLoop
 
 # Parse and validate arguments
 # ==============================================================================
@@ -54,6 +57,8 @@ parser.add_argument('--platform_config', default=os.path.join(fasoc_dir, "config
                     help='Platform configuration json file path')
 parser.add_argument('--mode', default="verilog",
                     help='Run Mode')
+parser.add_argument('--database', default="add",
+                    help='Add to database')
 args = parser.parse_args()
 
 
@@ -136,6 +141,8 @@ except KeyError:
 # STEP 3-5: For each module, generate if not cached (or in DB)
 # ==============================================================================
 module_list = []
+module_number = 0
+connection_done_flag = False
 
 for module in designJson["modules"]:
 # ----------------------------------------------------------------------------------------
@@ -166,89 +173,15 @@ for module in designJson["modules"]:
         for file in os.listdir(inputDir):
           os.remove(os.path.join(inputDir,file))
 
-    if module["generator"] in configJson["generators"] and "rtl" not in module["generator"]:
-      foundDB = checkDB(module,databaseDir,outputDir,ipXactDir)
-#---------------------------------------------------------------------------------------
-
-#---------------------------------------------------------------------------------------
-# Generate analog block      
-      if not foundDB:
-        print(module["module_name"] + " is going to be generate")
-        specFilePath = os.path.join(inputDir, module["module_name"] + ".spec")
-        outputSpec = module
-        del outputSpec["instance_name"]
-        with open(specFilePath, "w") as specfile:
-          json.dump(outputSpec, specfile, indent=True)
-
-        try:
-          cmd1 = os.path.join(fasoc_dir,configJson["generators"][module["generator"]]["path"])
-        except KeyError:
-          print("Please specify path for module: " + module["module_name"] + "instance: " + module["instance_name"])
-        cmd = cmd1 + " --specfile " + specFilePath + " --output " + outputDir + " --platform " + args.platform + "--mode" + args.mode
-        print("Launching: ", cmd)
-        
-        try:
-          ret = subprocess.check_call([cmd1,"--specfile",specFilePath,"--output",outputDir,"--platform",args.platform,"--mode",args.mode])
-          if ret:
-            print("Error: Command returned error " + error)
-            sys.exit(1)
-        except:
-          print ("Error/Exception occurred while running command:", sys.exc_info()[0])
-#---------------------------------------------------------------------------------------
-
-#---------------------------------------------------------------------------------------
-# Add to database/cache
-        try:
-          os.makedirs(os.path.join(databaseDir,'ZIP'))
-          print("Directory " + os.path.join(databaseDir,'ZIP') +  " Created in the database") 
-        except FileExistsError:
-          print("Directory " + os.path.join(databaseDir,'ZIP') + " already exists in the database")
-        
-        if not os.path.exists(os.path.join(databaseDir,"DB_mem.txt")):
-          with open(os.path.join(databaseDir,"DB_mem.txt"), 'w') as DBetxt:
-            DBetxt.write('0')
-
-        with open(os.path.join(databaseDir,"DB_mem.txt"),'r') as DBetxt:
-          DBNumber=DBetxt.readlines()
-        intDBNumber=int((DBNumber[0].split('\n'))[0])
-        with zipfile.ZipFile(os.path.join(databaseDir,'ZIP',module["module_name"] + str(intDBNumber) + '.zip'), 'w') as myzip:
-          for file in os.listdir(outputDir):
-            if not '.xml' in file:   
-              myzip.write(os.path.join(outputDir,file),file)
-
-        try:
-          os.makedirs(os.path.join(databaseDir,'JSN',module["generator"]))
-          print("Directory " + os.path.join(databaseDir,'JSN',module["generator"]) +  " Created in the database") 
-        except FileExistsError:
-          print("Directory " + os.path.join(databaseDir,'JSN',module["generator"]) + " already exists in the database")
-
-        shutil.copy(os.path.join(outputDir,module['module_name'] + '.json'),os.path.join(databaseDir,'JSN',module["generator"],module["module_name"] + str(intDBNumber) + '.json'))
-
-        intDBNumber += 1
-        with open(os.path.join(databaseDir,"DB_mem.txt"), 'w') as DBetxt:
-            DBetxt.write(str(intDBNumber))
-#---------------------------------------------------------------------------------------
-
-      
-#---------------------------------------------------------------------------------------       
-# Check if generator and database are done and make ipxact, and add json files to json folder
-      jsonXmlGenerator(configJson["generators"][module["generator"]],module,units,outputDir,ipXactDir)
-      postfixes = ['.db','.gds.gz','.json','.lef','.lib','.spi','.v','.cdl','.xml']
-      for postfix in postfixes:
-        if not os.path.exists(os.path.join(outputDir,module["module_name"] + postfix)):
-          print(module["module_name"] + postfix + " does not exist")
-      shutil.copy(os.path.join(outputDir,module["module_name"]+'.json'),jsnDir)
+    moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args.platform,args.mode,args.database,units,module_number,designJson,args.design,connection_done_flag)
+    module_number += 1
 #---------------------------------------------------------------------------------------      
 
 #---------------------------------------------------------------------------------------     
 # If generator is rtl
-    elif "rtl" in module["generator"]:
+    if not moduleIsGenerator and "rtl" in module["generator"]:
       shutil.copy(module['src'],outputDir)
       rtlXmlGenerator(configJson["generators"][module["generator"]],module,outputDir,ipXactDir)
-      foundDB = rtlcheckDB(module,databaseDir,outputDir,ipXactDir)
-
-      if not foundDB:
-        pass
 #--------------------------------------------------------------------------------------- 
 
 #--------------------------------------------------------------------------------------- 
@@ -265,63 +198,20 @@ for module in designJson["modules"]:
 
 # STEP 6: Check constraints and close the loop
 # ==============================================================================
-total_power_constraint = 0
-total_area_constraint = 0
-max_power_constraint = ['init',-1]
-max_area_constraint = ['init',-1]
-
-for jsonFile_constraint in os.listdir(jsnDir):
-  with open(os.path.join(jsnDir,jsonFile_constraint)) as f_constraint:
-    generator_element_constraint = json.load(f_constraint)
-  if "Power" in generator_element_constraint["results"]:
-    del generator_element_constraint["results"]["Power"]
-  if "area" not in generator_element_constraint["results"]:
-    generator_element_constraint["results"]["area"] = 100000
-  if "power" not in generator_element_constraint["results"]:
-    generator_element_constraint["results"]["power"] = 0
-  if "area" in generator_element_constraint["results"] and isinstance(generator_element_constraint["results"]["area"],str):
-    generator_element_constraint["results"]["area"] = 100000
-  with open(os.path.join(jsnDir,jsonFile_constraint), "w") as new_json_constraint:
-          json.dump(generator_element_constraint, new_json_constraint, indent=True)
-
-for jsonFile_constraint in os.listdir(jsnDir):
-  with open(os.path.join(jsnDir,jsonFile_constraint)) as f_constraint:
-    generator_element_constraint = json.load(f_constraint)
-  power_constraint = generator_element_constraint["results"]["power"]
-  area_constraint = generator_element_constraint["results"]["area"]
-
-  if power_constraint > max_power_constraint[1]:
-    max_power_constraint[0] = generator_element_constraint['module_name']
-    max_power_constraint[1] = power_constraint
-  if area_constraint > max_area_constraint[1]:
-    max_area_constraint[0] = generator_element_constraint['module_name']
-    max_area_constraint[1] = area_constraint
-
-  total_power_constraint = total_power_constraint + power_constraint
-  total_area_constraint = total_area_constraint + area_constraint
-
-target_power_constraint = designJson["constraints"]["power"]
-target_area_constraint = designJson["constraints"]["area"]
-
-if target_area_constraint < total_area_constraint:
-  print("area is not satisfied")
-  print('target_modification for area: ' + max_area_constraint[0])
-  sys.exit(1)
-else:
-  print("area is satisfied")
-if target_power_constraint < total_power_constraint:
-  print("power is not satisfied")
-  print('target_modification for power: ' + max_power_constraint[0])
-  sys.exit(1)
-else:
-  print("power is satisfied")
+closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,ipXactDir,fasoc_dir,args.platform,args.mode,args.database,units,module_number,args.design)
 
 # STEP 7: Call Socrates for stitching
 # ==============================================================================
+
+
+
 workplaceDir = design_dir
 projectName = designName + '_socrates_proj'
 projectDir = os.path.join(workplaceDir,projectName)
-
+design_vendor =  'arm.com'
+#design_library = designName + '_library'
+design_library = projectName
+design_version = 'r0p0'
 subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,
 '--project', projectName,'--flow', 'AddNewProject'])
 
@@ -331,17 +221,22 @@ shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMB
 shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4_rtl.xml'), projectDir)
 shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite.xml'), projectDir)
 shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite_rtl.xml'), projectDir)
-shutil.copy(platformJson["socrates_DRC_config"], workplaceDir)
+for file in os.listdir(platformJson["socrates_DRC_config"]):
+  shutil.copy(os.path.join(platformJson["socrates_DRC_config"],file), workplaceDir)
 
 subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'--project', projectName,
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/CLI_00_convert_json.rb?arg1='+args.design+'&arg2='+designName+'&arg3='+rubiDir+'/CLI_01_Create_Hier.rb&arg4='+rubiDir+'/CLI_02_Connect.rb',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/CLI_01_Create_Hier.rb',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/CLI_02_Connect.rb',
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/clean.rb?arg1='+designName,
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/convert_json.rb?arg1='+args.design+'&arg2='+designName+'&arg3='+rubiDir+'&arg4='+rubiDir+'/create_Hier.rb&arg5='+rubiDir+'/connect.rb',
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/create_Hier.rb',
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/connect.rb',
 '--check',
 '--result', projectDir+'/DRC.log',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/CLI_03_Report.rb?arg1='+designName+'&arg2='+projectDir+'/Design_Report.txt',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/CLI_04_Generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical',designName)])
+'--set', "IDEA_Checks",
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/report.rb?arg1='+rubiDir+'&arg2='+designName+'&arg3='+projectDir+'/Design_Report.txt',
+'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical'),
+'--flow', 'PrintIpxactSchematic', 'Vendor='+design_vendor, 'Library='+design_library, 'Name='+designName, 'Version='+design_version, 'FileType=pdf', 'Filter=Connections', 'OutputDir='+os.path.join(projectDir,'logical','Schematic')])
 
+# Unifying names
 with open (os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'r') as socrates_verilog:
   soc_ver=socrates_verilog.read()
 with open(args.design) as fdesign:
@@ -350,6 +245,13 @@ for module in designJson["modules"]:
   soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
 with open(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'w') as socrates_verilog:
   socrates_verilog.write(soc_ver)
+
+# Opening Socrates outputs 
+wb.open_new(os.path.join(projectDir,'logical','Schematic','schematic_Connections_'+designName+'_'+design_version+'.pdf'))
+wb.open_new(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'))
+wb.open_new(os.path.join(projectDir,'arm.com-'+projectName+'-'+designName+'_design-'+design_version+'.xml'))
+wb.open_new(os.path.join(projectDir,'arm.com-'+projectName+'-'+designName+'-'+design_version+'.xml'))
+
 # STEP 7: Assemble SoC run chip level Cadre Flow
 # ==============================================================================
 

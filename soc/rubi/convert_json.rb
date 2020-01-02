@@ -20,10 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-INCLUDE_ADCGEN = 0
-INCLUDE_CDCGEN = 0
-INCLUDE_DCDCGEN = 0
-INCLUDE_LDOGEN = 1
-INCLUDE_MEMGEN = 1
-INCLUDE_PLLGEN = 1
-INCLUDE_TEMPGEN = 1
+require "json"
+require 'IPXACT2009API'
+
+infile = getConfigItem("arg1", :default => ("arg1"))
+design = getConfigItem("arg2", :default => ("arg2"))
+rubiDir = getConfigItem("arg3", :default => ("arg3"))
+load("#{rubiDir}/parse_json.rb")
+outfile_hier = getConfigItem("arg4", :default => ("arg4"))
+outfile_conn = getConfigItem("arg5", :default => ("arg5"))
+parse_json(infile, design, outfile_hier, outfile_conn)

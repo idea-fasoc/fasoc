@@ -105,8 +105,8 @@ Date    : May 12, 2019
 # Supported Spec ranges
 1. Alpha version supports only nominal frequency for user input, but provides generated design's specs of frequency resolution of DCO, power consumption, area. Below are the spec ranges that the pll supports. If the user gives certain nominal frequency, the generator will provide other specs within the below spec ranges. Beta release will include phase noise, jitter in addition.
     ```bash
-	Nominal Frequency   : 240 MHz ~ 1.00GHz
-	Frequency Resolution: 3.15K Hz ~ 24.5KHz
+	Nominal Frequency   : 240 MHz ~ 840 MHz
+	Frequency Resolution: 3.15K Hz ~ 54.5KHz
 	Power Consumption   : 9.0mW ~ 17.7mW
 	Area                : 4460um^2 ~ 16416um^2
     ```

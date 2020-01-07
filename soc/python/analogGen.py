@@ -29,23 +29,37 @@ import json  # json parsing
 import subprocess  # process
 import zipfile
 from subprocess import call
+import sys  # exit function
 
 from checkDB import checkDB
 from jsonXmlGenerator import jsonXmlGenerator
 from connectionGen import connectionGen
 
-def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args_platform,args_mode,args_database,units,generator_number,designJson,designDir,connection_done_flag):
+def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args_platform,args_mode,args_database,units,module_number,designJson,designDir,connection_done_flag):
 
   if module["generator"] in configJson["generators"] and "rtl" not in module["generator"]:
     if not connection_done_flag:
       print("connections for the instance: " + module["instance_name"] + " is generating")
-      connectionGen(module["generator"],module["instance_name"],generator_number,designJson,designDir)
-    foundDB = checkDB(module,databaseDir,outputDir,ipXactDir)
+      connectionGen(module["generator"],module["instance_name"],module_number,designJson,designDir)
+    foundDB = checkDB(module,databaseDir,outputDir,ipXactDir,module_number,designJson['design_name'])
 
 #---------------------------------------------------------------------------------------
 # Generate analog block      
     if not foundDB:
-      print(module["module_name"] + " is going to be generate")
+      print(module["module_name"] + " is not found in the database and is going to be generated")
+
+      if module_number == 0:
+        while True:
+          print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
+          try:
+            response = input()
+            if response == 'resume':
+              print ('Resuming...')
+              break
+          except KeyboardInterrupt:
+            print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
+            continue
+
       specFilePath = os.path.join(inputDir, module["module_name"] + ".spec")
       outputSpec = module
       if "instance_name" in outputSpec:
@@ -72,6 +86,7 @@ def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_d
 #---------------------------------------------------------------------------------------
 # Add to database/cache
       if args_database == 'add':
+        print(module["module_name"] + " is going to be added to the database")
         try:
           os.makedirs(os.path.join(databaseDir,'ZIP'))
           print("Directory " + os.path.join(databaseDir,'ZIP') +  " Created in the database") 

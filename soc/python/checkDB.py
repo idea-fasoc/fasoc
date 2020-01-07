@@ -24,9 +24,11 @@ import shutil
 import os
 import json  # json parsing
 import zipfile
+import sys
+
 from modifyDBFiles import modifyDBFiles
 
-def checkDB(moduleJson,databaseDir,outputDir,ipXactDir):
+def checkDB(moduleJson,databaseDir,outputDir,ipXactDir,module_number,designName):
     genJson = moduleJson['generator']
     searchDir = os.path.join(databaseDir,'JSN',genJson)
     excluded_name = ['LDO_CONTROLLER','decoder_3to8','mux_8to1','ANALOG_CORE','bu_dco_8stg','dco_8stg','dco_10drv_10cc_30fc_18stg','dco_CC','dco_FC','DCO_MODEL','FUNCTIONS','PLL_CONTROLLER','PLL_CONTROLLER_TDC_COUNTER','SSC_GENERATOR','synth_dco','synth_pll_dco_interp','synth_pll_dco_outbuff','TB_synth_pll','TDC_COUNTER','test_synth_pll']
@@ -108,6 +110,19 @@ def checkDB(moduleJson,databaseDir,outputDir,ipXactDir):
                             found_Filename = os.path.join(databaseDir,'ZIP',(file.split('.'))[0]+'.zip')
                             if os.path.exists(found_Filename):
                                 print(moduleJson['module_name'] + " has been found at the database")
+
+                                if module_number == 1 and designName == '1ldo_1pll_1m0':
+                                    while True:
+                                      print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
+                                      try:
+                                        response = input()
+                                        if response == 'resume':
+                                          print ('Resuming...')
+                                          break
+                                      except KeyboardInterrupt:
+                                        print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
+                                        continue
+
                                 zip_ref = zipfile.ZipFile(found_Filename, 'r')
                                 zip_ref.extractall(outputDir)
                                 zip_ref.close()

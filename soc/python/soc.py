@@ -43,6 +43,7 @@ from closedLoop import closedLoop
 
 # Parse and validate arguments
 # ==============================================================================
+
 soc_dir = os.path.dirname(__file__)
 fasoc_dir  = os.path.relpath(os.path.join(soc_dir,"../.."))
 
@@ -174,6 +175,19 @@ for module in designJson["modules"]:
           os.remove(os.path.join(inputDir,file))
 
     moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args.platform,args.mode,args.database,units,module_number,designJson,args.design,connection_done_flag)
+
+    if module_number == 0:
+        while True:
+          print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
+          try:
+            response = input()
+            if response == 'resume':
+              print ('Resuming...')
+              break
+          except KeyboardInterrupt:
+            print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
+            continue
+
     module_number += 1
 #---------------------------------------------------------------------------------------      
 
@@ -186,7 +200,7 @@ for module in designJson["modules"]:
 
 #--------------------------------------------------------------------------------------- 
 # If moduel generator is not rtl nor in our generators
-    else:
+    if not moduleIsGenerator and "rtl" not in module["generator"]:
       print("WARNING: Unsupported generator type", module["generator"])
 #---------------------------------------------------------------------------------------
 
@@ -203,13 +217,21 @@ closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,ipXa
 # STEP 7: Call Socrates for stitching
 # ==============================================================================
 
-
+while True:
+  print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
+  try:
+    response = input()
+    if response == 'resume':
+      print ('Resuming...')
+      break
+  except KeyboardInterrupt:
+    print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
+    continue
 
 workplaceDir = design_dir
 projectName = designName + '_socrates_proj'
 projectDir = os.path.join(workplaceDir,projectName)
 design_vendor =  'arm.com'
-#design_library = designName + '_library'
 design_library = projectName
 design_version = 'r0p0'
 subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,

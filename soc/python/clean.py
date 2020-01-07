@@ -38,6 +38,8 @@ parser.add_argument('--platform_config', default=os.path.join(fasoc_dir, "config
                     help='Platform configuration json file path')
 parser.add_argument('--connection', default="remove",
                     help='whether removal connection in design file')
+parser.add_argument('--database', default="remove",
+                    help='whether removal the module from the database')
 args = parser.parse_args()
 
 print("Loading design: ", args.design)
@@ -80,15 +82,17 @@ for file in os.listdir(designDir):
 		elif  os.path.isdir(os.path.join(designDir,file)):
 			shutil.rmtree(os.path.join(designDir,file))
 
-if  os.path.isdir(databaseDir):
-	print("Cleaning database directory ...")
-	shutil.rmtree(databaseDir)
+if args.database == "remove":
+	if  os.path.isdir(databaseDir):
+		print("Cleaning database directory ...")
+		shutil.rmtree(databaseDir)
 
-if "connections" in designJson:
-	print("Cleaning design connection ...")
-	del designJson["connections"]
-	with open(args.design, "w") as f:
-		json.dump(designJson, f, indent=True)
+if args.connection == "remove":
+	if "connections" in designJson:
+		print("Cleaning design connection ...")
+		del designJson["connections"]
+		with open(args.design, "w") as f:
+			json.dump(designJson, f, indent=True)
 
 rubi_clean_tag = False
 for file in os.listdir(rubiDir):

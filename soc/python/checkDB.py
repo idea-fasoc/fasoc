@@ -111,18 +111,6 @@ def checkDB(moduleJson,databaseDir,outputDir,ipXactDir,module_number,designName)
                             if os.path.exists(found_Filename):
                                 print(moduleJson['module_name'] + " has been found at the database")
 
-                                if module_number == 1 and designName == '1ldo_1pll_1m0':
-                                    while True:
-                                      print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
-                                      try:
-                                        response = input()
-                                        if response == 'resume':
-                                          print ('Resuming...')
-                                          break
-                                      except KeyboardInterrupt:
-                                        print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
-                                        continue
-
                                 zip_ref = zipfile.ZipFile(found_Filename, 'r')
                                 zip_ref.extractall(outputDir)
                                 zip_ref.close()

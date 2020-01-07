@@ -176,18 +176,6 @@ for module in designJson["modules"]:
 
     moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args.platform,args.mode,args.database,units,module_number,designJson,args.design,connection_done_flag)
 
-    if module_number == 0:
-        while True:
-          print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
-          try:
-            response = input()
-            if response == 'resume':
-              print ('Resuming...')
-              break
-          except KeyboardInterrupt:
-            print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
-            continue
-
     module_number += 1
 #---------------------------------------------------------------------------------------      
 
@@ -216,17 +204,6 @@ closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,ipXa
 
 # STEP 7: Call Socrates for stitching
 # ==============================================================================
-
-while True:
-  print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
-  try:
-    response = input()
-    if response == 'resume':
-      print ('Resuming...')
-      break
-  except KeyboardInterrupt:
-    print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
-    continue
 
 workplaceDir = design_dir
 projectName = designName + '_socrates_proj'

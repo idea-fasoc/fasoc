@@ -114,18 +114,6 @@ def closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,
       print("Both power and area are satisfied")
       break
 
-    if (module_number == 6 or module_number == 7 or module_number == 8) and designJson['design_name'] == '1ldo_1pll_1m0':
-        while True:
-          print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
-          try:
-            response = input()
-            if response == 'resume':
-              print ('Resuming...')
-              break
-          except KeyboardInterrupt:
-            print ('\nPausing... (Type \'resume\' and ENTER to continue.)')
-            continue
-
     feasibility_counter = 0
     while feasibility_counter < len(modules_constraint_list):
       for diff_module in designJson["modules"]:

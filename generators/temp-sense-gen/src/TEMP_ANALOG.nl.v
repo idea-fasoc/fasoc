@@ -26,5 +26,11 @@ BUFX4RVT_ISOVDD a_buf_0 ( .A(nx1), .VIN(in_vin), .Y(nb1));
 BUFX4RVT_ISOVDD a_buf_1 ( .A(nb1), .VIN(in_vin), .Y(OUT));
 BUFX4RVT_ISOVDD a_buf_2 ( .A(nb2), .VIN(in_vin), .Y(OUTB));
 HEADERX1RVT a_header_0(.VIN(in_vin));
+HEADERX1RVT a_header_1(.VIN(in_vin));
+HEADERX1RVT a_header_2(.VIN(in_vin));
+HEADERX1RVT a_header_3(.VIN(in_vin));
+HEADERX1RVT a_header_4(.VIN(in_vin));
+HEADERX1RVT a_header_5(.VIN(in_vin));
+HEADERX1RVT a_header_6(.VIN(in_vin));
 
 endmodule

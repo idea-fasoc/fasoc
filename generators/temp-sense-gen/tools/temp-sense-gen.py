@@ -153,13 +153,24 @@ print('#----------------------------------------------------------------------')
 #------------------------------------------------------------------------------
 # Configure Synth and APR scripts
 #------------------------------------------------------------------------------
+designAreaVerilog= 2621.44 + 2621.4*0.001*nhead
+jsonSpec['results'] = {'platform': args.platform}
+jsonSpec['results'].update({'area': designAreaVerilog})
+jsonSpec['results'].update({'error': error})
+jsonSpec['results'].update({'power': power})
+
+with open(args.outputDir + '/' + designName + '.json', 'w') as resultSpecfile:
+   json.dump(jsonSpec, resultSpecfile, indent=True)
+
+
+
 
 time.sleep(2)
 print()
 if args.mode == 'verilog':
   print("Exiting tool....")
-  sys.exit(1)
-  #exit()
+  #sys.exit(1)
+  exit()
 print('#----------------------------------------------------------------------')
 print('# Configuring Synth and APR scripts...')
 print('#----------------------------------------------------------------------')

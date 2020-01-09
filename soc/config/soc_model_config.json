@@ -1,0 +1,31 @@
+{
+  "schema_version": 0.1,
+  "platforms": {
+    "tsmc65lp": {
+      "socModel": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool_model",
+      "generators":[
+        {
+          "name":"ldo-gen",
+          "train_test_input":"ldo_train_test_input.xlsx",
+          "train_test_output":"ldo_train_test_output.xlsx",
+          "whole":"ldo.csv",
+          "inputs":["vin","imax"]
+        },
+        {
+          "name":"pll-gen",
+          "train_test_input":"pll_train_test_input.xlsx",
+          "train_test_output":"pll_train_test_output.xlsx",
+          "whole":"pll.csv",
+          "inputs":["fnom"]
+        },
+        {
+          "name":"memory-gen",
+          "train_test_input":"memory_train_test_input.xlsx",
+          "train_test_output":"memory_train_test_output.xlsx",
+          "whole":"memory.csv",
+          "inputs":["multiplication"]
+        }
+      ]
+    }
+  }
+}

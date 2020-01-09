@@ -38,7 +38,6 @@ import webbrowser as wb
 from jsonXmlGenerator import jsonXmlGenerator
 from rtlXmlGenerator import rtlXmlGenerator
 from analogGen import analogGen
-#from ML_model import ML_model
 from closedLoop import closedLoop
 
 # Parse and validate arguments

@@ -138,7 +138,7 @@ TEMP_netlist.gen_temp_netlist(ninv,nhead,aux1,aux2,aux3,aux4,aux5, srcDir)
 
 print(designName)
 
-shutil.copyfile(flowDir + '/src/tempsenseInst.v',   flowDir + '/src/' + designName + '.v')
+shutil.copyfile(srcDir + '/tempsenseInst.v',   flowDir + '/src/' + designName + '.v')
 with open(flowDir + '/src/' + designName  + '.v', 'r') as file:
    filedata = file.read()
 filedata = re.sub(r'tempsenseInst*', r' ' + \

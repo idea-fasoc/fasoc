@@ -42,6 +42,8 @@ parser.add_argument('--platform', required=True,
                     help='PDK/process kit for cadre flow (.e.g tsmc16)')
 parser.add_argument('--mode', required=True,
                     help='Specify the outputs to be generated: verilog, macro, full (includes PEX extraction)')
+parser.add_argument('--clean', action='store_true',
+                    help='Clean the workspace.')
 args = parser.parse_args()
 
 

@@ -25,18 +25,7 @@ import os
 import time
 from readparamgen import check_search_done, platformConfig, designName, args, jsonSpec
 #from subprocess import call
-#------------------------------------------------------------------------------
-# Clean the workspace
-#------------------------------------------------------------------------------
-print('#----------------------------------------------------------------------')
-print('# Cleaning the workspace...')
-print('#----------------------------------------------------------------------')
-#p = sp.Popen(['make','bleach_all'], cwd=flowDir)
-#p.wait()
-#Future: need to remove this after comparator aux cell is characterized
-#for file in os.listdir(flowDir + '/src/'):
-#   os.remove(flowDir + '/src/' + file)
-# Define the internal variables used
+
 
 genDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../")
 
@@ -54,6 +43,23 @@ flowDir = os.path.join(privateGenDir , './flow')
 extDir = genDir + '../../private/generators/temp-sense-gen/extraction'
 simDir = genDir + '../../private/generators/temp-sense-gen/hspice'
 srcDir = genDir + './src'
+
+
+
+#------------------------------------------------------------------------------
+# Clean the workspace
+#------------------------------------------------------------------------------
+print('#----------------------------------------------------------------------')
+print('# Cleaning the workspace...')
+print('#----------------------------------------------------------------------')
+if (args.clean):
+ p = sp.Popen(['make','bleach_all'], cwd=flowDir)
+ p.wait()
+ for file in os.listdir(flowDir + '/src/'):
+  os.remove(flowDir + '/src/' + file)
+   	
+ print('Workspace clean done. Exiting the flow.')
+ sys.exit(0)
 
 for file in os.listdir(simDir + '/'):
    if not os.path.isdir(simDir + '/' + file):

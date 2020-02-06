@@ -6,7 +6,7 @@ model:
 
 
 clean:
-	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform tsmc65lp --clean
+	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform tsmc65lp --mode verilog --clean
 	#python tools/temp-sense-gen-model.py --platform tsmc65lp --clean
 
 

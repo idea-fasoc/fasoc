@@ -2,7 +2,7 @@
 
 # FASoC: Fully-Autonomous SoC Synthesis using Customizable Cell-Based Synthesizable Analog Circuits
 The FASoC Program is focused on developing a complete system-on-chip (SoC) synthesis tool from user specification to GDSII.
-See more at https://fasoc.engin.umich.edu/
+See more on our [website](https://fasoc.engin.umich.edu/).
 
 FASoC tool can be operated in three modes, "Verilog", "Macro" and "Full" modes.
 

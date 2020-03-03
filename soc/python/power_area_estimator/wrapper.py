@@ -61,7 +61,7 @@ sheetDir = socModelJson["platforms"]["tsmc65lp"]["socModel"]
 for gen in socModelJson["platforms"]["tsmc65lp"]["generators"]:
 	if gen["name"] == args.generator:
 		if args.mode == 'ml_regression':
-			ml_regression_merged(os.path.join(sheetDir,gen["train_test_input"]),os.path.join(sheetDir,gen["train_test_output"]),args.constraint,gen["inputs"]) 
+			ml_regression_merged(os.path.join(sheetDir,gen["train_test_input"]),os.path.join(sheetDir,gen["train_test_output"]),args.constraint,gen["inputs"],os.path.join(sheetDir,gen["whole"]),(args.generator.split('-'))[0]) 
 		elif args.mode == 'model_evaluator':
 			algebric_model_evaluator(os.path.join(sheetDir,gen["whole"]),args.constraint,(args.generator.split('-'))[0],gen["inputs"])
 		else:

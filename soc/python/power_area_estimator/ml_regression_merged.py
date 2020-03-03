@@ -28,8 +28,9 @@ from sklearn.metrics import r2_score
 import numpy as np
 import pandas as pd
 import xlrd
+from y_interception import y_interception
 
-def ml_regression_merged(inFile,outFile,outName,inArrName):
+def ml_regression_merged(inFile,outFile,outName,inArrName,interception_input_path,genName):
 	X_book = xlrd.open_workbook(inFile)
 	X_sheet = X_book.sheet_by_name('Sheet1')
 	X=[[X_sheet.cell_value(r, c) for c in range(X_sheet.ncols)] for r in range(1,X_sheet.nrows)]
@@ -60,4 +61,5 @@ def ml_regression_merged(inFile,outFile,outName,inArrName):
 	print("r2Score:")
 	print(r2Score)
 	coeff1 = pd.DataFrame(model1.coef_,index=df_poly.drop(outName,axis=1).columns, columns=['Coefficients Metamodel'])
+	y_interception(interception_input_path,outName,genName,inArrName)
 	print(coeff1[coeff1['Coefficients Metamodel']!=0])

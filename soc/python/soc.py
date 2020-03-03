@@ -26,16 +26,11 @@ import argparse  # arguement parsing
 import sys  # exit function
 import shutil  # filesystem manipulation
 import os  # filesystem manipulation
-import re  # regular expressiosn
 import json  # json parsing
 import subprocess  # process
-import zipfile
-import numpy as np
 from subprocess import call
-from collections import OrderedDict
 import webbrowser as wb
 
-from jsonXmlGenerator import jsonXmlGenerator
 from rtlXmlGenerator import rtlXmlGenerator
 from analogGen import analogGen
 from closedLoop import closedLoop
@@ -131,6 +126,7 @@ try:
 except KeyError:
   print("units is not mentioned in the design file")
   units = {}
+  
 # STEP 2: Run the design solver
 # ==============================================================================
 

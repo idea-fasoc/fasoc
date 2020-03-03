@@ -344,7 +344,6 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 		designJson["connections"] = connections
 	if "connections" in designJson:
 		connections = designJson["connections"]
-		#tag_top_pll_SYSCLKOUT = False
 		tag_top_SYSCLK = False
 		tag_top_SYSRESETN = False
 		tag_ahp_PADDR_11_8 = False
@@ -622,6 +621,184 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 				connection_to_top_pll_SYSRESETN_dict["port"] = "PRESETn"
 				connection_to_top_pll_SYSRESETN_list.append(connection_to_top_pll_SYSRESETN_dict)
 				connection_top_SYSRESETN["to"] = connection_to_top_pll_SYSRESETN_list
+				connections.append(connection_top_SYSRESETN)
+
+
+
+			if not tag_ahp_PADDR_11_8:
+				connection_ahp_PADDR_11_8 = {}
+				connection_ahp_PADDR_11_8["type"] = "adhoc"
+
+				connection_from_ahp_PADDR_11_8 = {}
+				connection_from_ahp_PADDR_11_8["instance"] = instance_ahp
+				connection_from_ahp_PADDR_11_8["port"] = "PADDR"
+				connection_from_ahp_PADDR_11_8["range"] = {}
+				connection_from_ahp_PADDR_11_8["range"]["max"] = 11
+				connection_from_ahp_PADDR_11_8["range"]["min"] = 8
+				connection_ahp_PADDR_11_8["from"] = connection_from_ahp_PADDR_11_8
+
+				connection_to_ahp_PADDR_11_8_list = []
+				connection_to_ahp_PADDR_11_8_dict = {}
+				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
+				connection_to_ahp_PADDR_11_8_dict["port"] = "PADDR"
+				connection_to_ahp_PADDR_11_8_dict["range"] = {}
+				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
+				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
+				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
+				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
+				connections.append(connection_ahp_PADDR_11_8)
+
+			else:
+				connection_to_ahp_PADDR_11_8_list = connection_ahp_PADDR_11_8["to"]
+				connection_to_ahp_PADDR_11_8_dict = {}
+				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
+				connection_to_ahp_PADDR_11_8_dict["port"] = "PADDR"
+				connection_to_ahp_PADDR_11_8_dict["range"] = {}
+				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
+				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
+				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
+				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
+				connections.append(connection_ahp_PADDR_11_8)
+
+
+
+			if not tag_ahp_PENABLE:
+				connection_ahp_PENABLE = {}
+				connection_ahp_PENABLE["type"] = "adhoc"
+
+				connection_from_ahp_PENABLE = {}
+				connection_from_ahp_PENABLE["instance"] = instance_ahp
+				connection_from_ahp_PENABLE["port"] = "PENABLE"
+				connection_ahp_PENABLE["from"] = connection_from_ahp_PENABLE
+
+				connection_to_ahp_PENABLE_list = []
+				connection_to_ahp_PENABLE_dict = {}
+				connection_to_ahp_PENABLE_dict["instance"] = instance
+				connection_to_ahp_PENABLE_dict["port"] = "PENABLE"
+				connection_to_ahp_PENABLE_list.append(connection_to_ahp_PENABLE_dict)
+				connection_ahp_PENABLE["to"] = connection_to_ahp_PENABLE_list
+				connections.append(connection_ahp_PENABLE)
+
+			else:
+				connection_to_ahp_PENABLE_list = connection_ahp_PENABLE["to"]
+				connection_to_ahp_PENABLE_dict = {}
+				connection_to_ahp_PENABLE_dict["instance"] = instance
+				connection_to_ahp_PENABLE_dict["port"] = "PENABLE"
+				connection_to_ahp_PENABLE_list.append(connection_to_ahp_PENABLE_dict)
+				connection_ahp_PENABLE["to"] = connection_to_ahp_PENABLE_list
+				connections.append(connection_ahp_PENABLE)
+
+
+
+			if not tag_ahp_PWRITE:
+				connection_ahp_PWRITE = {}
+				connection_ahp_PWRITE["type"] = "adhoc"
+
+				connection_from_ahp_PWRITE = {}
+				connection_from_ahp_PWRITE["instance"] = instance_ahp
+				connection_from_ahp_PWRITE["port"] = "PWRITE"
+				connection_ahp_PWRITE["from"] = connection_from_ahp_PWRITE
+
+				connection_to_ahp_PWRITE_list = []
+				connection_to_ahp_PWRITE_dict = {}
+				connection_to_ahp_PWRITE_dict["instance"] = instance
+				connection_to_ahp_PWRITE_dict["port"] = "PWRITE"
+				connection_to_ahp_PWRITE_list.append(connection_to_ahp_PWRITE_dict)
+				connection_ahp_PWRITE["to"] = connection_to_ahp_PWRITE_list
+				connections.append(connection_ahp_PWRITE)
+
+			else:
+				connection_to_ahp_PWRITE_list = connection_ahp_PWRITE["to"]
+				connection_to_ahp_PWRITE_dict = {}
+				connection_to_ahp_PWRITE_dict["instance"] = instance
+				connection_to_ahp_PWRITE_dict["port"] = "PWRITE"
+				connection_to_ahp_PWRITE_list.append(connection_to_ahp_PWRITE_dict)
+				connection_ahp_PWRITE["to"] = connection_to_ahp_PWRITE_list
+				connections.append(connection_ahp_PWRITE)
+
+
+
+			if not tag_ahp_PWDATA:
+				connection_ahp_PWDATA = {}
+				connection_ahp_PWDATA["type"] = "adhoc"
+
+				connection_from_ahp_PWDATA = {}
+				connection_from_ahp_PWDATA["instance"] = instance_ahp
+				connection_from_ahp_PWDATA["port"] = "PWDATA"
+				connection_ahp_PWDATA["from"] = connection_from_ahp_PWDATA
+
+				connection_to_ahp_PWDATA_list = []
+				connection_to_ahp_PWDATA_dict = {}
+				connection_to_ahp_PWDATA_dict["instance"] = instance
+				connection_to_ahp_PWDATA_dict["port"] = "PWDATA"
+				connection_to_ahp_PWDATA_list.append(connection_to_ahp_PWDATA_dict)
+				connection_ahp_PWDATA["to"] = connection_to_ahp_PWDATA_list
+				connections.append(connection_ahp_PWDATA)
+
+			else:
+				connection_to_ahp_PWDATA_list = connection_ahp_PWDATA["to"]
+				connection_to_ahp_PWDATA_dict = {}
+				connection_to_ahp_PWDATA_dict["instance"] = instance
+				connection_to_ahp_PWDATA_dict["port"] = "PWDATA"
+				connection_to_ahp_PWDATA_list.append(connection_to_ahp_PWDATA_dict)
+				connection_ahp_PWDATA["to"] = connection_to_ahp_PWDATA_list
+				connections.append(connection_ahp_PWDATA)
+
+		elif (generator == 'temp-sense-gen'):
+			connection_slave_temp_APBM = {}
+			connection_slave_temp_APBM["type"] = "apb"
+
+			connection_from_slave_temp_APBM = {}
+			connection_from_slave_temp_APBM["instance"] = instance_slave
+			connection_from_slave_temp_APBM["port"] = "APBM" + str(1 + module_number)
+			connection_slave_temp_APBM["from"] = connection_from_slave_temp_APBM
+
+			connection_to_slave_temp_TEMP_APBS_list = []
+			connection_to_slave_temp_TEMP_APBS_dict = {}
+			connection_to_slave_temp_TEMP_APBS_dict["instance"] = instance
+			connection_to_slave_temp_TEMP_APBS_dict["port"] = "TEMP_APBS"
+			connection_to_slave_temp_TEMP_APBS_list.append(connection_to_slave_temp_TEMP_APBS_dict)
+			connection_slave_temp_APBM["to"] = connection_to_slave_temp_TEMP_APBS_list
+			connections.append(connection_slave_temp_APBM)
+
+
+
+			connection_top_temp_SYSCLKOUT = {}
+			connection_top_temp_SYSCLKOUT["type"] = "clock"
+
+			connection_from_top_temp_SYSCLKOUT = {}
+			connection_from_top_temp_SYSCLKOUT["instance"] = "toplevel"
+			connection_from_top_temp_SYSCLKOUT["port"] = "SYSCLKOUT" + str(module_number)
+			connection_top_temp_SYSCLKOUT["from"] = connection_from_top_temp_SYSCLKOUT
+
+			connection_to_top_temp_CLKOUT_list = []
+			connection_to_top_temp_CLKOUT_dict = {}
+			connection_to_top_temp_CLKOUT_dict["instance"] = instance
+			connection_to_top_temp_CLKOUT_dict["port"] = "CLKOUT"
+			connection_to_top_temp_CLKOUT_list.append(connection_to_top_temp_CLKOUT_dict)
+			connection_top_temp_SYSCLKOUT["to"] = connection_to_top_temp_CLKOUT_list
+			connections.append(connection_top_temp_SYSCLKOUT)
+
+
+
+			if tag_top_SYSCLK:
+				connection_to_top_temp_PCLK_list = connection_top_SYSCLK["to"]
+				connection_to_top_temp_PCLK_dict = {}
+				connection_to_top_temp_PCLK_dict["instance"] = instance
+				connection_to_top_temp_PCLK_dict["port"] = "PCLK"
+				connection_to_top_temp_PCLK_list.append(connection_to_top_temp_PCLK_dict)
+				connection_top_SYSCLK["to"] = connection_to_top_temp_PCLK_list
+				connections.append(connection_top_SYSCLK)
+
+
+
+			if tag_top_SYSRESETN:
+				connection_to_top_temp_SYSRESETN_list = connection_top_SYSRESETN["to"]
+				connection_to_top_temp_SYSRESETN_dict = {}
+				connection_to_top_temp_SYSRESETN_dict["instance"] = instance
+				connection_to_top_temp_SYSRESETN_dict["port"] = "PRESETn"
+				connection_to_top_temp_SYSRESETN_list.append(connection_to_top_temp_SYSRESETN_dict)
+				connection_top_SYSRESETN["to"] = connection_to_top_temp_SYSRESETN_list
 				connections.append(connection_top_SYSRESETN)
 
 

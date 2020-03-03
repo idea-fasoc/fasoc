@@ -31,7 +31,7 @@ from modifyDBFiles import modifyDBFiles
 def checkDB(moduleJson,databaseDir,outputDir,ipXactDir,module_number,designName):
     genJson = moduleJson['generator']
     searchDir = os.path.join(databaseDir,'JSN',genJson)
-    excluded_name = ['LDO_CONTROLLER','decoder_3to8','mux_8to1','ANALOG_CORE','bu_dco_8stg','dco_8stg','dco_10drv_10cc_30fc_18stg','dco_CC','dco_FC','DCO_MODEL','FUNCTIONS','PLL_CONTROLLER','PLL_CONTROLLER_TDC_COUNTER','SSC_GENERATOR','synth_dco','synth_pll_dco_interp','synth_pll_dco_outbuff','TB_synth_pll','TDC_COUNTER','test_synth_pll']
+    excluded_name = ['LDO_CONTROLLER','decoder_3to8','mux_8to1','ANALOG_CORE','bu_dco_8stg','dco_8stg','dco_10drv_10cc_30fc_18stg','dco_CC','dco_FC','DCO_MODEL','FUNCTIONS','PLL_CONTROLLER','PLL_CONTROLLER_TDC_COUNTER','SSC_GENERATOR','synth_dco','synth_pll_dco_interp','synth_pll_dco_outbuff','TB_synth_pll','TDC_COUNTER','test_synth_pll','counter','TEMP_ANALOG.nl','TEMP_ANALOG_test.nl','TEMP_AUTO_def','tempsenseInst']
     if 'specifications' in moduleJson:
         target_specsJson = moduleJson['specifications']
 

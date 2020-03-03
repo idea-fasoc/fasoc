@@ -343,8 +343,24 @@
                   "width":32},
                "PREADY":"PREADY",
                "PSLVERR":"PSLVERR"
-            }
-        }
+            },
+        "ports": [
+          {
+          "direction": "in",
+          "name": "CLK_REF",
+          "type": "clock"
+          },
+          {
+          "direction": "out",
+          "name": "CLKOUT",
+          "type": "clock"
+          },
+          {
+          "direction": "in",
+          "name": "VIN_TEMPSENSE",
+          "type": "power"
+          }]
+        } 
       ]
     },
     "memory-gen": {

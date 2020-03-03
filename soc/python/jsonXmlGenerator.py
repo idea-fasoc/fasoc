@@ -23,7 +23,6 @@
 
 from xml.dom import minidom
 import os
-from collections import OrderedDict
 import json
 import shutil
 

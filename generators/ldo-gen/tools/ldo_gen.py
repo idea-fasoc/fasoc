@@ -58,8 +58,10 @@ if not os.path.isfile(args.specfile):
    print('File Path: ' + args.specfile)
    sys.exit(1)
 
-if args.platform != 'tsmc65lp' and args.platform != 'gfbicmos8hp':
-   print('Error: Only supports TSMC65lp and GFBiCmos8hp kits as of now.')
+if args.platform != 'tsmc65lp' and args.platform != 'gfbicmos8hp' and \
+   args.platform != 'gf12lp':
+   print('Error: Only supports TSMC65lp, GFBiCmos8hp and GF12LP kits ' + \
+         'as of now.')
    sys.exit(1)
 
 if args.mode != 'verilog':
@@ -348,9 +350,9 @@ if args.mode != 'verilog':
    print('#------------------------------------------------------------------')
    print('# Configuring Synth and APR scripts...')
    print('#------------------------------------------------------------------')
-   cfg.ldo_gen_dg_flow_cfg(args.platform, platformConfig['aux_lib'], \
+   cfg.ldo_gen_dg_flow_cfg(args.platform, vin, platformConfig['aux_lib'], \
                            designName, flowDir)
-   
+
    #---------------------------------------------------------------------------
    # Run Synthesis and APR
    #---------------------------------------------------------------------------

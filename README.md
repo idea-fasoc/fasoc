@@ -55,7 +55,13 @@ The macro generation mode will generate hard macros in addition to the verilog. 
     cd fasoc
     git submodule update --init --recursive
     ```
-
+    
+1. For GF14/GF12 PDKs support, run the below commands (if you are working with other PDKs then you can skip this step)
+    ```bash
+    cd private/cad
+    git checkout gf14
+    ```
+    
 1. Setup the cadre flow to for your specific location. The "Macro/Full" modes currently requires TSMC65LP PDK and ARM standard cells. More instructions on how to setup this particular platform can be found in the [Cadre Flow Guide](doc/Cadre%20Flow%20Guide.pdf)
 
 

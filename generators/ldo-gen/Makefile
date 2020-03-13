@@ -13,6 +13,12 @@ model_65lp:
 gen_8hp:
 	./tools/ldo_gen.py --specfile test.json --output ./work --platform gfbicmos8hp
 
+gen_8hp_macro:
+	./tools/ldo_gen.py --specfile test.json --output ./work --platform gfbicmos8hp --mode macro
+
+gen_8hp_full:
+	./tools/ldo_gen.py --specfile test.json --output ./work --platform gfbicmos8hp --mode full
+
 model_8hp:
 	./tools/ldo_model.py --platform gfbicmos8hp
 
@@ -24,6 +30,9 @@ gen_12lp_macro:
 
 gen_12lp_full:
 	./tools/ldo_gen.py --specfile test.json --output ./work --platform gf12lp --mode full
+
+model_12lp:
+	./tools/ldo_model.py --platform gf12lp
 
 clean:
 	./tools/ldo_gen.py --specfile test.json --output ./work --platform tsmc65lp --clean

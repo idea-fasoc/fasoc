@@ -1,4 +1,3 @@
-# This is the readme
 
 # ADC-GEN: ADC SAR generator
 This is a fully autonomous tool to generate a low drop out regulator circuit from user specification to GDSII enabling temperature sensing in SoC design.

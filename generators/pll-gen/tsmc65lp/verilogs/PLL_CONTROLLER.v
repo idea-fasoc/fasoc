@@ -283,7 +283,7 @@ module PLL_CONTROLLER(
 
 
 		reg	signed	[FILTER_ACCUM_INT_WIDTH-1:0]	filter_out_int; 
-		reg			[FILTER_ACCUM_INT_WIDTH-1:0]	dco_control_word;
+		reg		[FILTER_ACCUM_INT_WIDTH-1:0]	dco_control_word;
 
 		reg 		[DCO_CCW_WIDTH-1:0]				dco_ccw;
 		reg 		[DCO_CCW_WIDTH-1:0]				dco_ccw_filter;
@@ -293,15 +293,15 @@ module PLL_CONTROLLER(
 		reg 		[DCO_FCW_WIDTH-1:0]				dco_fcw_filter;
 		wire 		[DCO_FCW_WIDTH-1:0]				dco_fcw_coarse_lock_ctrl;
 
-		reg											dco_open_loop_en_d;
+		reg								dco_open_loop_en_d;
 		reg			[DCO_CCW_WIDTH +
-					 DCO_FCW_WIDTH-1:0]				dco_open_loop_ctrl_d;
+					 DCO_FCW_WIDTH-1:0]			dco_open_loop_ctrl_d;
 		reg 		[DCO_CCW_WIDTH-1:0]				dco_ccw_open_loop;
 		reg 		[DCO_FCW_WIDTH-1:0]				dco_fcw_open_loop;
 
-		wire 										fine_lock_detect;
+		wire 								fine_lock_detect;
 
-		reg			[SSC_MOD_WIDTH-1:0]				ssc_value;
+		reg		[SSC_MOD_WIDTH-1:0]				ssc_value;
 	
 
 	// Create the phase ramps and the error signal
@@ -384,10 +384,12 @@ module PLL_CONTROLLER(
 		always @* begin
 
 			if(phase_ramp_error_temp > PHASE_RAMP_ERROR_MAX) 
+			//if(phase_ramp_error_true > PHASE_RAMP_ERROR_MAX) 
 				begin
 					phase_ramp_error = PHASE_RAMP_ERROR_MAX;
 				end
 			else if(phase_ramp_error_temp < PHASE_RAMP_ERROR_MIN) 
+			//else if(phase_ramp_error_true < PHASE_RAMP_ERROR_MIN) 
 				begin
 					phase_ramp_error = PHASE_RAMP_ERROR_MIN;
 				end
@@ -472,6 +474,7 @@ module PLL_CONTROLLER(
 		always @* begin
 
 			// use the integer portion of the filter output
+			// it is signed extension
 			filter_out_int = filter_out>>>(FILTER_ACCUM_FRAC_WIDTH+1);
 
 

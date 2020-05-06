@@ -7,63 +7,45 @@ import HSPICE_mds
 import sys
 import os
 import shutil
-def pll_flow_setup(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,nfc,nstg):
+def pll_flow_setup(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,nfc,nstg,verilogSrcDir):
 
-	# write verilog 
-	nm1=HSPICE_mds.netmap()
-	nm1.get_net('iN',designName,None,None,None)		
-	nm1.get_net('nM',None,None,nstg,1)		
-	nm1.get_net('nD',None,None,ndrv,1)		
-	nm1.get_net('nF',None,None,nfc,1)		
-	nm1.get_net('nC',None,None,ncc,1)		
-	r_pll_v=open(formatDir+'form_synth_pll.v','r')	
-	lines=list(r_pll_v.readlines())
-
-	with open(genDir+'verilogs/'+designName+'.v','w') as w_pll_v:
-		for line in lines:
-			nm1.printline(line,w_pll_v)
 	if outMode=='macro' or outMode=='full':
-		vsrcs=os.listdir(genDir+'./verilogs/')
-		for vsrc in vsrcs:
-			full_vsrc=os.path.join(genDir+'./verilogs/',vsrc)
-			if os.path.isfile(full_vsrc):
-				shutil.copy(full_vsrc,flowDir+'src/')
+		shutil.copyfile(verilogSrcDir+'FUNCTIONS.v',flowDir+'/src/FUNCTIONS.v')	
+		shutil.copyfile(verilogSrcDir+'PLL_CONTROLLER_TDC_COUNTER.v',flowDir+'/src/PLL_CONTROLLER_TDC_COUNTER.v')	
+		shutil.copyfile(verilogSrcDir+'PLL_CONTROLLER.v',flowDir+'/src/PLL_CONTROLLER.v')	
+		shutil.copyfile(verilogSrcDir+'TDC_COUNTER.v',flowDir+'/src/TDC_COUNTER.v')	
+		shutil.copyfile(verilogSrcDir+'SSC_GENERATOR.v',flowDir+'/src/SSC_GENERATOR.v')	
+		shutil.copyfile(verilogSrcDir+'dco_CC.v',flowDir+'/src/dco_CC.v')	
+		shutil.copyfile(verilogSrcDir+'dco_FC.v',flowDir+'/src/dco_FC.v')	
+		shutil.copyfile(verilogSrcDir+'synth_pll_dco_interp.v',flowDir+'/src/synth_pll_dco_interp.v')	
+		shutil.copyfile(verilogSrcDir+'synth_pll_dco_outbuff.v',flowDir+'/src/synth_pll_dco_outbuff.v')	
 		print(outMode,'mode: verilog sources are generated in ',flowDir,'src/')
 	elif outMode=='verilog':
-		vsrcs=os.listdir(genDir+'./verilogs/')
-		for vsrc in vsrcs:
-			full_vsrc=os.path.join(genDir+'./verilogs/',vsrc)
-			if os.path.isfile(full_vsrc):
-				shutil.copy(full_vsrc,outDir+'/')
+		shutil.copyfile(verilogSrcDir+'FUNCTIONS.v',outDir+'/FUNCTIONS.v')	
+		shutil.copyfile(verilogSrcDir+'PLL_CONTROLLER_TDC_COUNTER.v',outDir+'/PLL_CONTROLLER_TDC_COUNTER.v')	
+		shutil.copyfile(verilogSrcDir+'PLL_CONTROLLER.v',outDir+'/PLL_CONTROLLER.v')	
+		shutil.copyfile(verilogSrcDir+'TDC_COUNTER.v',outDir+'/TDC_COUNTER.v')	
+		shutil.copyfile(verilogSrcDir+'SSC_GENERATOR.v',outDir+'/SSC_GENERATOR.v')	
+		shutil.copyfile(verilogSrcDir+'dco_CC.v',outDir+'/dco_CC.v')	
+		shutil.copyfile(verilogSrcDir+'dco_FC.v',outDir+'/dco_FC.v')	
+		shutil.copyfile(verilogSrcDir+'synth_pll_dco_interp.v',outDir+'/synth_pll_dco_interp.v')	
+		shutil.copyfile(verilogSrcDir+'synth_pll_dco_outbuff.v',outDir+'/synth_pll_dco_outbuff.v')	
+		print(outMode,'mode: verilog sources are generated in ',outDir)
 		print('verilog mode: verilog sources are generated in '+outDir)
-		#p = sp.Popen(['cp','verilogs/'+designName+'.v',outDir+'/']) 
-		#p.wait()
-#		with open(flowDir+'src/'+designName+'.v','w') as w_pll_v2:
-#			for line in lines:
-#				nm1.printline(line,w_pll_v2)	
-	#remove generated pll file
-	os.remove(genDir+'verilogs/'+designName+'.v')
+		#--- generate verilog file ---
+		rvfile=open(formatDir+'/form_pll_PD.v','r')
+		nm1=HSPICE_mds.netmap()
+		nm1.get_net('iN',designName,None,None,None)
+		nm1.get_net('nM',None,nstg,nstg,1)
+		nm1.get_net('nD',None,ndrv,ndrv,1)
+		nm1.get_net('nF',None,nfc,nfc,1)
+		nm1.get_net('nC',None,ncc,ncc,1)
+		nm1.get_net('dN',designName+'_ffdco',None,None,None)
+		with open(outDir+'/'+designName+'.v','w') as wvfile:
+			lines_const=list(rvfile.readlines())
+			for line in lines_const:
+				nm1.printline(line,wvfile)
 
-	
-	# write include.mk 
-	nm1=HSPICE_mds.netmap()
-	nm1.get_net('dn',designName,None,None,None)		
-	r_pll_mk=open(formatDir+'form_pll_include.mk','r')	
-	lines=list(r_pll_mk.readlines())
-	if outMode=='macro' or outMode=='full':
-		with open(flowDir+'/include.mk','w') as w_pll_mk:
-			for line in lines:
-				nm1.printline(line,w_pll_mk)	
-
-	# write dc.filelist.tcl 
-	nm1=HSPICE_mds.netmap()
-	nm1.get_net('DN',designName,None,None,None)		
-	r_pll_fl=open(formatDir+'form_pll_dc.filelist.tcl','r')	
-	lines=list(r_pll_fl.readlines())
-	if outMode=='macro' or outMode=='full':
-		with open(flowDir+'/scripts/dc/dc.filelist.tcl','w') as w_pll_fl:
-			for line in lines:
-				nm1.printline(line,w_pll_fl)	
 
 def dco_flow_setup(formatDir,flowDir,ndrv,ncc,nfc,nstg):
 

@@ -125,18 +125,24 @@ def command_parse(parseList):
 # 2. returns the width/length of aux-cell from .lef
 #==========================================================
 def dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib):
-	if os.path.isdir(flowDir+'/blocks/dco_CC/export/'):
-		print('*** '+'/blocks already exists')
+	if os.path.isdir(flowDir+'blocks/'):
+		print('*** '+flowDir+'blocks/ already exists')
 	else:
 		try:
 			os.mkdir(flowDir+'/blocks')
+		except OSError:
+			print('unable to create '+flowDir+'/blocks/')
+	if os.path.isdir(flowDir+'/blocks/dco_CC/export/'):
+		print('*** '+flowDir+'/blocks/dco_CC/export already exists')
+	else:
+		try:
 			os.mkdir(flowDir+'/blocks/dco_CC')
 			os.mkdir(flowDir+'/blocks/dco_CC/export/')
 			print(flowDir+'/blocks/dco_CC/export/'+' generated')
 		except OSError:
 			print('unable to create '+flowDir+'/blocks/dco_CC/export/')
 	if os.path.isdir(flowDir+'/blocks/dco_FC/export/'):
-		print('*** '+'/blocks already exists')
+		print('*** '+flowDir+'/blocks/dco_FC/export already exists')
 	else:
 		try:
 			os.mkdir(flowDir+'/blocks/dco_FC')
@@ -183,11 +189,23 @@ def dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib):
 
 	return W_CC,H_CC,W_FC,H_FC
 
-def dir_tree(outMode,pvtGenDir,hspice,outputDir,extDir,calibreRulesDir):
+def dir_tree(outMode,pvtGenDir,hspice,finesim,outputDir,extDir,calibreRulesDir):
 	if outMode=="macro" or outMode=="full":
 		hspiceDirs=['HSPICE','HSPICE/NETLIST','HSPICE/TB','HSPICE/DUMP_result','HSPICE/TBrf','HSPICE/DUMPrf_result','HSPICE/pex_NETLIST','HSPICE/pex_TB','HSPICE/pex_DUMP_result']
 		if hspice==1:
 			for subDir in hspiceDirs:
+				Dir = os.path.join(pvtGenDir , './tsmc65lp/'+subDir)
+				if os.path.isdir(Dir):
+					print('*** '+Dir+' already exists')
+				else:
+					try:
+						os.mkdir(Dir)
+						print(Dir+' generated')
+					except OSError:
+						print('unable to create'+Dir)
+		finesimDirs=['FINESIM','FINESIM/NETLIST','FINESIM/TB','FINESIM/DUMP_result','FINESIM/TBrf','FINESIM/DUMPrf_result','FINESIM/pex_NETLIST','FINESIM/pex_TB','FINESIM/pex_DUMP_result']
+		if finesim==1:
+			for subDir in finesimDirs:
 				Dir = os.path.join(pvtGenDir , './tsmc65lp/'+subDir)
 				if os.path.isdir(Dir):
 					print('*** '+Dir+' already exists')

@@ -1,0 +1,25 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
+-XLMODE
+./INCA_libs/irun.lnx8664.15.20.nc
+-RUNMODE
+-sv
+./tb/TB_PLL_CONTROLLER_TDC_COUNTER.sv
+./verilog/ANALOG_CORE.v
+./verilog/PLL_CONTROLLER_TDC_COUNTER.v
+./verilog/PLL_CONTROLLER.v
+./verilog/TDC_COUNTER.v
+./verilog/DCO_MODEL.v
+./verilog/SSC_GENERATOR.v
+./verilog/FUNCTIONS.v
+-CDSLIB
+./INCA_libs/irun.lnx8664.15.20.nc/cdsrun.lib
+-HDLVAR
+./INCA_libs/irun.lnx8664.15.20.nc/hdlrun.var
+-MESSAGES
+-UPDATE
+-XLLIBSTORE
+./INCA_libs/irun.lnx8664.15.20.nc/xllibs
+-ALLOWUNBOUND

@@ -1,1 +1,3 @@
-s1(24May2019:13:00:28):  irun -64bit -elaborate -sv -sem2009 -sysv_ext +.vh -access +rwc -timescale 1ns/1ps -f ./flist.f -l irun_comp.log 
+s1(09Jan2020:16:49:47):  irun -64bit -elaborate -sv -sem2009 -sysv_ext +.vh -access +rwc -timescale 1ns/1ps -f ./flist.f -l irun_comp.log 
+s2(09Jan2020:16:49:50):  irun -64bit -R -sv -sem2009 -access +rwc -input dump_irun.tcl +delay_mode_unit -timescale 1ns/1ps -l irun_run.log 
+s3(09Jan2020:16:52:22):  irun -64bit -elaborate -sv -sem2009 -sysv_ext +.vh -access +rwc -timescale 1ns/1ps -f ./flist.f -l irun_comp.log 

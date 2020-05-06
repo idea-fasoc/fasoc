@@ -5,8 +5,15 @@ See more at https://fasoc.engin.umich.edu/ad-pll/
 
 # Version Details
 ```
-Version : Alpha-1.0                                                             
-Date    : May 12, 2019 
+Version : Beta-1.0                                                             
+Date    : May 3, 2020 
+```
+# Major updates 
+```
+Date    : May 3, 2020
+	1. Supported specifications are added (inband phase noise, dco power etc.). For details, refer to the example in "Running the tools" section below.
+	2. For the noise performance, power domain of DCO is separated from the controller. The layout style resembles that of the taped-out chip on summer 2019. Measurement results will be updated in FASoC web-page.
+	3. Output buffer/ divder block is embedded in PLL to drive large load of pad and to enable devided output clock. Power domain of this block is separated from controller and DCO as well for the noise performance.
 ```
 
 # Environment Setup
@@ -47,16 +54,22 @@ Date    : May 12, 2019
 	"module_name": "test_synth_pll",
 	"specifications": 
 	   {
-	"Fnom_min":8.40e8,	<= lower limit of nominal frequency range (this is NOT the minimum frequency of pll) 
-	"Fnom_max":8.60e8,	<= upper limit of nominal frequency range (this is NOT the maximum frequency of pll)	
+		"Fnom_min":2.80e8,	<= lowend of the nominal frequency range (nominal frequency is the DCO frequency when the control word is medium)
+		"Fnom_max":3.00e8,	<= highend of the nominal frequency range
+		"FCR_min":1,     	<= frequency coverage ratio of fine/coarse (fine frequency tuning range / coarse frequency step) 
+		"Fmax":5e8,		<= maximum frequency
+		"Fmin":35e6,		<= minimum frequency
+		"Fres":20e3,		<= frequency resolution
+		"inband_PN":-80,	<= inband phase noise in dBc/Hz
+		"dco_PWR":24e-3		<= dco power
 	   }
 	}
     ```
 
 1. Running the PLL generator. 
-   To run the PLL generator, execute the below command from any location.
+   To run the latest PLL generator, execute the below command from any location. Hierarchical layout with separate power domains for DCO and buffer will be generated. Silicon performance measured.
     ```bash
-    .{Path_to_Generator_Folder}/tsmc65lp/tools/PLL_GEN.py --specfile {Input_Spec_File.json} --output {Output_Folder} --platform {Technology_Node} [--mode {Run_Mode}] [--run_vsim {Verilog_sim}]
+    .{Path_to_Generator_Folder}/tsmc65lp/tools/PLL_GEN_Beta.py --specfile {Input_Spec_File.json} --output {Output_Folder} --platform {Technology_Node} [--mode {Run_Mode}] [--run_vsim {Verilog_sim}]
     ```
    All the options specified in square brackets [] are optional. When `--clean` option is provided, the tool exits after a cleanup of the workspace. Each of the command line variables are described below in detail.
    
@@ -105,8 +118,12 @@ Date    : May 12, 2019
 # Supported Spec ranges
 1. Alpha version supports only nominal frequency for user input, but provides generated design's specs of frequency resolution of DCO, power consumption, area. Below are the spec ranges that the pll supports. If the user gives certain nominal frequency, the generator will provide other specs within the below spec ranges. Beta release will include phase noise, jitter in addition.
     ```bash
-	Nominal Frequency   : 240 MHz ~ 840 MHz
-	Frequency Resolution: 3.15K Hz ~ 54.5KHz
-	Power Consumption   : 9.0mW ~ 17.7mW
-	Area                : 4460um^2 ~ 16416um^2
+	Maximum Frequency	: 449 MHz ~ 3.02 GHz
+	Minimum Frequency	: 6.4 MHz ~ 2.09 GHz 
+	Nominal Frequency	: 262 MHz ~ 2.53 GHz
+	Frequency Resolution	: 0.28 KHz ~ 126 KHz
+	Frequency Cover Ratio	: 0.15 ~ 48 
+	DCO Power Consumption   : 9.0mW ~ 17.7mW
+	PLL inband phase noise	: -90.2 dBc/Hz ~ -63.3 dBc/Hz
+	Area			: 4460um^2 ~ 76416um^2
     ```

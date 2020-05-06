@@ -96,7 +96,7 @@ Date    : May 3, 2020
 
 1. Run the test script from `pll-gen/tsmc65lp/` folder to ensure the generator tool and the model tool are correctly setup
     ```bash
-   make pll_gen 
+   make pll_gen_beta 
     ```
 
 1. Running the model generator in standalone mode. Run this in 'pll-gen/tsmc65lp'

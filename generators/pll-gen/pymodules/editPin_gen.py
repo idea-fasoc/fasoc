@@ -11,7 +11,7 @@ import numpy as np
 import argparse
 import json
 sys.path.append('./../pymodules/')
-import ignore_HSPICE_mds
+import HSPICE_mds2
 
 #Ndrv=1
 #Ncc=24
@@ -35,7 +35,7 @@ def editPin_gen(Ndrv,Ncc,Nfc,Nstg,formatDir,version,wfile_name):
 	# 	which makes stg0 and stg7 too far
 	#========================================================================
 	if version==1:
-		nm2=ignore_HSPICE_mds.netmap()
+		nm2=HSPICE_mds2.netmap()
 		nm2.get_net('po',None,0,Nstg-1,1)
 		nm2.get_net('no',None,0,Nstg-1,1)
 		nm2.get_net('ep',None,0,Nstg-1,1)
@@ -50,7 +50,7 @@ def editPin_gen(Ndrv,Ncc,Nfc,Nstg,formatDir,version,wfile_name):
 		istg=0
 		for line in lines:
 			if line[0:2]=='@W': 
-				nm1=ignore_HSPICE_mds.netmap()
+				nm1=HSPICE_mds2.netmap()
 				nm1.get_net('f1','FC[',istg,istg+Nstg*(Nfc-1),Nstg)
 				nm1.get_net('c1','CC[',istg,istg+Nstg*(Ncc-1),Nstg)
 				nm1.printline(line,wfile)
@@ -69,7 +69,7 @@ def editPin_gen(Ndrv,Ncc,Nfc,Nstg,formatDir,version,wfile_name):
 	if version==2:
 		Nedge_start=Nstg*2
 		eps=int(Nstg/2) # edge_per_side per either N or P
-		nm2=ignore_HSPICE_mds.netmap()
+		nm2=HSPICE_mds2.netmap()
 		#--- distribute EDGE_SEL ---
 		nm2.get_net('el',None,0,eps-1,1)
 		nm2.get_net('eL',None,Nedge_start,Nedge_start+eps-1,1)
@@ -102,7 +102,7 @@ def editPin_gen(Ndrv,Ncc,Nfc,Nstg,formatDir,version,wfile_name):
 		istg=0
 		for line in lines:
 			if line[0:2]=='@W': 
-				nm1=ignore_HSPICE_mds.netmap()
+				nm1=HSPICE_mds2.netmap()
 				nm1.get_net('f1','FC[',istg,istg+Nstg*(Nfc-1),Nstg)
 				nm1.get_net('c1','CC[',istg,istg+Nstg*(Ncc-1),Nstg)
 				nm1.printline(line,wfile)

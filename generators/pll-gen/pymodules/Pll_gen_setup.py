@@ -215,8 +215,9 @@ def dir_tree(outMode,pvtGenDir,hspice,finesim,outputDir,extDir,calibreRulesDir):
 						print(Dir+' generated')
 					except OSError:
 						print('unable to create'+Dir)
-		extDirs=[extDir+'/run',extDir+'/sch',extDir+'/layout']
-		for Dir in extDirs:
+		extDirs=[extDir,extDir+'/run',extDir+'/sch',extDir+'/layout']
+		for subDir in extDirs:
+			Dir = os.path.join(pvtGenDir , './tsmc65lp/'+subDir)
 			if os.path.isdir(Dir):
 				print('*** '+Dir+' already exists')
 			else:

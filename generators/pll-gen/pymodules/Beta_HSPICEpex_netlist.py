@@ -4,7 +4,7 @@
 #	2. pex_XringX_oscX.sp: netlist wrapper with all the voltage source name defined
 #=====================================================================================================
 import HSPICE_mds
-import ignore_HSPICE_mds
+import HSPICE_mds2
 import re
 import subprocess as sp
 

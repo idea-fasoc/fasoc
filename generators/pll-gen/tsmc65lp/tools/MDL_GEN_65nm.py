@@ -49,11 +49,12 @@ genDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../")
 
 
 
-hspiceDir=genDir +  'HSPICE/'
+hspiceDir=privateGenDir +  '/tsmc65lp/HSPICE/'
 formatDir=genDir + 'formats/'
+pvtFormatDir=privateGenDir + '/tsmc65lp/formats/'
 
-aux_FC = formatDir+'form_DCO_FC.sp'
-aux_CC = formatDir+'form_DCO_CC.sp'
+aux_FC = pvtFormatDir+'form_DCO_FC.sp'
+aux_CC = pvtFormatDir+'form_DCO_CC.sp'
 netlistDir=hspiceDir+'NETLIST/'
 resultDir=hspiceDir+'DUMP_result/'
 resultrfDir=hspiceDir+'DUMPrf_result/'
@@ -74,18 +75,19 @@ num_core=4
 #--------------------------------------------------------
 # parse the command
 #--------------------------------------------------------
-parseList=[0,1,0,0,0,0]  #[specfile,platform,outputDir,pex_verify,runVsim,mode]
+parseList=[0,1,0,0,0,1]  #[specfile,platform,outputDir,pex_verify,runVsim,mode]
 specfile,platform,outputDir,pexVerify,runVsim,outMode=Pll_gen_setup.command_parse(parseList)
 
 configFile=genDir + './../../../config/platform_config.json'
-aLib,mFile,calibreRulesDir,hspiceModel=Pll_gen_setup.config_parse(configFile,platform)
+aLib,mFile,calibreRulesDir,hspiceModel=Pll_gen_setup.config_parse(outMode,configFile,platform)
 
 #------------------------------------------------------------------------------
 #  make HSPICE directory tree
 #------------------------------------------------------------------------------
 hspice=1
-Pll_gen_setup.dir_tree(hspice,0)
+finesim=0
 
+Pll_gen_setup.dir_tree(outMode,privateGenDir,hspice,finesim,outputDir,extDir,calibreRulesDir)
 #------------------------------------------------------------------------------
 #  Sub-circuit definition for dco_CC
 #------------------------------------------------------------------------------
@@ -122,13 +124,10 @@ print_error=1
 #------------------------------------------------------------------------------
 subckt=HSPICE_subckt.gen_subckt_65nm(netlistDir,aux_CC,aux_FC)
 #
-try:
-	for i in range(1,len(vm1.comblist[0])):
-		netlist=HSPICE_netlist.gen_netlist(netlistDir,formatDir,vm1.comblist[0][i],vm1.comblist[1][i],vm1.comblist[2][i],vm1.comblist[3][i],vm1.comblist[3][i],1)
-		tb=HSPICE_tb.gen_tb(hspiceModel,tbDir,formatDir,vm1.comblist[0][i],vm1.comblist[1][i],vm1.comblist[2][i],vm1.comblist[3][i],vm1.comblist[3][i],1,vdd,temp,500)
-	print("%d number of tb.sp generated"%(len(vm1.comblist[0])-1))
-except:
-	print('error encountered during netlist/tb generation')
+for i in range(1,len(vm1.comblist[0])):
+	netlist=HSPICE_netlist.gen_netlist(netlistDir,pvtFormatDir,vm1.comblist[0][i],vm1.comblist[1][i],vm1.comblist[2][i],vm1.comblist[3][i],vm1.comblist[3][i],1)
+	tb=HSPICE_tb.gen_tb(hspiceModel,tbDir,pvtFormatDir,vm1.comblist[0][i],vm1.comblist[1][i],vm1.comblist[2][i],vm1.comblist[3][i],vm1.comblist[3][i],1,vdd,temp,500)
+print("%d number of tb.sp generated"%(len(vm1.comblist[0])-1))
 #------------------------------------------------------------------------------
 # Makefile generation for hspice simulation
 #------------------------------------------------------------------------------
@@ -137,8 +136,8 @@ mkfile=MKfile.gen_mkfile_v2(formatDir,hspiceDir,vm1.comblist[0],vm1.comblist[1],
 #------------------------------------------------------------------------------
 # Run HSPICE sim
 #------------------------------------------------------------------------------
-#p=sp.Popen(['make','hspicesim'])
-#p.wait()
+p=sp.Popen(['make','hspicesim'])
+p.wait()
 
 #------------------------------------------------------------------------------
 # Read transient sim result, receive nominal frequencies

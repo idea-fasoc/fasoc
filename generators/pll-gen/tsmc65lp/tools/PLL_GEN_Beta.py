@@ -292,7 +292,7 @@ if outMode=='macro' or outMode=='full':
 	# generate Feed Forward DCO 
 	#--------------------------------------------------------
 	pll_name=designName
-	bleach_dco=0 # test switch
+	bleach_dco=1 # test switch
 	ffdco_synth=1
 	ffdco_apr=1
 	W_dco,H_dco=FFdco_flow.ffdco_flow(pvtFormatDir,ffdco_flowDir,pll_name,bleach_dco,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,ffdco_synth,ffdco_apr,verilogSrcDir)

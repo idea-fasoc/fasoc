@@ -33,7 +33,7 @@ endif
 include bleach.mk
 
 modeling:
-	cd $(HOME_PATH); python $(PY_DIR)/MDL_GEN_65nm.py --platform tsmc65lp
+	cd $(HOME_PATH); python $(PY_DIR)/MDL_GEN_65nm.py --platform tsmc65lp --mode full
 
 pex_modeling:
 	cd $(HOME_PATH); python $(PY_DIR)/PEX_MDL_GEN_65nm.py --platform tsmc65lp

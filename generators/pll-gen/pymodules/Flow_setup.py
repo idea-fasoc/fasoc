@@ -33,7 +33,7 @@ def pll_flow_setup(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,n
 		print(outMode,'mode: verilog sources are generated in ',outDir)
 		print('verilog mode: verilog sources are generated in '+outDir)
 		#--- generate verilog file ---
-		rvfile=open(formatDir+'/form_pll_PD.v','r')
+		r_pll_v=open(formatDir+'/form_pll_PD.v','r')
 		nm1=HSPICE_mds.netmap()
 		nm1.get_net('iN',designName,None,None,None)
 		nm1.get_net('nM',None,nstg,nstg,1)
@@ -42,59 +42,20 @@ def pll_flow_setup(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,n
 		nm1.get_net('nC',None,ncc,ncc,1)
 		nm1.get_net('dN',designName+'_ffdco',None,None,None)
 		with open(outDir+'/'+designName+'.v','w') as wvfile:
-			lines_const=list(rvfile.readlines())
-			for line in lines_const:
+			lines_pll=list(r_pll_v.readlines())
+			for line in lines_pll:
+				nm1.printline(line,wvfile)
+		#--- generate verilog file ---
+		r_dco_v=open(formatDir+'/form_ffdco.v','r')
+		nm1=HSPICE_mds.netmap()
+		nm1.get_net('iN',designName+'_ffdco',None,None,None)
+		nm1.get_net('nM',None,nstg,nstg,1)
+		nm1.get_net('nD',None,ndrv,ndrv,1)
+		nm1.get_net('nF',None,nfc,nfc,1)
+		nm1.get_net('nC',None,ncc,ncc,1)
+		with open(outDir+'/'+designName+'_ffdco.v','w') as wvfile:
+			lines_dco=list(r_dco_v.readlines())
+			for line in lines_dco:
 				nm1.printline(line,wvfile)
 
 
-def dco_flow_setup(formatDir,flowDir,ndrv,ncc,nfc,nstg):
-
-	#-------------------------------------------
-	# generate dco.v to /flow/src/
-	#-------------------------------------------
-	r_dco_v=open(formatDir+'form_DCO.v','r')	
-	lines=list(r_dco_v.readlines())
-	
-	nm1=HSPICE_mds.netmap()
-	nm1.get_net('nD',None,None,ndrv,1)		
-	nm1.get_net('nC',None,None,ncc,1)		
-	nm1.get_net('nF',None,None,nfc,1)		
-	nm1.get_net('nM',None,None,nstg,1)		
-	nm1.get_net('nm',None,None,nstg,1)		
-	nm1.get_net('nd',None,None,ndrv,1)		
-	nm1.get_net('nf',None,None,nfc,1)		
-	nm1.get_net('nc',None,None,ncc,1)		
-	
-	with open(flowDir+'src/dco_%ddrv_%dcc_%dfc_%dstg.v'%(ndrv,ncc,nfc,nstg),'w') as w_dco_v:		
-		for line in lines:
-			nm1.printline(line,w_dco_v)	
-	#-------------------------------------------
-	# generate include.mk 
-	#-------------------------------------------
-	r_include=open(formatDir+'form_include.mk','r')	
-	lines=list(r_include.readlines())
-	
-	nm1=HSPICE_mds.netmap()
-	nm1.get_net('nD',None,None,ndrv,1)		
-	nm1.get_net('nC',None,None,ncc,1)		
-	nm1.get_net('nF',None,None,nfc,1)		
-	nm1.get_net('nM',None,None,nstg,1)		
-	
-	with open(flowDir+'include.mk','w') as w_include:		
-		for line in lines:
-			nm1.printline(line,w_include)	
-	#-------------------------------------------
-	# generate dc.filelist.tcl 
-	#-------------------------------------------
-	r_flist=open(formatDir+'form_dc.filelist.tcl','r')	
-	lines=list(r_flist.readlines())
-	
-	nm1=HSPICE_mds.netmap()
-	nm1.get_net('nD',None,None,ndrv,1)		
-	nm1.get_net('nC',None,None,ncc,1)		
-	nm1.get_net('nF',None,None,nfc,1)		
-	nm1.get_net('nM',None,None,nstg,1)		
-	
-	with open(flowDir+'scripts/dc/dc.filelist.tcl','w') as w_flist:	
-		for line in lines:
-			nm1.printline(line,w_flist)	

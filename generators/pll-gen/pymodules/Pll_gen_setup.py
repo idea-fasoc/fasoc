@@ -131,7 +131,7 @@ def dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib):
 		try:
 			os.mkdir(flowDir+'/blocks')
 		except OSError:
-			print('unable to create '+flowDir+'/blocks/')
+			print('Error: unable to create '+flowDir+'/blocks/')
 	if os.path.isdir(flowDir+'/blocks/dco_CC/export/'):
 		print('*** '+flowDir+'/blocks/dco_CC/export already exists')
 	else:
@@ -140,7 +140,7 @@ def dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib):
 			os.mkdir(flowDir+'/blocks/dco_CC/export/')
 			print(flowDir+'/blocks/dco_CC/export/'+' generated')
 		except OSError:
-			print('unable to create '+flowDir+'/blocks/dco_CC/export/')
+			print('Error: unable to create '+flowDir+'/blocks/dco_CC/export/')
 	if os.path.isdir(flowDir+'/blocks/dco_FC/export/'):
 		print('*** '+flowDir+'/blocks/dco_FC/export already exists')
 	else:
@@ -149,7 +149,7 @@ def dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib):
 			os.mkdir(flowDir+'/blocks/dco_FC/export/')
 			print(flowDir+'/blocks/dco_FC/export/'+' generated')
 		except OSError:
-			print('unable to create '+flowDir+'/blocks/dco_FC/export/')
+			print('Error: unable to create '+flowDir+'/blocks/dco_FC/export/')
 
 	shutil.copyfile(dco_CC_lib + '/dco_CC.cdl',  flowDir + '/blocks/dco_CC/export/dco_CC.cdl')
 	shutil.copyfile(dco_CC_lib + '/dco_CC.gds', flowDir + '/blocks/dco_CC/export/dco_CC.gds')

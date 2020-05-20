@@ -50,11 +50,6 @@ import Beta_HSPICE_result
 
 privateGenDir = os.path.relpath(os.path.join(genDir, '../../../', 'private', head_tail_1[1], head_tail_0[1]))
 privatePyDir = os.path.join(privateGenDir , './pymodules/')
-#print("privateGenDir=%s"%(privateGenDir))
-#sys.exit(1)
-#sys.path.append(privatePyDir)
-#import HSPICE_subckt
-
 
 #--------------------------------------------------------
 #	public directories
@@ -175,7 +170,7 @@ try:
 	f = open(mFile, 'r')
 	print('*** model file from platform_config.json is properly read')
 except ValueError as e:
-	print ('Model file creation failed')
+	print ('Error: Model file creation failed')
 	sys.exit(1)
 #---------------------------------------------------------------------------------------
 # read model file
@@ -193,7 +188,7 @@ mult_Coff= jsonModel['pex coefficients']['mult_Coff']
 pex_Iavg_const=jsonModel['pex coefficients']['pex_Iavg_const']
 PN_const= jsonModel['pll_model_constants']['1M_PN_const']
 
-print('model constants read properly: CF=%e, mult_Con=%e'%(CF,mult_Con))
+#print('model constants read properly: CF=%e, mult_Con=%e'%(CF,mult_Con))
 #--------------------------------------------------------
 # search design solutions 
 #--------------------------------------------------------

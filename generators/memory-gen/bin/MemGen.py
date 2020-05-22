@@ -1,15 +1,15 @@
 #!/usr/bin/env python3.7
-
 ###################################################################################
-# Version : Alpha-1.0                                      #
-# Date    : Apr 26, 2019                                     #
-# Author  : Sumanth Kamineni                                 #
-# Contact : SumanthKamineni@virginia.edu                                #
+# Version : Beta-0.1                                                              #
+# Date    : May 21, 2020                                                          #
+# Author  : Sumanth Kamineni                                                      #
+# Contact : SumanthKamineni@virginia.edu                                          #
 ###################################################################################
 # What's in the release?                                                          #
-# First version of the Memory generator alpha release.                         #
+# Updated MemGen to support FinFET process. Current Version supports              #
+# Current Version supports TSMC 65nm planar and GF 12nm FinFET processes.         #
 # This version generates the memory and its associated (GDS, LEF, LIB, DB)        #
-# files for the given user specifications.                  #
+# files for the given user specifications.                                        #
 # This relase includes verilog generation, synthesis and auto place & route       #
 ###################################################################################
 
@@ -252,13 +252,17 @@ class MemGen():
                sfh.write("`timescale 1ns / 1ns\n")
                sfh.write('`include "%s.v"\n'%self.decoder_name)
                sfh.write('`include "%s.v"\n\n\n'%self.mux_name)
-               sfh.write("module %s (DOUT, ADDR, CLK, DBE, CEN, DIN, WE);\n"%self.sram_name)
+               if p_options['PDK'] =='gf12lp':
+                     sfh.write("module %s (DOUT, ADDR, CLK, CEN, DIN, WE);\n"%self.sram_name)
+               else:
+                     sfh.write("module %s (DOUT, ADDR, CLK, DBE, CEN, DIN, WE);\n"%self.sram_name)
                sfh.write("   parameter address_size = %d;\n"%self.address_size)
                sfh.write("   parameter no_banks = %d;\n"%self.no_banks)
                sfh.write("   parameter bank_address_size = %d;\n"%self.bank_address_size)
                sfh.write("   parameter word_size    = %d;\n"%self.word_size)
                sfh.write("   input  CLK, CEN,  WE;\n")
-               sfh.write("   input [3:0]  DBE;\n")
+               if p_options['PDK'] !='gf12lp':
+                     sfh.write("   input [3:0]  DBE;\n")
                sfh.write("   input [address_size-1:0]  ADDR;\n")
                sfh.write("   input [word_size-1:0]  DIN;\n")
                sfh.write("   output [word_size-1:0]  DOUT;\n")
@@ -266,7 +270,10 @@ class MemGen():
                sfh.write("   wire [word_size-1:0] DATA_SRAM_BANK_OUT [no_banks-1:0];\n")
                sfh.write("   %s DI (.DATA_REQ(DATA_REQ), .ADDR(ADDR[address_size-1:bank_address_size]), .DATA_REQIN(CEN));\n"%(self.decoder_name))
                for j in range(0, self.no_banks):
-                     sfh.write("   SRAM_2KB SR%d ( .DOUT(DATA_SRAM_BANK_OUT[%d]), .ADDR_IN(ADDR[bank_address_size-1:0]), .CLK_IN(CLK), .DATA_BE_IN(DBE), .DATA_REQ_IN(DATA_REQ[%d]), .DIN(DIN), .WE_IN(WE));\n"%(j, j, j))
+                     if p_options['PDK'] =='gf12lp':
+                          sfh.write("   SRAM_2KB_GF12 SR%d ( .DOUT(DATA_SRAM_BANK_OUT[%d]), .ADDR_IN(ADDR[bank_address_size-1:0]), .CLK_IN(CLK), .CE_IN(DATA_REQ[%d]), .DIN(DIN), .WE_IN(WE));\n"%(j, j, j))
+                     else:
+                          sfh.write("   SRAM_2KB SR%d ( .DOUT(DATA_SRAM_BANK_OUT[%d]), .ADDR_IN(ADDR[bank_address_size-1:0]), .CLK_IN(CLK), .DATA_BE_IN(DBE), .DATA_REQ_IN(DATA_REQ[%d]), .DIN(DIN), .WE_IN(WE));\n"%(j, j, j))
                sfh.write("   %s MI (.DATA_OUT(DOUT), .DATA_IN(DATA_SRAM_BANK_OUT), .DATA_SEL(ADDR[address_size-1:bank_address_size]));\n"%(self.mux_name))
                sfh.write("endmodule\n")
                sfh.close()
@@ -322,6 +329,42 @@ class MemGen():
                      p_options["PDK"], filedata)
                with open(self.digitalflowdir + '/include.mk', 'w') as file:
                      file.write(filedata)
+               # Copying the PDK specific apr scripts to the scripts directory
+               self.scriptsdir=self.digitalflowdir + '/scripts/'
+               if not os.path.exists(self.scriptsdir):
+                     log.error("%s does not exist. The PDK specific are not found. Make sure the apr scripts exists"%self.scriptsdir)
+                     sys.exit(1)
+               else:
+                     self.dcscriptsdir=self.scriptsdir+'dc'
+                     self.invscriptsdir=self.scriptsdir+'innovus'
+                     if not os.path.isdir(self.dcscriptsdir):
+                          os.makedirs(self.dcscriptsdir)
+                     if not os.path.isdir(self.invscriptsdir):
+                          os.makedirs(self.invscriptsdir)
+                     try:
+                         pdkdcdir=self.scriptsdir+'%s/dc'%p_options["PDK"]
+                         files = os.listdir(pdkdcdir)
+                         for f in files:
+                             file_name = os.path.join(pdkdcdir, f)
+                             if (os.path.isfile(file_name)):
+                                 shutil.copy(file_name, self.dcscriptsdir)
+                     except IOError as e:
+                         log.error("Unable to copy the pdk specific dc compiler scripts under the directory %s"%(pdkdcdir))
+                         if not os.path.exists(pdkdcdir):
+                             log.error("%s does not exist. Make sure the apr scripts are present in the path"%pdkdcdir)
+                             sys.exit(1)
+                     try:
+                         pdkinvdir=self.scriptsdir+'%s/innovus'%p_options["PDK"]
+                         files = os.listdir(pdkinvdir)
+                         for f in files:
+                             file_name = os.path.join(pdkinvdir, f)
+                             if (os.path.isfile(file_name)):
+                                 shutil.copy(file_name, self.invscriptsdir)
+                     except IOError as e:
+                         log.error("Unable to copy the pdk specific innovus scripts under the directory %s"%(pdkinvdir))
+                         if not os.path.exists(pdkinvdir):
+                             log.error("%s does not exist. Make sure the apr scripts are present in the path"%pdkinvdir)
+                             sys.exit(1)
                # Update the verilog file list for Synthesis
                with open(self.digitalflowdir + '/scripts/dc/dc.filelist.tcl', 'r') as file:
                      filedata = file.read()
@@ -338,6 +381,7 @@ class MemGen():
                      log.error('Error occurred opening or loading json file.')
                      log.error('Exception: %s' % str(e))
                      sys.exit(1)
+               # Copying the Auxcell library to the run directiory.
                digitalflowexprdir=os.path.join(self.digitalflowdir,'blocks/SRAM_2KB/export')
                SRAM_2KB_dir=os.path.join(platformConfig["platforms"][p_options["PDK"]]["aux_lib"],'SRAM_2KB/latest')
                if not os.path.isdir(digitalflowexprdir):
@@ -758,9 +802,9 @@ def main():
                      log.error('The PDK technology information is not provided. Can not generate the tool. Exting....')
                      log.error('Please specify the trchnology info and re-run the tool.')
                      sys.exit(1)
-               elif p_options['PDK'] != 'tsmc65lp':
-                     log.error('Currently MemGen supports only TSMC 65nm.')
-                     log.error('Provided PDK info is not TSMC 65nm. Exiting the MemGen...')
+               elif p_options['PDK'] not in  ['tsmc65lp', 'gf12lp']:
+                     log.error('Currently MemGen supports only TSMC 65nm and GF12nm PDK.')
+                     log.error('Currently, the platform %s is not setup in MemGen. Please enable MemGen with the required PDK and re-run. Exiting the MemGen...'%p_options['PDK'])
                      sys.exit(1)
                if not (p_options['Config'] or p_options['PDK']):
                      sys.exit(1)

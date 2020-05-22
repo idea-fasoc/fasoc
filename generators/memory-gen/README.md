@@ -3,9 +3,15 @@ Memory-Gen is a technology agnostic python-based memory design platform that aut
 
 # Version Details:
 ```
-Version : Alpha-1.0                                                             
-Date    : Apr 26, 2019 
+Current Version : Beta-0.1
+Date           : May 21, 2020
 ```
+# What's in the release
+- First Beta version of the tool.
+- Supports the FinFET process in addition to all the features of the alpha-1.0 version. Refer below for alpha-1.0 details.
+```
+Previous Version : Alpha-1.0                                                             
+Date    : Apr 26, 2019 
 # What's in the release
 - First version of the tool. 
 - Generates the SRAM memory macro and its associated views (GDS, LEF, LIB, DB and CDL) for given user specs.
@@ -14,7 +20,7 @@ Date    : Apr 26, 2019
   - Synthesis and PNR of the SRAM.
   - Performing the physical verification (PV) check.
   - Generating the associated views.
-
+```
 # Tool Setup:
 The tool is heavily dependent on the EDA tools as well as the technology PDK. Hence, ensure that all the required tools are available and enabled in the environment. For the list of the tools, technology info and setting up the environment, refer https://github.com/idea-fasoc/fasoc/blob/master/README.md
 
@@ -35,8 +41,14 @@ The tool is heavily dependent on the EDA tools as well as the technology PDK. He
 ```
   __apr__
 
-  - Folder with the synthesis and APR scripts that runs the CADRE flow.  
-
+  - Folder with the synthesis and APR scripts that runs the CADRE flow. Due to the NDA dependencies, the folder is moved under  **../../private/generators/memory-gen/**. To access this folder, Please contact ajayi@umich.edu.
+```
+        apr
+        |--- include.mk
+	|--- Makefile
+	|--- scripts                           Placeholder for PDK specific apr scripts
+	|--- src                               Placeholder for design files.
+```
   __bin__
 
   - Directory with source scripts of the tool that encapsulates the memory macro generation process. 
@@ -101,7 +113,7 @@ Update only the following variables according to the user requirements.
     - Word Size: Width of the Data bus.Fixed at 32 for this release. 
       - Ex: 32
     - Technology (PDK): TSMC 65nm for now 
-      - Ex: tsmc65lp
+      - Ex: tsmc65lp/gf12lp
 
 ## Outputs:
  - The tool generates the multi-bank memory macro and its asssociated views (GDS, Verilog, LIB, LEF, DB, & CDL). All the outputs will be under the output directory specified by the user.
@@ -134,7 +146,7 @@ python ./bin/MemGen --specfile ./SRAM_input_spec.json --output ./outputs --platf
 # Known Issues/Limitations:
 1. Capacity is in multiples of 2KB. 
 2. Word size is 32.
-3. Supports only TSMC 65nm PDK.
+3. Supports TSMC 65nm and GF12nm PDKs.
 
 # Contact Details:
 For further questions, please feel free to contact us at idea-uva@virginia.edu.

@@ -3,6 +3,14 @@ Memory-Gen is a technology agnostic python-based memory design platform that aut
 
 # Version Details:
 ```
+Latest Version : Beta-0.1
+Date           : May 21, 2020
+```
+# What's in the release
+- First Beta version of the tool.
+- Supports the FinFET process in addition to all the features of the alpha-1.0 version. Refer below for alpha-1.0 details. 
+
+```
 Version : Alpha-1.0                                                             
 Date    : Apr 26, 2019 
 ```
@@ -22,7 +30,7 @@ The tool is heavily dependent on the EDA tools as well as the technology PDK. He
 
 ## Tool directory structure:
 ```
-        MemGen
+        memory-gen
 	|--- apr
 	|--- bin
 	|--- Makefile   
@@ -35,7 +43,11 @@ The tool is heavily dependent on the EDA tools as well as the technology PDK. He
 ```
   __apr__
 
-  - Folder with the synthesis and APR scripts that runs the CADRE flow.  
+  - Folder with the synthesis and APR scripts that runs the CADRE flow. Due to the NDA dependencies, the folder is moved under  **../../private/generators/memory-gen/**. To access this folder, Please contact ajayi@umich.edu.  
+```
+	apr
+	|--- 
+```
 
   __bin__
 
@@ -134,7 +146,7 @@ python ./bin/MemGen --specfile ./SRAM_input_spec.json --output ./outputs --platf
 # Known Issues/Limitations:
 1. Capacity is in multiples of 2KB. 
 2. Word size is 32.
-3. Supports only TSMC 65nm PDK.
+3. Supports only GF12LP and TSMC 65nm PDK.
 
 # Contact Details:
 For further questions, please feel free to contact us at idea-uva@virginia.edu.

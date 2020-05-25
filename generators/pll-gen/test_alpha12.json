@@ -1,0 +1,14 @@
+{
+"generator": "pll-gen",
+"module_name": "pll6",
+"specifications": 
+   {
+"Fnom_min":7.80e9,
+"Fnom_max":9.00e9,
+"FCR_min":1,
+"Fmax":11e9,
+"Fmin":6e9,
+"Fres":2e6,
+"dco_PWR":8e-3
+   }
+}

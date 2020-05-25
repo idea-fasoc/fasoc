@@ -1,7 +1,9 @@
 #=========================================================
-# functions that makes set ups for pll-gen
-#	1. directory tree generation
-#	2. aux cell parser
+# preparing for the flows
+#	1. parse command line
+#	2. parse configurations  
+#	3. directory tree generation
+#	4. parse aux cells
 #=========================================================
 import os
 import sys
@@ -9,6 +11,8 @@ import argparse
 import json
 import shutil
 import subprocess as sp
+import txt_mds
+
 
 def config_parse(outMode,configFile,platform):
 	print ('#----------------------------------------------------------------------')
@@ -51,8 +55,20 @@ def config_parse(outMode,configFile,platform):
 	calibreRulesDir = 'placeHolder'
 	if outMode=='full' or outMode=='macro':
 		aLib = platformConfig['aux_lib']
-		hspiceModel = platformConfig['hspiceModels'] + '/toplevel.l'
+		if platform=='tsmc65lp':
+			hspiceModel = platformConfig['hspiceModels'] + '/toplevel.l'
+		if platform=='gf12lp':
+			hspiceModel = platformConfig['hspiceModels'] + '/12LP_Hspice.lib'
 		calibreRulesDir = platformConfig['calibreRules']
+		if aLib=='placeHolder':
+			print('Error: aux-cell lib is not properly read')
+			sys.exit(1)	
+		if hspiceModel=='placeHolder':
+			print('Error: hspiceModel is not properly read')
+			sys.exit(1)	
+		if calibreRulesDir=='placeHolder':
+			print('Error: calibre rules directory is not properly read')
+			sys.exit(1)	
 
 	mFile = platformConfig['model_lib'] + '/pll_model.json'
 
@@ -104,8 +120,8 @@ def command_parse(parseList):
 			sys.exit(1)
 		specfile=args.specfile
 	if platForm==1:
-		if args.platform != 'tsmc65lp':
-			print ('Error: tsmc65lp is the only platform supported')
+		if args.platform != 'tsmc65lp' and args.platform != 'gf12lp' :
+			print ('Error: tsmc65lp and gf12lp are the only supported platforms, received platform: '+args.platform)
 			sys.exit(1)
 		platform=args.platform
 	if outDir==1:
@@ -117,23 +133,38 @@ def command_parse(parseList):
 	#---determine the output level: verilog/macro/full---
 	if mode==1:
 		outMode=args.mode
-#	print('run_vsim=%d'%(run_vsim))
+
 	return specfile,platform,outputDir,pex_verify,run_vsim,outMode
 
+
+def aux_copy_spice (dco_CC_lib, dco_FC_lib, targetDir):
+	try:
+		shutil.copyfile(dco_CC_lib + '/DCO_CC.sp',  targetDir + '/DCO_CC.sp')
+	except:
+		print("failed to copy "+ dco_CC_lib + '/DCO_CC.sp to ' +  targetDir + '/DCO_CC.sp')
+		sys.exit(1)
+	try:
+		shutil.copyfile(dco_FC_lib + '/DCO_FC.sp',  targetDir + '/DCO_FC.sp')
+	except:
+		print("failed to copy "+ dco_FC_lib + '/DCO_FC.sp to ' +  targetDir + '/DCO_FC.sp')
+		sys.exit(1)
+	
 #==========================================================
 # 1. copies the aux files to flow/blocks/
-# 2. returns the width/length of aux-cell from .lef
 #==========================================================
-def dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib):
+def aux_copy_export(flowDir,dco_CC_lib,dco_FC_lib):
+	print ('#----------------------------------------------------------------------')
+	print ('# Parsing DCO aux-cells dimensions and generating blocks/ directory in '+flowDir)
+	print ('#----------------------------------------------------------------------')
 	if os.path.isdir(flowDir+'blocks/'):
-		print('*** '+flowDir+'blocks/ already exists')
+		print('INFO: '+flowDir+'blocks/ already exists')
 	else:
 		try:
 			os.mkdir(flowDir+'/blocks')
 		except OSError:
 			print('Error: unable to create '+flowDir+'/blocks/')
 	if os.path.isdir(flowDir+'/blocks/dco_CC/export/'):
-		print('*** '+flowDir+'/blocks/dco_CC/export already exists')
+		print('INFO: '+flowDir+'/blocks/dco_CC/export already exists')
 	else:
 		try:
 			os.mkdir(flowDir+'/blocks/dco_CC')
@@ -142,7 +173,7 @@ def dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib):
 		except OSError:
 			print('Error: unable to create '+flowDir+'/blocks/dco_CC/export/')
 	if os.path.isdir(flowDir+'/blocks/dco_FC/export/'):
-		print('*** '+flowDir+'/blocks/dco_FC/export already exists')
+		print('INFO: '+flowDir+'/blocks/dco_FC/export already exists')
 	else:
 		try:
 			os.mkdir(flowDir+'/blocks/dco_FC')
@@ -151,16 +182,22 @@ def dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib):
 		except OSError:
 			print('Error: unable to create '+flowDir+'/blocks/dco_FC/export/')
 
-	shutil.copyfile(dco_CC_lib + '/dco_CC.cdl',  flowDir + '/blocks/dco_CC/export/dco_CC.cdl')
-	shutil.copyfile(dco_CC_lib + '/dco_CC.gds', flowDir + '/blocks/dco_CC/export/dco_CC.gds')
-	shutil.copyfile(dco_CC_lib + '/dco_CC.lef',  flowDir + '/blocks/dco_CC/export/dco_CC.lef')
-	shutil.copyfile(dco_CC_lib + '/dco_CC.lib',  flowDir + '/blocks/dco_CC/export/dco_CC.lib')
+	try:
+		shutil.copyfile(dco_CC_lib + '/dco_CC.cdl',  flowDir + '/blocks/dco_CC/export/dco_CC.cdl')
+		shutil.copyfile(dco_CC_lib + '/dco_CC.gds', flowDir + '/blocks/dco_CC/export/dco_CC.gds')
+		shutil.copyfile(dco_CC_lib + '/dco_CC.lef',  flowDir + '/blocks/dco_CC/export/dco_CC.lef')
+		shutil.copyfile(dco_CC_lib + '/dco_CC.lib',  flowDir + '/blocks/dco_CC/export/dco_CC.lib')
 
-	shutil.copyfile(dco_FC_lib + '/dco_FC.cdl',  flowDir + '/blocks/dco_FC/export/dco_FC.cdl')
-	shutil.copyfile(dco_FC_lib + '/dco_FC.gds', flowDir + '/blocks/dco_FC/export/dco_FC.gds')
-	shutil.copyfile(dco_FC_lib + '/dco_FC.lef',  flowDir + '/blocks/dco_FC/export/dco_FC.lef')
-	shutil.copyfile(dco_FC_lib + '/dco_FC.lib',  flowDir + '/blocks/dco_FC/export/dco_FC.lib')
+		shutil.copyfile(dco_FC_lib + '/dco_FC.cdl',  flowDir + '/blocks/dco_FC/export/dco_FC.cdl')
+		shutil.copyfile(dco_FC_lib + '/dco_FC.gds', flowDir + '/blocks/dco_FC/export/dco_FC.gds')
+		shutil.copyfile(dco_FC_lib + '/dco_FC.lef',  flowDir + '/blocks/dco_FC/export/dco_FC.lef')
+		shutil.copyfile(dco_FC_lib + '/dco_FC.lib',  flowDir + '/blocks/dco_FC/export/dco_FC.lib')
+	except OSError:
+		print('Error: unable to copy aux-cell files in '+flowDir+'/blocks/')
+		sys.exit(1)
 
+
+def aux_parse_size(dco_CC_lib,dco_FC_lib):
 	dco_CC_lef=open(dco_CC_lib+'dco_CC.lef','r')
 	lines_CC=list(dco_CC_lef.readlines())
 	inCC=0
@@ -189,57 +226,42 @@ def dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib):
 
 	return W_CC,H_CC,W_FC,H_FC
 
-def dir_tree(outMode,pvtGenDir,hspice,finesim,outputDir,extDir,calibreRulesDir):
+def gen_subDirs (subDirs):
+	for subDir in subDirs:
+		if os.path.isdir(subDir):
+			print('INFO: '+subDir+' already exists')
+		else:
+			try:
+				os.mkdir(subDir)
+				print(subDir+' generated')
+			except OSError:
+				print('unable to create'+Dir)
+				sys.exit(1)
+
+def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,pll_flowDir):
 	if outMode=="macro" or outMode=="full":
-		hspiceDirs=['HSPICE','HSPICE/NETLIST','HSPICE/TB','HSPICE/DUMP_result','HSPICE/TBrf','HSPICE/DUMPrf_result','HSPICE/pex_NETLIST','HSPICE/pex_TB','HSPICE/pex_DUMP_result']
-		if hspice==1:
-			for subDir in hspiceDirs:
-				Dir = os.path.join(pvtGenDir , './tsmc65lp/'+subDir)
-				if os.path.isdir(Dir):
-					print('*** '+Dir+' already exists')
-				else:
-					try:
-						os.mkdir(Dir)
-						print(Dir+' generated')
-					except OSError:
-						print('unable to create'+Dir)
-		finesimDirs=['FINESIM','FINESIM/NETLIST','FINESIM/TB','FINESIM/DUMP_result','FINESIM/TBrf','FINESIM/DUMPrf_result','FINESIM/pex_NETLIST','FINESIM/pex_TB','FINESIM/pex_DUMP_result']
-		if finesim==1:
-			for subDir in finesimDirs:
-				Dir = os.path.join(pvtGenDir , './tsmc65lp/'+subDir)
-				if os.path.isdir(Dir):
-					print('*** '+Dir+' already exists')
-				else:
-					try:
-						os.mkdir(Dir)
-						print(Dir+' generated')
-					except OSError:
-						print('unable to create'+Dir)
-		extDirs=[extDir,extDir+'/run',extDir+'/sch',extDir+'/layout']
-		for subDir in extDirs:
-			Dir = os.path.join(pvtGenDir , './tsmc65lp/'+subDir)
-			if os.path.isdir(Dir):
-				print('*** '+Dir+' already exists')
-			else:
-				try:
-					os.mkdir(Dir)
-					print(Dir+' generated')
-				except OSError:
-					print('unable to create'+Dir)
+		gen_subDirs([absPvtDir_plat])
+
+		hspiceDirs=[hspiceDir,hspiceDir+'/NETLIST',hspiceDir+'/TB',hspiceDir+'/DUMP_result',hspiceDir+'/TBrf',hspiceDir+'/DUMPrf_result',hspiceDir+'/pex_NETLIST',hspiceDir+'/pex_TB',hspiceDir+'/pex_DUMP_result']
+		gen_subDirs(hspiceDirs)
+
+		finesimDirs=[finesimDir,finesimDir+'/NETLIST',finesimDir+'/TB',finesimDir+'/DUMP_result',finesimDir+'/TBrf',finesimDir+'/DUMPrf_result',finesimDir+'/pex_NETLIST',finesimDir+'/pex_TB',finesimDir+'/pex_DUMP_result']
+		gen_subDirs(finesimDirs)
+
+		extDirs=[extDir,extDir+'/run',extDir+'/sch',extDir+'/layout',extDir+'/runsets']
+		gen_subDirs(extDirs)
 
 		p=sp.Popen(['cp',calibreRulesDir+'/calibre.lvs',extDir+'/run/'])
 		p.wait()
 		p=sp.Popen(['cp',calibreRulesDir+'/calibre.rcx',extDir+'/run/'])
 		p.wait()
+		
+		dco_flowDirs=[dco_flowDir,dco_flowDir+'/src',dco_flowDir+'/scripts',dco_flowDir+'/scripts/innovus',dco_flowDir+'/scripts/dc']
+		gen_subDirs(dco_flowDirs)
 	
-	if outputDir!=0:
-		if os.path.isdir(outputDir):
-			print('*** '+outputDir+' already exists')
-		else:
-			try:
-				os.mkdir(outputDir)
-				print(outputDir+' generated')
-			except OSError:
-				print('unable to create'+outputDir)
+		pll_flowDirs=[pll_flowDir,pll_flowDir+'/src',pll_flowDir+'/scripts',pll_flowDir+'/scripts/innovus',pll_flowDir+'/scripts/dc']
+		gen_subDirs(pll_flowDirs)
 
+	if outputDir!=0:
+		gen_subDirs([outputDir])
 

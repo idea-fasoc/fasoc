@@ -269,6 +269,26 @@ class netmap:
 						if self.name[varidx]:
 							wrfile.write(self.map[varidx][0])
 						if type(self.map[varidx][iv])==int:
+							wrfile.write('%d   '%(self.map[varidx][iv])) #this is added for edit pin
+						elif type(self.map[varidx][iv])==float:
+							wrfile.write('%.1f	'%(self.map[varidx][iv]))
+					self.ci_at=ci
+				else:
+					wrfile.write(self.clist[ci])
+			self.ci_at=-5
+		elif line[0:2]=='@E':  #lateral writing for edit pin
+			#print('found word line')
+			self.nline=line[3:len(line)]
+			self.clist=list(self.nline)
+			for ci in range(0,len(self.clist)):
+				if (ci==self.ci_at+1 or ci==self.ci_at+2):
+					pass
+				elif self.clist[ci]=='@':
+					varidx=self.flag.index(self.clist[ci+1]+self.clist[ci+2])
+					for iv in range(1,len(self.map[varidx])):
+						if self.name[varidx]:
+							wrfile.write(self.map[varidx][0])
+						if type(self.map[varidx][iv])==int:
 							wrfile.write('%d] '%(self.map[varidx][iv])) #this is added for edit pin
 						elif type(self.map[varidx][iv])==float:
 							wrfile.write('%.1f	'%(self.map[varidx][iv]))
@@ -362,7 +382,7 @@ class resmap:
 			self.vl[itb]=[None]*(num_words+index)
 			self.vlinit[itb]=[0]*(num_words+index)
 	def get_var(self,ntb,var):
-		self.vr[self.tbi[ntb]]=(var)
+		self.vr[self.tbi[ntb]]=(var) # variable
 #		self.vl[ntb][self.tbi[ntb]]=list([None])
 		self.tbi[ntb]+=1
 		if self.tbi[ntb]==len(self.vr):    #????????
@@ -370,10 +390,10 @@ class resmap:
 
 	def add(self,ntb,value):
 		if self.vlinit[ntb][self.tbi[ntb]]==0:   #initialization
-			self.vl[ntb][self.tbi[ntb]]=[value]
+			self.vl[ntb][self.tbi[ntb]]=[value] # value
 			self.vlinit[ntb][self.tbi[ntb]]+=1
 		else:
-			self.vl[ntb][self.tbi[ntb]].append(value)
+			self.vl[ntb][self.tbi[ntb]].append(value) # value
 		self.tbi[ntb]=(self.tbi[ntb]+1)%len(self.vr)
 
 	def plot_env(self,ntb,start,step,xvar,xval):            #setting plot environment: if ntb=='all': x axis is in terms of testbench 

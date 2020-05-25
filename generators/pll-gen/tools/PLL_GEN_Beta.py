@@ -20,105 +20,132 @@ import argparse
 import json
 
 absGenDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),"../")
-absPvtDir = os.path.join(absGenDir,"../../../private/generators/pll-gen/")
+absPvtDir = os.path.join(absGenDir,"../../private/generators/pll-gen/")
 print("absGenDir=%s"%(absGenDir))
 print("absPvtDir=%s"%(absPvtDir))
-genDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../")
-pllDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../../")
-head_tail_0 = os.path.split(os.path.abspath(pllDir))
-head_tail_1 = os.path.split(head_tail_0[0])
+sys.path.append(absGenDir + './pymodules/')
 
-sys.path.append(genDir + './../pymodules/')
+import txt_mds
+import modeling 
+import preparations
+import run_digital_flow
+import run_pex_flow 
+import run_pex_sim 
+import run_pre_sim 
 
-import MKfile
-import Tb_verilog_gen
-import HSPICE_mds
-import HSPICE_tb
-import HSPICE_result
-import Math_model
-import Design_solution
-import Cadre_flow
-import Pex_gen
-import Pll_gen_setup
-import Flow_setup
-import FFdco_flow 
-import PDpll_flow 
-import Beta_pex_gen 
-import Beta_tb 
-import Beta_HSPICEpex_netlist
-import Beta_HSPICE_result
+pvtPyDir = os.path.join(absPvtDir , './pymodules/')
+configFile=absGenDir + './../../config/platform_config.json'
 
-privateGenDir = os.path.relpath(os.path.join(genDir, '../../../', 'private', head_tail_1[1], head_tail_0[1]))
-privatePyDir = os.path.join(privateGenDir , './pymodules/')
-
-#--------------------------------------------------------
-#	public directories
-#--------------------------------------------------------
-verilogSimDir=genDir + 'verilog_sim/'
-verilogSrcDir=genDir + 'verilogs/'
-formatDir=genDir + 'formats/'
-homeDir=os.getcwd() # this is for absolute path for aux cell path in .spi
-homeDir=homeDir+'/'
-configFile=genDir + './../../../config/platform_config.json'
-vdd=[1.2]
-temp=[25]
-
-#--------------------------------------------------------
+#========================================================
 # parse the command & config.json
-#--------------------------------------------------------
-
+#========================================================
 parseList=[1,1,1,1,1,1]  #[specfile,platform,outputDir,pex_verify,run_vsim,mode]
-specfile,platform,outputDir,pexVerify,runVsim,outMode=Pll_gen_setup.command_parse(parseList)
+specfile,platform,outputDir,pexVerify,runVsim,outMode=preparations.command_parse(parseList)
 specIn=open(specfile,'r')
 
-aLib,mFile,calibreRulesDir,hspiceModel=Pll_gen_setup.config_parse(outMode,configFile,platform)
+aLib,mFile,calibreRulesDir,hspiceModel=preparations.config_parse(outMode,configFile,platform)
 dco_CC_lib=aLib+'/dco_CC/latest/'
 dco_FC_lib=aLib+'/dco_FC/latest/'
 
-#--------------------------------------------------------
+#========================================================
 # directory path settings
+#========================================================
+#	public directories
+#--------------------------------------------------------
+verilogSimDir=absGenDir + 'verilog_sim/'
+verilogSrcDir=absGenDir + 'verilogs/'
+formatDir=absGenDir + 'formats/'
+
 #--------------------------------------------------------
 #	private directories
 #--------------------------------------------------------
-netlistDir = os.path.join(privateGenDir , './tsmc65lp/HSPICE/pex_NETLIST/')
-tbDir = os.path.join(privateGenDir , './tsmc65lp/HSPICE/pex_TB/')
-pvtFormatDir = os.path.join(privateGenDir , './tsmc65lp/formats/')
-extDir = os.path.join(privateGenDir , './tsmc65lp/extraction/')
-simDir = os.path.join(privateGenDir , './tsmc65lp/HSPICE/')
-fs_simDir = os.path.join(privateGenDir , './tsmc65lp/FINESIM/')
-absSimDir = os.path.join(absPvtDir , './tsmc65lp/HSPICE/')
-fs_absSimDir = os.path.join(absPvtDir , './tsmc65lp/FINESIM/')
-ffdco_flowDir = os.path.join(privateGenDir , './tsmc65lp/flow_ffdco/')
-outbuff_div_flowDir = os.path.join(privateGenDir, './tsmc65lp/flow_outbuff_div/')
-pdpll_flowDir = os.path.join(privateGenDir, './tsmc65lp/flow_pdpll/')
-dcoFlowDir = os.path.join(privateGenDir , './tsmc65lp/flow_dco/')
+pvtFormatDir = absPvtDir + 'formats/'
+
+absPvtDir_plat=absPvtDir+platform+'/'
+hspiceDir=absPvtDir_plat +  '/HSPICE/'
+netlistDir=hspiceDir+'NETLIST/'
+tbDir=hspiceDir+'TB/'
+tbrfDir=hspiceDir+'TBrf/'
+extDir = absPvtDir_plat + 'extraction/'
+finesimDir = absPvtDir_plat + 'FINESIM/'
+pll_flowDir = absPvtDir_plat + 'flow_pdpll/'
+dco_flowDir = absPvtDir_plat + 'flow_dco/'
+outbuff_div_flowDir = pvtFormatDir +platform+ '_flow_outbuff_div/'
+
+if platform=='tsmc65lp':
+	fc_en_type = 1 # dco_FC en => increase frequency
+	modelVersion='Beta' 
+	dco_flowDir = absPvtDir_plat + 'flow_dco/'
+	fc_en_type = 1 # dco_FC en => increase frequency
+	sim_time = 40e-9
+	corner_lib='tt_lib'
+	tech_node='65'
+	wellpin=0 # aux-cell well pin  
+	edge_sel=1
+	buf_small='BUFH_X2M_A9TR'
+	buf_big='BUFH_X9M_A9TR'
+	bufz='BUFZ_X4M_A9TR'
+	min_p_rng_l= 4
+	min_p_str_l= 3
+	p_rng_w= 1.6 
+	p_rng_s= 0.8
+	p2_rng_w= 1.6
+	p2_rng_s= 0.8
+	max_r_l=5
+	pll_max_r_l=8
+	outbuff_div=1
+	tdc_dff='DFFRPQ_X0P5M_A9TR'
+	H_stdc=1.8
+	custom_lvs=1
+elif platform=='gf12lp':
+	fc_en_type = 2 # dco_FC en => decrease frequency
+	modelVersion='Alpha' 
+	dco_flowDir = absPvtDir_plat + 'flow_dco/'
+	fc_en_type = 2 # dco_FC en => decrease frequency
+	sim_time = 20e-9
+	corner_lib='TT' 
+	tech_node='12' 
+	wellpin=1 
+	edge_sel=0
+	buf_small='BUFH_X2N_A10P5PP84TR_C14'
+	buf_big='BUFH_X8N_A10P5PP84TR_C14'
+	bufz='placeHolder'
+	min_p_rng_l= 4
+	min_p_str_l= 4
+	p_rng_w= 1.6 
+	p_rng_s= 0.8
+	p2_rng_w= 1.2
+	p2_rng_s= 0.8
+	max_r_l=5
+	pll_max_r_l=8
+	outbuff_div=0
+	tdc_dff='DFFRPQL_X1N_A10P5PP84TR_C14'
+	H_stdc=0.672
+	custom_lvs=0
+#========================================================
+# generate directory tree 
+#========================================================
+print ('#======================================================================')
+print ('# check directory tree and generate missing directories')
+print ('#======================================================================')
+preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,pll_flowDir)
+
 #--------------------------------------------------------
 # check for private directory 
 #--------------------------------------------------------
 if outMode=='macro' or outMode=='full':
-	if os.path.isdir(privateGenDir)!=1:
-		print("Error: Need private directory for mode 'macro' or 'full'. Currently not there.")
+	if os.path.isdir(absPvtDir)!=1:
+		print("Error: Need private directory for mode 'macro' or 'full'. Check README")
 		sys.exit(1)
-	sys.path.append(privatePyDir)
-	import HSPICE_subckt
 	#--------------------------------------------------------
 	#	read the aux-cells	
 	#--------------------------------------------------------
-	W_CC,H_CC,W_FC,H_FC=Pll_gen_setup.dco_aux_parse(ffdco_flowDir,dco_CC_lib,dco_FC_lib)
-	W_CC,H_CC,W_FC,H_FC=Pll_gen_setup.dco_aux_parse(pdpll_flowDir,dco_CC_lib,dco_FC_lib)
+	preparations.aux_copy_export(dco_flowDir,dco_CC_lib,dco_FC_lib)
+	preparations.aux_copy_export(pll_flowDir,dco_CC_lib,dco_FC_lib)
+	W_CC,H_CC,W_FC,H_FC=preparations.aux_parse_size(dco_CC_lib,dco_FC_lib)
 	A_CC=W_CC*H_CC
 	A_FC=W_FC*H_FC
 
-#--------------------------------------------------------
-# generate directory tree 
-#--------------------------------------------------------
-print ('#======================================================================')
-print ('# check directory tree and generate missing directories')
-print ('#======================================================================')
-#==hspice directory tree==
-hspice=1
-finesim=1
-Pll_gen_setup.dir_tree(outMode,privateGenDir,hspice,finesim,outputDir,extDir,calibreRulesDir)
 #--------------------------------------------------------
 # read input
 #--------------------------------------------------------
@@ -140,8 +167,13 @@ try:
 	Fmax = float(jsonSpec['specifications']['Fmax'])
 	Fmin = float(jsonSpec['specifications']['Fmin'])
 	Fres = float(jsonSpec['specifications']['Fres'])
-	IB_PN = float(jsonSpec['specifications']['inband_PN']) #in dBc
-	dco_PWR = float(jsonSpec['specifications']['dco_PWR']) 
+	dco_PWR = float(jsonSpec['specifications']['dco_PWR'])
+	try: 
+		IB_PN = float(jsonSpec['specifications']['inband_PN']) #in dBc
+		spec_priority={"Fnom":"dummy","IB_PN":"lo","Fmax":"hi","Fmin":"lo","Fres":"lo","FCR":"hi","dco_PWR":"lo"}					
+	except:
+		IB_PN=-200 # in case not specified: use dummy value 
+		spec_priority={"Fnom":"dummy","Fmax":"hi","Fmin":"lo","Fres":"lo","FCR":"hi","dco_PWR":"lo"}					
 except:
 	print('Error: wrong categories in spec.json, refer to provided example')
 	sys.exit(1)	
@@ -149,29 +181,32 @@ except:
 #===============================================================
 # generate dictionary list for spec priority 
 #===============================================================
-spec_priority={"Fnom":"dummy","IB_PN":"lo","Fmax":"hi","Fmin":"lo","Fres":"lo","FCR":"lo","dco_PWR":"lo"}					
 
 if Fnom_min >= Fnom_max:
 	print('Error: Fnom_min should be greater than Fnom_max')
 	sys.exit(1)	
 
+#---------------------------------------------------------------
 # when there is no model file, generate one
+#---------------------------------------------------------------
 if not os.path.isfile(mFile):
+	print ('#======================================================================')
+	print ('# There is no model file: '+mFile+' => running modeling procedure')
+	print ('#======================================================================')
 	if outMode=='verilog': # use public model
-		mFile=os.path.join(genDir,'./publicModel/pll_model.json')
-		print('*** public model file is used: %s'%(mFile))
+		mFile=os.path.join(absGenDir,'./publicModel/'+platform+'_pll_model.json')
+		print('INFO: public model file is used: %s'%(mFile))
 	elif outMode=='macro' or outMode=='full':	
-		p = sp.Popen(['python','tools/MDL_GEN_65nm.py','--platform',platform])
-		p.wait()
-		p = sp.Popen(['python','tools/PEX_MDL_GEN_65nm.py','--platform',platform])
+		p = sp.Popen(['python','tools/MDL_GEN_Beta.py','--platform',platform,'--mode',outMode])
 		p.wait()
 
 try:
 	f = open(mFile, 'r')
-	print('*** model file from platform_config.json is properly read')
+	print('INFO: model file from platform_config.json is properly read')
 except ValueError as e:
 	print ('Error: Model file creation failed')
 	sys.exit(1)
+
 #---------------------------------------------------------------------------------------
 # read model file
 #---------------------------------------------------------------------------------------
@@ -180,15 +215,20 @@ jsonModel= json.load(modelFile)
 CF= jsonModel['pll_model_constants']['CF']
 Cc= jsonModel['pll_model_constants']['Cc']
 Cf= jsonModel['pll_model_constants']['Cf']
-A_CC= jsonModel['pll_model_constants']['A_CC']
-A_FC= jsonModel['pll_model_constants']['A_FC']
 Iavg_const= jsonModel['pll_model_constants']['Iavg_const']
-mult_Con= jsonModel['pex coefficients']['mult_Con']
-mult_Coff= jsonModel['pex coefficients']['mult_Coff']
-pex_Iavg_const=jsonModel['pex coefficients']['pex_Iavg_const']
-PN_const= jsonModel['pll_model_constants']['1M_PN_const']
+try:
+	mult_Con= jsonModel['pex coefficients']['mult_Con']
+	mult_Coff= jsonModel['pex coefficients']['mult_Coff']
+	pex_Iavg_const=jsonModel['pex coefficients']['pex_Iavg_const']
+	PN_const= jsonModel['pll_model_constants']['1M_PN_const']
+	print("INFO: Current model is Beta version.")
+except: # dummies
+	mult_Con= 2
+	mult_Coff= 2 
+	pex_Iavg_const= 1
+	PN_const= 1 
+	print("INFO: Current model is Alpha version. Phase noise will not be supported. Generate Beta version model for phase noise.")
 
-#print('model constants read properly: CF=%e, mult_Con=%e'%(CF,mult_Con))
 #--------------------------------------------------------
 # search design solutions 
 #--------------------------------------------------------
@@ -201,12 +241,14 @@ Ndrv_range=[2,22,4]
 Nfc_range=[10,30,4]
 Ncc_range=[10,30,4]
 Nstg_range=[4,16,4]
+vdd=[1.2]
+temp=[25]
 
-pass_flag,passed_designs,passed_specs,specRangeDic=Design_solution.ds_Fnom_v2(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN,dco_PWR,CF,Cf,Cc,mult_Con,mult_Coff,Iavg_const,PN_const,vdd,Ndrv_range,Nfc_range,Ncc_range,Nstg_range,A_CC,A_FC)
+pass_flag,passed_designs,passed_specs,specRangeDic=modeling.design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN,dco_PWR,CF,Cf,Cc,mult_Con,mult_Coff,Iavg_const,PN_const,vdd,Ndrv_range,Nfc_range,Ncc_range,Nstg_range,A_CC,A_FC,modelVersion)
 
 
 #--------------------------------------------------------
-# select the design with least area(Alpha version) 
+# select the design with least area
 #--------------------------------------------------------
 if pass_flag==1:
 	areaMdl=[]
@@ -215,20 +257,27 @@ if pass_flag==1:
 		
 	sys.setrecursionlimit(10000)  #expand the recursion limit if exceeded
 	try:
-		HSPICE_mds.sort_via_1d_mult(areaMdl,passed_specs,passed_designs)
+		txt_mds.sort_via_1d_mult(areaMdl,passed_specs,passed_designs)
 	except:
 		print("sorting failed due to recursion limit: using the first design that meets the spec")
 	print ('passed_specs=')
 	print (passed_specs[0])
 	final_specs=passed_specs[0]
 	[Ndrv,Ncc,Nfc,Nstg]=passed_designs[0]
-	[Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,FCR_mdl,Pwr_mdl,Area_mdl,IB_PN_mdl]=passed_specs[0]
+	if modelVersion=='Beta':
+		[Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,FCR_mdl,Pwr_mdl,Area_mdl,IB_PN_mdl]=passed_specs[0]
+	elif modelVersion=='Alpha':
+		[Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,FCR_mdl,Pwr_mdl,Area_mdl]=passed_specs[0]
 	print ('#======================================================================')
 	print ('# selected design solution: ndrv=%d, ncc=%d, nfc=%d, nstg=%d'%(Ndrv,Ncc,Nfc,Nstg))
-	print ('# expected specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, IB_PN=%.2e, Pwr=%e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,IB_PN_mdl,Pwr_mdl))
-	print ('# required specs: Fnom_min,max=%.2e,%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, IB_PN=%.2e'%(Fnom_min,Fnom_max,Fmax,Fmin,Fres,IB_PN))
+	if modelVersion=='Beta':
+		print ('# expected specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, IB_PN=%.2e, Pwr=%e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,IB_PN_mdl,Pwr_mdl))
+		print ('# required specs: Fnom_min,max=%.2e,%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, IB_PN=%.2e'%(Fnom_min,Fnom_max,Fmax,Fmin,Fres,IB_PN))
+	elif modelVersion=='Alpha':
+		print ('# expected specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, Pwr=%e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl))
+		print ('# required specs: Fnom_min,max=%.2e,%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e'%(Fnom_min,Fnom_max,Fmax,Fmin,Fres))
 	print ('#======================================================================')
-	
+
 	#------------------------------------------------------------------------------
 	# write output json file 
 	#------------------------------------------------------------------------------
@@ -238,8 +287,9 @@ if pass_flag==1:
 	jsonSpec['results'].update({'Fmax':Fmax_mdl})	
 	jsonSpec['results'].update({'Fmin':Fmin_mdl})	
 	jsonSpec['results'].update({'Fres':Fres_mdl})	
-	jsonSpec['results'].update({'dco_PWR':Pwr_mdl})	
-	jsonSpec['results'].update({'inband_PN':IB_PN_mdl})	
+	jsonSpec['results'].update({'dco_PWR':Pwr_mdl})
+	if modelVersion=='Beta':	
+		jsonSpec['results'].update({'inband_PN':IB_PN_mdl})	
 	jsonSpec['results'].update({'area': Area_mdl})	
 	print("model predicted specs generated on "+outputDir+'/pll_spec_out.json')
 	with open(outputDir+'/pll_spec_out.json','w') as resultSpecfile:
@@ -278,44 +328,38 @@ max_per=vco_per*3.125 #??
 #--------------------------------------------------------
 # generate PLL verilog, flow setups
 #--------------------------------------------------------
-#---!! current CADRE flow does only valid DRC: LVS needs to be carried out on pll-gen side !!---
-#==verilog gen==
-Flow_setup.pll_flow_setup(outMode,designName,genDir,outputDir,formatDir,pdpll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir)
+# verilog gen
+pll_name=designName
+dcoName=pll_name+'_dco'
+run_digital_flow.pll_verilog_gen(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform)
 
 if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	# generate Feed Forward DCO 
 	#--------------------------------------------------------
-	pll_name=designName
-	bleach_dco=1 # test switch
-	ffdco_synth=1
-	ffdco_apr=1
-	W_dco,H_dco=FFdco_flow.ffdco_flow(pvtFormatDir,ffdco_flowDir,pll_name,bleach_dco,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,ffdco_synth,ffdco_apr,verilogSrcDir)
-	
-	#--------------------------------------------------------
-	# generate outbuff_div 
-	#--------------------------------------------------------
-	outbuff_div_bleach=0
-	outbuff_div_design=0
-	FFdco_flow.outbuff_div_flow(outbuff_div_flowDir,outbuff_div_bleach,outbuff_div_design)
-
+	dco_bleach=0 # test switch
+	dco_synth=1
+	dco_apr=0
+	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l)
 	#--------------------------------------------------------
 	# generate PDpll 
 	#--------------------------------------------------------
-	pdpll_synth=1 # test switch
-	pdpll_apr=1
 	pdpll_bleach=0
-	W_dco,H_dco,W_pll,H_pll=PDpll_flow.pdpll_flow(pvtFormatDir,pdpll_flowDir,ffdco_flowDir,outbuff_div_flowDir,pll_name,pdpll_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,pdpll_synth,pdpll_apr,verilogSrcDir)
+	pdpll_synth=1 # test switch
+	pdpll_apr=0
+	W_dco,H_dco,W_pll,H_pll=run_digital_flow.pdpll_flow(pvtFormatDir,pll_flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,pdpll_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,pdpll_synth,pdpll_apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,pll_max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc)
 	A_core=W_pll*H_pll	
 	#--------------------------------------------------------
 	# run independent lvs 
 	#--------------------------------------------------------
-	VDDnames=['VDD','VDD_DCO','VDD_BUF']
-	lvs=1  # do lvs for default
-	pex=0
-	buf=1
-	Beta_pex_gen.post_apr_HM(VDDnames,buf,'outbuff_div',pll_name+'_ffdco',calibreRulesDir,homeDir+pdpll_flowDir,extDir,pll_name,lvs,pex)
+	if custom_lvs==1:
+		VDDnames=['VDD','VDD_DCO','VDD_BUF']
+		lvs=1  # do lvs for default
+		pex=0
+		buf=1
+		run_digital_flow.pdpll_custom_lvs(VDDnames,buf,'outbuff_div',pll_name+'_dco',calibreRulesDir,pll_flowDir,extDir,pvtFormatDir,platform,pll_name,lvs,pex)
 
+	sys.exit(1)
 	if outMode=='full': 
 		#--------------------------------------------------------
 		# run analog sim
@@ -323,35 +367,11 @@ if outMode=='macro' or outMode=='full':
 		print ('#======================================================================')
 		print ('# running post-pex analog sim for DCO alone')
 		print ('#======================================================================')
-		#-------------------------------------------
-		# generate testbench
-		#-------------------------------------------
-		finesim=1
-		testbench=1
-		if testbench==1:
-			sav=1
-			tb=Beta_tb.gen_tb_pex(CF*mult_Con,Cc*mult_Con,Cf*mult_Con,hspiceModel,finesim,fs_simDir+'pex_TB/',pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,Nstg,1,vdd,temp,25,pll_name+'_ffdco',sav)
-
-		lvs=0		
-		pex=0		
-		Pex_gen.post_apr(calibreRulesDir,absPvtDir+ffdco_flowDir,extDir,simDir,pll_name+'_ffdco',lvs,pex)
-		#-------------------------------------------
-		# generate pex Netlist (wrapped netlist)
-		#-------------------------------------------
-		Beta_HSPICEpex_netlist.gen_dco_pex_netlist(extDir+'/run',fs_absSimDir+'pex_NETLIST/',pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,2,pll_name+'_ffdco')
-		#-------------------------------------------
-		# copy .pxi, .pex
-		#-------------------------------------------
-		p = sp.Popen(['cp',extDir+'/run/'+pll_name+'_ffdco.pex.netlist.'+pll_name+'_ffdco.pxi',fs_simDir+'pex_NETLIST/'+pll_name+'_ffdco.pex.netlist.'+pll_name+'_ffdco.pxi'])
-		p.wait()
-		p = sp.Popen(['cp',extDir+'/run/'+pll_name+'_ffdco.pex.netlist.pex',fs_simDir+'pex_NETLIST/'+pll_name+'_ffdco.pex.netlist.pex'])
-		p.wait()
-		#-------------------------------------------
-		# run finesim 
-		#-------------------------------------------
-		p = sp.Popen(['finesim','./../pex_TB/tb_'+pll_name+'_ffdco.sp'],cwd=fs_simDir+'pex_DUMP_result')
-		p.wait()
-		sys.exit(1)
+		run_pex_flow.gen_post_pex_netlist(platform, dcoName, pvtFormatDir, dco_flowDir, extDir, calibreRulesDir, wellpin)
+		run_pex_sim.gen_dco_pex_wrapper(extDir,pex_netlistDir,pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,ninterp,dcoName,fc_en_type)
+		run_pex_sim.gen_tb_wrapped(hspiceModel,pex_tbDir,pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,vdd,temp,fc_en_type,pex_sim_time,corner_lib,dcoName,pex_netlistDir)
+		dcoNames=[dcoName]
+		run_pex_sim.gen_mkfile_pex(pvtFormatDir,hspiceDir,pex_resDir,pex_tbDir,num_core,dcoNames,tech_node)
 
 		#-------------------------------------------
 		# read pex sim results
@@ -366,7 +386,7 @@ if outMode=='macro' or outMode=='full':
 		Ndrv=['ndrv',Ndrv]
 		Ndrv=['ndrv',Ndrv]
 		#idK,Kg,Fnom,Fmax,Fmin,Fres,FCR,Iavg,result_exist,dm=HSPICE_result.gen_result_v3(resultDir,Ncc,Ndrv,Nfc,Nstg,num_meas,index,show,vdd,temp)
-		idK,Kg,Fnom,Fmax,Fmin,Fres,FCR,Iavg,result_exist,dm=Beta_HSPICE_result.gen_result_v3(tbDir,Ncc,Ndrv,Nfc,Nstg,num_meas,index,show,vdd,temp)
+		idK,Kg,Fnom,Fmax,Fmin,Fres,FCR,Iavg,result_exist,dm=run_pex_sim.gen_result_v3(tbDir,Ncc,Ndrv,Nfc,Nstg,num_meas,index,show,vdd,temp)
 
 		jsonSpec['pex sim results']={'platform': 'tsmc65lp'}
 		jsonSpec['pex sim results'].update({'nominal frequency':Fnom})
@@ -388,19 +408,19 @@ if outMode=='macro' or outMode=='full':
 	print ('#======================================================================')
 	print ('# exporting deliverables')
 	print ('#======================================================================')
-	p = sp.Popen(['cp', pdpll_flowDir+'/export/'+designName+'.gds.gz', \
+	p = sp.Popen(['cp', pll_flowDir+'/export/'+designName+'.gds.gz', \
 	        outputDir+'/'+designName+'.gds.gz'])
 	p.wait()
-	p = sp.Popen(['cp', pdpll_flowDir+'/export/'+designName+'.lef', \
+	p = sp.Popen(['cp', pll_flowDir+'/export/'+designName+'.lef', \
 	        outputDir+'/'+designName+'.lef'])
 	p.wait()
-	p = sp.Popen(['cp', pdpll_flowDir+'/export/'+designName+'_min.lib', \
+	p = sp.Popen(['cp', pll_flowDir+'/export/'+designName+'_min.lib', \
 	        outputDir+'/'+designName+'.lib'])
 	p.wait()
-	p = sp.Popen(['cp', pdpll_flowDir+'/export/'+designName+'_min.db', \
+	p = sp.Popen(['cp', pll_flowDir+'/export/'+designName+'_min.db', \
 		     outputDir+'/'+designName+'.db'])
 	p.wait()
-	p = sp.Popen(['cp', pdpll_flowDir+'/export/'+designName+'.lvs.v', \
+	p = sp.Popen(['cp', pll_flowDir+'/export/'+designName+'.lvs.v', \
 		      outputDir+'/'+designName+'.v'])
 	p.wait()
 	p = sp.Popen(['cp', extDir+'/sch/'+designName+'.spi', \
@@ -433,10 +453,10 @@ if runVsim==1:
 	print ('# Running verilog simulation of controller for digital functional verification')
 	print ('#======================================================================')
 
-	verTbDir=genDir + 'verilog_sim/tb/'
-	verDir=genDir + 'verilog_sim/'
+	verTbDir=absGenDir + 'verilog_sim/tb/'
+	verDir=absGenDir + 'verilog_sim/'
 	simvision=0
-	Tb_verilog_gen.tb_verilog_gen(formatDir,verTbDir,relBW,Kp_o_Ki,Fref,dFf,dFc,FCW,Fbase,Ndrv,Ncc,Nfc,Nstg)
+	run_pre_sim.tb_verilog_gen(formatDir,verTbDir,relBW,Kp_o_Ki,Fref,dFf,dFc,FCW,Fbase,Ndrv,Ncc,Nfc,Nstg)
 
 	p = sp.Popen(['./:run'],cwd=verDir)
 	p.wait()

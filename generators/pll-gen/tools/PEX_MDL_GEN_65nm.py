@@ -12,49 +12,47 @@ import argparse
 import json
 
 genDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../")
+absGenDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),"../")
+absPvtDir = os.path.join(absGenDir,"../../private/generators/pll-gen/")
+print("absGenDir=%s"%(absGenDir))
+print("absPvtDir=%s"%(absPvtDir))
 
-sys.path.append(genDir + './../pymodules/')
+sys.path.append(absGenDir + './pymodules/')
 
-import Pll_gen_setup
-import MKfile
-import HSPICE_mds
-import HSPICE_result
-import HSPICE_tb
-import HSPICEpex_netlist
-import Math_model
-import Pex_gen
 import re
-import Flow_setup
-import Cadre_flow
+import txt_mds
+import modeling 
+import preparations
+import run_digital_flow
+import run_pex_flow 
+import run_pex_sim 
+import run_pre_sim 
 #ndrv=8
 #ncc=16
 #nfc=16
 #nstg=8
 ninterp=2
 
-configFile=genDir + './../../../config/platform_config.json'
+configFile=absGenDir + './../../config/platform_config.json'
 
-rawPexDir=genDir + 'extraction/run'
-formatDir=genDir + 'formats/'
+rawPexDir=absPvtDir + 'extraction/run'
+formatDir=absPvtDir + 'formats/'
 modelDir=genDir + 'model/'
-netlistDir=genDir + 'HSPICE/pex_NETLIST/'
-tbDir=genDir + 'HSPICE/pex_TB/'
-extDir=genDir + 'extraction/'
-flowDir=genDir + 'flow_dco/'
-simDir = genDir + 'HSPICE/'
+netlistDir=absPvtDir + 'HSPICE/pex_NETLIST/'
+tbDir=absPvtDir + 'HSPICE/pex_TB/'
+extDir=absPvtDir + 'extraction/'
+flowDir=absPvtDir + 'flow_ffdco/'
+simDir = absPvtDir + 'HSPICE/'
 resultDir=simDir+'pex_DUMP_result/'
-tech_node='65nm'
 resultrfDir=simDir+'DUMPrf_result/'
 num_core=4
-homeDir=genDir
-homeDir=homeDir+'/'
 
 vdd=[1.2]   #vdd[0] is the nominal val
 temp=[25] #tmep[0] is the nominal val
 
-vm1=HSPICE_mds.varmap()
-vm1.get_var('n_cc',8,16,8)   #[0]=n_cc
-vm1.get_var('n_drv',8,16,8)  #[1]=n_drv
+vm1=txt_mds.varmap()
+vm1.get_var('n_cc',8,8,1)   #[0]=n_cc
+vm1.get_var('n_drv',4,4,1)  #[1]=n_drv
 vm1.get_var('n_fc',16,32,16)  #[2]=n_fc
 vm1.get_var('n_stg',10,12,2)  #[3]=n_stg
 
@@ -70,12 +68,12 @@ nstgList=vm1.comblist[3]
 #--------------------------------------------------------
 
 parseList=[0,1,0,0,0,0]  #[specfile,platform,outputDir,pex_verify,run_vsim,mode]
-specfile,platform,outputDir,pexVerify,runVsim,outMode=Pll_gen_setup.command_parse(parseList)
-aLib,mFile,calibreRulesDir,hspiceModel=Pll_gen_setup.config_parse(configFile,platform)
+specfile,platform,outputDir,pexVerify,runVsim,outMode=preparations.command_parse(parseList)
+aLib,mFile,calibreRulesDir,hspiceModel=preparations.config_parse(outMode,configFile,platform)
 dco_CC_lib=aLib+'/dco_CC/export/'
 dco_FC_lib=aLib+'/dco_FC/export/'
 
-W_CC,H_CC,W_FC,H_FC=Pll_gen_setup.dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib)
+W_CC,H_CC,W_FC,H_FC=preparations.dco_aux_parse(flowDir,dco_CC_lib,dco_FC_lib)
 
 #-------------------------------------------
 # Width and Height of the auxcells: for area calculation
@@ -90,12 +88,12 @@ for i in range(1,len(vm1.comblist[0])):
 	nfc=vm1.comblist[2][i]
 	nstg=vm1.comblist[3][i]
 	designName='dco_%ddrv_%dcc_%dfc_%dstg'%(ndrv,ncc,nfc,nstg)
-	Cadre_flow.dco_flow_pex(calibreRulesDir,netlistDir,formatDir,homeDir+flowDir,rawPexDir,extDir,simDir,ndrv,ncc,nfc,nstg,ninterp,W_CC,H_CC,W_FC,H_FC,bleach,design,pex)
+	run_pex_flow.dco_flow_pex(calibreRulesDir,netlistDir,formatDir,flowDir,rawPexDir,extDir,simDir,ndrv,ncc,nfc,nstg,ninterp,W_CC,H_CC,W_FC,H_FC,bleach,design,pex)
 #------------------------------------------------------------------------------
 #  make HSPICE directory tree
 #------------------------------------------------------------------------------
 hspice=1
-Pll_gen_setup.dir_tree(hspice,0)
+preparations.dir_tree(hspice,0)
 
 #-------------------------------------------
 # generate testbench
@@ -107,7 +105,7 @@ for i in range(1,len(vm1.comblist[0])):
 	nstg=vm1.comblist[3][i]
 	designName='dco_%ddrv_%dcc_%dfc_%dstg'%(ndrv,ncc,nfc,nstg)
 	sav=0
-	tb=HSPICE_tb.gen_tb_pex(hspiceModel,tbDir,formatDir,ncc,ndrv,nfc,nstg,nstg,1,vdd,temp,600,designName,sav)
+	tb=run_pex_sim.gen_tb_pex(hspiceModel,tbDir,formatDir,ncc,ndrv,nfc,nstg,nstg,1,vdd,temp,600,designName,sav)
 print("%d number of testbench generated on "%(len(vm1.comblist[0]))+tbDir)
 
 #-------------------------------------------
@@ -118,7 +116,7 @@ num_core=4
 hspiceDir=genDir + 'HSPICE/'
 hspiceResDir=genDir + 'pex_DUMP_result'
 tbDirName=genDir + 'pex_TB'
-MKfile.gen_mkfile_pex(formatDir,hspiceDir,hspiceResDir,tbDirName,nccList,ndrvList,nfcList,nstgList,num_core)
+run_pex_sim.gen_mkfile_pex(formatDir,hspiceDir,hspiceResDir,tbDirName,nccList,ndrvList,nfcList,nstgList,num_core)
 
 #-------------------------------------------
 # run pex HSPICE sim
@@ -136,7 +134,7 @@ except:
 num_meas=3 #freq, per, iavg
 index=1
 show=1
-idK,Kg,Fnom,Fmax,Fmin,Fres,FCR,Iavg,result_exist,dm=HSPICE_result.gen_result_v3(resultDir,vm1.comblist[0],vm1.comblist[1],vm1.comblist[2],vm1.comblist[3],num_meas,index,show,vdd,temp)
+idK,Kg,Fnom,Fmax,Fmin,Fres,FCR,Iavg,result_exist,dm=run_pre_sim.gen_result(resultDir,vm1.comblist[0],vm1.comblist[1],vm1.comblist[2],vm1.comblist[3],num_meas,index,show,vdd,temp)
 print ("Fmax=")
 print (Fmax)
 print ("Fnom=")
@@ -167,13 +165,13 @@ for nd in result_exist:
 	Ncc=dm[nd][1]
 	Nfc=dm[nd][3]
 	Nstg=dm[nd][2]
-	Fmax_mdl,Fmin_mdl,Fres_mdl,Fnom_mdl,freqCoverRatio,Ctotal= Math_model.spec_cal(Ndrv,Ncc,Nfc,Nstg,Cc,Cf,CF)
+	Fmax_mdl,Fmin_mdl,Fres_mdl,Fnom_mdl,freqCoverRatio,Ctotal= modeling.spec_cal(Ndrv,Ncc,Nfc,Nstg,Cc,Cf,CF)
 	Fmax_pex_ratio=Fmax_mdl/Fmax_meas
 	Fmin_pex_ratio=Fmin_mdl/Fmin_meas
 	mult_Con=Fmax_pex_ratio
 	mult_Coff=(Ndrv+Ncc)/Ndrv*Fmin_pex_ratio-mult_Con
 	print(mult_Con,mult_Coff)
-	Fmax_mdl,Fmin_mdl,Fres_mdl,Fnom_mdl,FCR_mdl,Ctotal= Math_model.spec_cal_pex65(Ndrv,Ncc,Nfc,Nstg,Cc,Cf,CF,mult_Con,mult_Coff)
+	Fmax_mdl,Fmin_mdl,Fres_mdl,Fnom_mdl,FCR_mdl,Ctotal= modeling.spec_cal_pex65(Ndrv,Ncc,Nfc,Nstg,Cc,Cf,CF,mult_Con,mult_Coff)
 	Fmax_pex_ratio=Fmax_mdl/Fmax_meas
 	Fnom_pex_ratio=Fnom_mdl/Fnom_meas
 	Fmin_pex_ratio=Fmin_mdl/Fmin_meas

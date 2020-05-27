@@ -58,6 +58,33 @@ bleach_dco:
 	rm -f  ./../../private/generators/pll-gen/gf12lp/flow_dco/tool_versions.txt			
 	rm -f  ./../../private/generators/pll-gen/gf12lp/flow_dco/*.lef			
 
+bleach_outbuff_div:
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/blocks	
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/checkDesign	
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/checkPoints
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/logs
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/*dclib
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/results
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/vpath
+	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/*.log
+	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/query_results
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/reports
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/export
+	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/tool_versions.txt			
+	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/*.lef			
+	rm -rf ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/blocks	
+	rm -rf ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/checkDesign	
+	rm -rf ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/checkPoints
+	rm -rf ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/logs
+	rm -rf ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/*dclib
+	rm -rf ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/results
+	rm -rf ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/vpath
+	rm -f  ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/*.log
+	rm -f  ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/query_results
+	rm -rf ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/reports
+	rm -rf ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/export
+	rm -f  ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/tool_versions.txt			
+	rm -f  ./../../private/generators/pll-gen/gf12lp/flow_outbuff_div/*.lef			
 
 bleach_work:
 	rm -f work/*
@@ -128,5 +155,18 @@ bleach_all:
 	rm -f  ./../../private/generators/pll-gen/gf12lp/extraction/run/*	
 	rm -f  ./../../private/generators/pll-gen/gf12lp/extraction/sch/*	
 	rm -f  ./../../private/generators/pll-gen/gf12lp/extraction/layout/*	
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/blocks	
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/checkDesign	
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/checkPoints
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/logs
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/*dclib
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/results
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/vpath
+	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/*.log
+	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/query_results
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/reports
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/export
+	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/tool_versions.txt			
+	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/*.lef			
 
 

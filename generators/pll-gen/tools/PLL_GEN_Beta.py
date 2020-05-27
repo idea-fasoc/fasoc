@@ -70,7 +70,8 @@ extDir = absPvtDir_plat + 'extraction/'
 finesimDir = absPvtDir_plat + 'FINESIM/'
 pll_flowDir = absPvtDir_plat + 'flow_pdpll/'
 dco_flowDir = absPvtDir_plat + 'flow_dco/'
-outbuff_div_flowDir = pvtFormatDir +platform+ '_flow_outbuff_div/'
+outbuff_div_flowDir = absPvtDir_plat + 'flow_outbuff_div/'
+#outbuff_div_flowDir = pvtFormatDir +platform+ '_flow_outbuff_div/'
 
 if platform=='tsmc65lp':
 	fc_en_type = 1 # dco_FC en => increase frequency
@@ -128,7 +129,7 @@ elif platform=='gf12lp':
 print ('#======================================================================')
 print ('# check directory tree and generate missing directories')
 print ('#======================================================================')
-preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,pll_flowDir)
+preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir)
 
 #--------------------------------------------------------
 # check for private directory 
@@ -331,6 +332,7 @@ max_per=vco_per*3.125 #??
 # verilog gen
 pll_name=designName
 dcoName=pll_name+'_dco'
+bufName='outbuff_div'
 run_digital_flow.pll_verilog_gen(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform)
 
 if outMode=='macro' or outMode=='full':
@@ -341,6 +343,15 @@ if outMode=='macro' or outMode=='full':
 	dco_synth=1
 	dco_apr=1
 	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l)
+	#--------------------------------------------------------
+	# generate output buffer, divider 
+	#--------------------------------------------------------
+	buf_bleach=1
+	buf_design=1
+	buf_lvs=1
+	run_digital_flow.outbuff_div_flow(pvtFormatDir,outbuff_div_flowDir,bufName,platform,buf_bleach,buf_design)
+	if buf_lvs==1:
+		run_digital_flow.buf_custom_lvs(calibreRulesDir,outbuff_div_flowDir,extDir,bufName,pvtFormatDir,platform)
 	#--------------------------------------------------------
 	# generate PDpll 
 	#--------------------------------------------------------
@@ -357,9 +368,8 @@ if outMode=='macro' or outMode=='full':
 		lvs=1  # do lvs for default
 		pex=0
 		buf=1
-		run_digital_flow.pdpll_custom_lvs(VDDnames,buf,'outbuff_div',pll_name+'_dco',calibreRulesDir,pll_flowDir,extDir,pvtFormatDir,platform,pll_name,lvs,pex)
+		run_digital_flow.pdpll_custom_lvs(VDDnames,buf,bufName,pll_name+'_dco',calibreRulesDir,pll_flowDir,extDir,pvtFormatDir,platform,pll_name,lvs,pex)
 
-	sys.exit(1)
 	if outMode=='full': 
 		#--------------------------------------------------------
 		# run analog sim

@@ -244,7 +244,23 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 #	1. Divide ratio: 1~64 (only 2^N works)
 #	2. buffer power: 1~16 
 #------------------------------------------------------------------------------
-def outbuff_div_flow(flowDir,bleach,design):
+def outbuff_div_flow(formatDir,flowDir,bufName,platform,bleach,design):
+	# copy scripts, src, Makefile
+	if os.path.isdir(flowDir+'scripts')==0:	
+		shutil.copytree(formatDir+'buf_scripts',flowDir+'/scripts')
+		shutil.copytree(formatDir+'buf_src',flowDir+'/src')
+		shutil.copyfile(formatDir+'cadre_Makefile',flowDir+'/Makefile')	
+
+	#--- generate  include.mk file ---
+	rmkfile=open(formatDir+'/form_include.mk','r')
+	nm1=txt_mds.netmap()
+	nm1.get_net('iN',bufName,None,None,None)
+	nm1.get_net('pf',platform,None,None,None)
+	with open(flowDir+'include.mk','w') as wmkfile:
+		lines_const=list(rmkfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wmkfile)
+
 	#--- bleach ---
 	if bleach==1:
 		p = sp.Popen(['make','bleach_all'], cwd=flowDir)
@@ -311,10 +327,10 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 		shutil.copytree(dco_flowDir+'export',flowDir+'blocks/'+dcoName+'/export')
 	#--- copy exports from outbuff_div ---
 	if outbuff_div==1:
-		spfiles=glob.iglob(os.path.join(outbuff_div_flowDir+'aux_results/calibre/lvs/','*.sp'))
+		spfiles=glob.iglob(os.path.join(outbuff_div_flowDir+'results/calibre/lvs/','*.sp'))
 		for spfile in spfiles:
 			if os.path.isfile(spfile):
-				shutil.copy2(spfile,outbuff_div_flowDir+'aux_export/outbuff_div.cdl')
+				shutil.copy2(spfile,outbuff_div_flowDir+'export/outbuff_div.cdl')
 			else:
 				print('Error: cant find the outbuff_div.sp file in '+outbuff_div_flowDir+'results/calibre/lvs/')
 				sys.exit(1)
@@ -323,7 +339,7 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 			p.wait()
 		
 		if os.path.isdir(flowDir+'blocks/outbuff_div/export')==0:
-			shutil.copytree(outbuff_div_flowDir+'aux_export',flowDir+'blocks/outbuff_div/export')
+			shutil.copytree(outbuff_div_flowDir+'export',flowDir+'blocks/outbuff_div/export')
 
 	#--- generate  include.mk file ---
 	rmkfile=open(formatDir+'/form_include.mk','r')
@@ -616,3 +632,66 @@ def editPin_gen(Ndrv,Ncc,Nfc,Nstg,formatDir,wfile_name):
 			istg=istg+1
 		else:
 			nm2.printline(line,wfile)
+
+def buf_custom_lvs(calibreRulesDir,flowDir,extDir,designName,formatDir,platform):
+	# copy lvs ruleFiles
+	if os.path.isdir(extDir+'ruleFiles')==0:	
+		shutil.copytree(formatDir+platform+'_ext_ruleFiles',extDir+'ruleFiles')
+
+	# Generate pre PEX netlist and gds files
+	p = sp.Popen(['cp', flowDir+'/results/innovus/'+designName+'_lvs.v', flowDir+'/results/innovus/'+designName+'_lvs_well.v']) 
+	p.wait()
+	
+	p = sp.Popen(['vi', flowDir+'/results/innovus/'+designName+'_lvs_well.v', \
+		      '-c', '%s/.VDD(VDD)/.VDD(VDD), .VNW(VDD), .VPW(VSS)/g | wq'])
+	p.wait()
+	
+	cdlInclude = ''
+	cdlParse   = ''
+	with open(flowDir + '/scripts/innovus/generated/' + designName + \
+		  '.cdlList', 'r') as file:
+	   filedata = file.readlines()
+	
+	for line in filedata:
+	   cdlInclude = cdlInclude + ' -s ' + line.rstrip()
+	   cdlParse   = cdlParse + ' -lsr ' + line.rstrip()
+
+	p = sp.Popen(['v2lvs', cdlParse,
+		      cdlInclude,'-v',
+	              flowDir+'/results/innovus/'+designName+'_lvs_well.v',
+	              '-o',extDir+'/sch/'+designName+'.spi','-i','-c','/_'])
+	p.wait()
+	
+	# NOTE: The exported version of the gds is not merged (i.e. doesn't include standard cells)
+	p = sp.Popen(['cp', flowDir+'/results/calibre/'+designName+'.merged.gds.gz', \
+		      extDir+'/layout/'+designName+'.gds.gz'])
+	p.wait()
+	
+	# Clean the space
+	if os.path.isfile(extDir + '/run/svdb/' + designName + '.dv'):
+	   os.remove(extDir + '/run/svdb/' + designName + '.dv')
+	if os.path.isfile(extDir + '/run/svdb/' + designName + '.extf'):
+	   os.remove(extDir + '/run/svdb/' + designName + '.extf')
+	if os.path.isfile(extDir + '/run/svdb/' + designName + '.lvsf'):
+	   os.remove(extDir + '/run/svdb/' + designName + '.lvsf')
+	if os.path.isfile(extDir + '/run/svdb/' + designName + '.pdsp'):
+	   os.remove(extDir + '/run/svdb/' + designName + '.pdsp')
+	if os.path.isfile(extDir + '/run/svdb/' + designName + '.sp'):
+	   os.remove(extDir + '/run/svdb/' + designName + '.sp')
+
+	# Calibre LVS
+	p = sp.Popen(['cp',extDir+'/ruleFiles/_calibre.lvs_',extDir+'/run/'])
+	p.wait()
+	with open(extDir+'/run/_calibre.lvs_', 'r') as file:
+	   filedata = file.read()
+	filedata = filedata.replace('design', designName)
+	with open(extDir+'/run/_calibre.lvs_', 'w') as file:
+	   file.write(filedata)
+	
+	if os.path.isdir(extDir + '/run/svdb/' + designName + '.pdhB'):
+	   shutil.rmtree(extDir + '/run/svdb/' + designName + '.pdhB', 
+	                 ignore_errors=True)
+	p = sp.Popen(['calibre','-spice',designName+'.sp','-lvs','-hier','-nowait',
+	              '_calibre.lvs_'],cwd=extDir+'/run')
+	p.wait()
+	print ('# OUTBUFF_DIV - LVS completed. check '+extDir+'/run/'+designName+'.lvs.report')

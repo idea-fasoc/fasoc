@@ -238,7 +238,7 @@ def gen_subDirs (subDirs):
 				print('unable to create'+Dir)
 				sys.exit(1)
 
-def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,pll_flowDir):
+def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir):
 	if outMode=="macro" or outMode=="full":
 		gen_subDirs([absPvtDir_plat])
 
@@ -259,6 +259,9 @@ def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,f
 		dco_flowDirs=[dco_flowDir,dco_flowDir+'/src',dco_flowDir+'/scripts',dco_flowDir+'/scripts/innovus',dco_flowDir+'/scripts/dc']
 		gen_subDirs(dco_flowDirs)
 	
+		outbuff_div_flowDirs=[outbuff_div_flowDir]
+		gen_subDirs(outbuff_div_flowDirs)
+
 		pll_flowDirs=[pll_flowDir,pll_flowDir+'/src',pll_flowDir+'/scripts',pll_flowDir+'/scripts/innovus',pll_flowDir+'/scripts/dc']
 		gen_subDirs(pll_flowDirs)
 

@@ -311,10 +311,10 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 		shutil.copytree(dco_flowDir+'export',flowDir+'blocks/'+dcoName+'/export')
 	#--- copy exports from outbuff_div ---
 	if outbuff_div==1:
-		spfiles=glob.iglob(os.path.join(outbuff_div_flowDir+'results/calibre/lvs/','*.sp'))
+		spfiles=glob.iglob(os.path.join(outbuff_div_flowDir+'aux_results/calibre/lvs/','*.sp'))
 		for spfile in spfiles:
 			if os.path.isfile(spfile):
-				shutil.copy2(spfile,outbuff_div_flowDir+'export/outbuff_div.cdl')
+				shutil.copy2(spfile,outbuff_div_flowDir+'aux_export/outbuff_div.cdl')
 			else:
 				print('Error: cant find the outbuff_div.sp file in '+outbuff_div_flowDir+'results/calibre/lvs/')
 				sys.exit(1)
@@ -323,7 +323,7 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 			p.wait()
 		
 		if os.path.isdir(flowDir+'blocks/outbuff_div/export')==0:
-			shutil.copytree(outbuff_div_flowDir+'export',flowDir+'blocks/outbuff_div/export')
+			shutil.copytree(outbuff_div_flowDir+'aux_export',flowDir+'blocks/outbuff_div/export')
 
 	#--- generate  include.mk file ---
 	rmkfile=open(formatDir+'/form_include.mk','r')

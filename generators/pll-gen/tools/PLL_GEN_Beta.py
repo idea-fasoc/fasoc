@@ -112,7 +112,7 @@ elif platform=='gf12lp':
 	buf_big='BUFH_X8N_A10P5PP84TR_C14'
 	bufz='placeHolder'
 	min_p_rng_l= 4
-	min_p_str_l= 4
+	min_p_str_l= 5
 	p_rng_w= 1.6 
 	p_rng_s= 0.8
 	p2_rng_w= 1.2
@@ -339,7 +339,7 @@ if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	# generate Feed Forward DCO 
 	#--------------------------------------------------------
-	dco_bleach=1 # test switch
+	dco_bleach=0 # test switch
 	dco_synth=1
 	dco_apr=1
 	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l)
@@ -349,9 +349,10 @@ if outMode=='macro' or outMode=='full':
 	buf_bleach=1
 	buf_design=1
 	buf_lvs=1
-	run_digital_flow.outbuff_div_flow(pvtFormatDir,outbuff_div_flowDir,bufName,platform,buf_bleach,buf_design)
-	if buf_lvs==1:
-		run_digital_flow.buf_custom_lvs(calibreRulesDir,outbuff_div_flowDir,extDir,bufName,pvtFormatDir,platform)
+	if outbuff_div==1:
+		run_digital_flow.outbuff_div_flow(pvtFormatDir,outbuff_div_flowDir,bufName,platform,buf_bleach,buf_design)
+		if buf_lvs==1:
+			run_digital_flow.buf_custom_lvs(calibreRulesDir,outbuff_div_flowDir,extDir,bufName,pvtFormatDir,platform)
 	#--------------------------------------------------------
 	# generate PDpll 
 	#--------------------------------------------------------

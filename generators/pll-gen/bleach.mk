@@ -89,7 +89,7 @@ bleach_outbuff_div:
 bleach_work:
 	rm -f work/*
 	
-bleach_all:
+bleach_flows:
 	rm -f work/*
 	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_dco/*.lef			
 	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_dco/blocks	
@@ -168,5 +168,10 @@ bleach_all:
 	rm -rf ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/export
 	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/tool_versions.txt			
 	rm -f  ./../../private/generators/pll-gen/tsmc65lp/flow_outbuff_div/*.lef			
+
+bleach_all:
+	rm -rf ./../../private/generators/pll-gen/tsmc65lp
+	rm -rf ./../../private/generators/pll-gen/gf12lp
+	rm -rf ./work/*
 
 

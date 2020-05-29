@@ -214,17 +214,9 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 		   print ('Synthesis Failed')
 
 	if apr==1:
-		os.system('module unload calibre')
-			
-		os.system('module load calibre/2016.1_23.16')
-
 		p = sp.Popen(['make','design'], cwd=flowDir)
 		p.wait()
 		
-		os.system('module unload calibre')
-			
-		os.system('module load calibre/2019.3_25')
-
 		p = sp.Popen(['make','lvs'], cwd=flowDir)
 		p.wait()
 		
@@ -485,16 +477,8 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 	print('# ready for apr')
 	print ('#======================================================================')
 	if apr==1:	
-		os.system('module unload calibre')
-			
-		os.system('module load calibre/2016.1_23.16')
-
 		p = sp.Popen(['make','design'], cwd=flowDir)
 		p.wait()
-		
-		os.system('module unload calibre')
-			
-		os.system('module load calibre/2019.3_25')
 		
 		p = sp.Popen(['make','lvs'], cwd=flowDir)
 		p.wait()

@@ -339,14 +339,14 @@ if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	# generate Feed Forward DCO 
 	#--------------------------------------------------------
-	dco_bleach=1 # test switch
+	dco_bleach=0 # test switch
 	dco_synth=1
 	dco_apr=1
 	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l)
 	#--------------------------------------------------------
 	# generate output buffer, divider 
 	#--------------------------------------------------------
-	buf_bleach=1
+	buf_bleach=0
 	buf_design=1
 	buf_lvs=1
 	run_digital_flow.outbuff_div_flow(pvtFormatDir,outbuff_div_flowDir,bufName,platform,buf_bleach,buf_design)
@@ -355,9 +355,9 @@ if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	# generate PDpll 
 	#--------------------------------------------------------
-	pdpll_bleach=1
+	pdpll_bleach=0
 	pdpll_synth=1 # test switch
-	pdpll_apr=1
+	pdpll_apr=0
 	W_dco,H_dco,W_pll,H_pll=run_digital_flow.pdpll_flow(pvtFormatDir,pll_flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,pdpll_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,pdpll_synth,pdpll_apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,pll_max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc)
 	A_core=W_pll*H_pll	
 	#--------------------------------------------------------

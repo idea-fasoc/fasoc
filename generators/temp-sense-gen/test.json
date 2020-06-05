@@ -1,5 +1,5 @@
 {
-    "instance_name": "tempsenseInst_error",
+    "module_name": "tempsenseInst_error",
     "generator": "temp-sense-gen",
     "specifications": {
     	"temperature": { "min": -20, "max": 100 },

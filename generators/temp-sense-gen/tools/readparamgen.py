@@ -33,6 +33,16 @@ print( sys.argv)
 
 genDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../")
 
+
+
+head_tail_0 = os.path.split(os.path.abspath(genDir))
+head_tail_1 = os.path.split(head_tail_0[0])
+privateGenDir = os.path.relpath(os.path.join(genDir, '../../', 'private', head_tail_1[1], head_tail_0[1]))
+print(head_tail_0)
+print(head_tail_1)
+print(privateGenDir)
+
+
 parser = argparse.ArgumentParser(description='Temperature Sensor design generator')
 parser.add_argument('--specfile', required=True,
                     help='File containing the specification for the generator')
@@ -53,11 +63,16 @@ if not os.path.isfile(args.specfile):
    sys.exit(1)
 
 
-
-
-if args.platform != 'tsmc65lp':
-  print("Error: tsmc65lp is the only platform supported")
+if args.platform != 'tsmc65lp' and args.platform != 'gf12lp':
+  print("Error: tsmc65lp and gf12lp are the only platform supported as of now")
   sys.exit(1)
+
+if args.mode != 'verilog':
+   if not os.path.isdir(privateGenDir):   
+      print('Error. Private directory does not exist. ' + \
+            'Please use only \'verilog\' mode.')
+      sys.exit(1)
+
 
 # Load json spec file
 print("Loading specfile...")
@@ -71,6 +86,8 @@ except ValueError as e:
 
 if jsonSpec['generator'] != 'temp-sense-gen':
   print("Error: Generator specification must be \"temp-sense-gen\".")
+  sys.exit(1)
+
 
 # Load json config file
 print("Loading platform_config file...")
@@ -85,27 +102,47 @@ except ValueError as e:
 
 
 # Get the config variable from platfom config file
-simTool = jsonConfig['simTool']
-if simTool != 'hspice':
-   print("Error: Only support hspice simulator now")
-   sys.exit(1)
+if args.mode != 'verilog':
+   simTool = jsonConfig['simTool']
+   if simTool != 'hspice' and simTool != 'finesim':
+      print('Error: Supported simulators are \'hspice\' or \'finesim\' ' + \
+            'as of now')
+      sys.exit(1)
 
-extTool = jsonConfig['extractionTool']
-if extTool != 'calibre':
-   print("Error: Only support calibre extraction now")
-   sys.exit(1)
+   if args.mode == 'full':
+      extTool = jsonConfig['extractionTool']
+      if extTool != 'calibre':
+         print('Error: Only support calibre extraction now')
+         sys.exit(1)
+      
+      netlistTool = jsonConfig['netlistTool']
+      if netlistTool != 'calibredrv':
+         print('Error: Only support calibredrv netlist tool now')
+         sys.exit(1)
 
-netlistTool = jsonConfig['netlistTool']
-if netlistTool != 'calibredrv':
-   print("Error: Only support calibredrv netlist tool now")
-   sys.exit(1)
 
-calibreRulesDir = jsonConfig['calibreRules']
+# simTool = jsonConfig['simTool']
+# if simTool != 'hspice':
+#    print("Error: Only support hspice simulator now")
+#    sys.exit(1)
+
+# extTool = jsonConfig['extractionTool']
+# if extTool != 'calibre':
+#    print("Error: Only support calibre extraction now")
+#    sys.exit(1)
+
+# netlistTool = jsonConfig['netlistTool']
+# if netlistTool != 'calibredrv':
+#    print("Error: Only support calibredrv netlist tool now")
+#    sys.exit(1)
+
+if args.mode == 'full':
+   calibreRulesDir = platformConfig['calibreRules']
 
 try:
    platformConfig = jsonConfig['platforms'][args.platform]
 except ValueError as e:
-   print("Error: \"' + args.platform + '\" config not available")
+   print('Error: \"' + args.platform + '\" config not available')
    sys.exit(1)
 
 #Open the json file and read the content
@@ -115,7 +152,7 @@ except ValueError as e:
     # parse file
 #obj = json.loads(data)
 try:
-   designName = jsonSpec['instance_name']
+   designName = jsonSpec['module_name']
 except KeyError as e:
    print('Error: Bad Input Specfile. \'module_name\' variable is missing.')
    sys.exit(1)
@@ -140,7 +177,7 @@ mFilePublic1 = genDir + '/models/' + args.platform + '.model_tempsense'
 
 if not os.path.isfile(mFile1):
    if args.mode == 'verilog':
-      print('Model file \'' + mFile + '\' is not valid. ' + \
+      print('Model file \'' + mFile1 + '\' is not valid. ' + \
             'Using the model file provided in the repo.')
       mFile1 = mFilePublic1
    else:
@@ -160,7 +197,7 @@ Model = mFile1
 
 
 # Get the design spec & parameters from spec file
-designName = jsonSpec['instance_name']
+designName = jsonSpec['module_name']
 
 Tmin = float(jsonSpec['specifications']['temperature']['min'])
 Tmax = float(jsonSpec['specifications']['temperature']['max'])

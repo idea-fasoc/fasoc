@@ -1,9 +1,9 @@
 {
-    "instance_name": "adcInst",
+    "instance_name": "sar",
     "generator": "adc-gen",
     "specifications": {
     	"fsampling": 1000000,
-    	"target enob": 6.8,
+    	"target enob": 7.4,
     	"optimization":"area",
     	"model" :"modelfile.csv"
 	}

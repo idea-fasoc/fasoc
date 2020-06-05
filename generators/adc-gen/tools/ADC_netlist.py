@@ -4,10 +4,10 @@ import shutil
 import string
 import time
 
-def gen_adc_netlist(resolution_in, nisw_in, ncsw_in,srcDir,genDir):
+def gen_adc_netlist(resolution_in, nisw_in, ncsw_in,simDir,genDir):
 	##### Directory name for result files
-	#dir_name = 'net_generated'
-	dir_name2 = './hspice/run'
+	dir_name = simDir + '/run'
+	#dir_name2 = './hspice/run'
 	
 	##### Result directory generation
 	#try:
@@ -23,17 +23,17 @@ def gen_adc_netlist(resolution_in, nisw_in, ncsw_in,srcDir,genDir):
 	
 	
 	##### CDAC unit cap value
-	capVal = [2e-15]
+	capVal = [3.2e-15]
 	for i in range(0,len(capVal)):
 		capVal[i] = str(capVal[i])
 	
 	##### Input switch unit width
-	widthi = [500e-9]
+	widthi = [2]
 	for i in range(0,len(widthi)):
 		widthi[i] = str(widthi[i])
 	
 	##### VCM switch unit width
-	widthc = [1000e-9]
+	widthc = [2]
 	for i in range(0,len(widthc)):
 		widthc[i] = str(widthc[i])
 	
@@ -86,23 +86,23 @@ def gen_adc_netlist(resolution_in, nisw_in, ncsw_in,srcDir,genDir):
 								for ll in range(0,len(ncv)):
 									#####
 									config="%s_%s_%s_%s"%(NBIT[ii],nisw[jj],ncsw[kk],ncv[ll])
-									#s = open("./tools/tbSar.sp").read()
-									#s = s.replace('@capVal', capVal[i])
-									#s = s.replace('@widthi', widthi[j])
-									#s = s.replace('@widthc', widthc[k])
-									#s = s.replace('@fsmpl', fsmpl[l])
+									s = open("./tools/tbSar.sp").read()
+									s = s.replace('@capVal', capVal[i])
+									s = s.replace('@widthi', widthi[j])
+									s = s.replace('@widthc', widthc[k])
+									s = s.replace('@fsmpl', fsmpl[l])
 									#s = s.replace('@config', config)
 									
-									#f = open("%s/tbSar_capVal_%s_widthi_%s_widthc_%s_fsmpl_%s_config_%s.sp"%(dir_name2, capVal[i], widthi[j], widthc[k], fsmpl[l], config), 'w')
-									#f.write(s)
-									#f.close()
-									run_data="finesim -spice -np 4 %s/tbSar_capVal_%s_widthi_%s_widthc_%s_fsmpl_%s_config_%s.sp -o %s/tbSar_capVal_%s_widthi_%s_widthc_%s_fsmpl_%s_config_%s\n"%(dir_name2, capVal[i], widthi[j], widthc[k], fsmpl[l], config, dir_name2, capVal[i], widthi[j], widthc[k], fsmpl[l], config)
+									f = open("%s/tbSar_capVal_%s_widthi_%s_widthc_%s_fsmpl_%s_config_%s.sp"%(dir_name, capVal[i], widthi[j], widthc[k], fsmpl[l], config), 'w')
+									f.write(s)
+									f.close()
+									run_data="finesim -spice -np 4 %s/tbSar_capVal_%s_widthi_%s_widthc_%s_fsmpl_%s_config_%s.sp -o %s/tbSar_capVal_%s_widthi_%s_widthc_%s_fsmpl_%s_config_%s\n"%(dir_name, capVal[i], widthi[j], widthc[k], fsmpl[l], config, dir_name, capVal[i], widthi[j], widthc[k], fsmpl[l], config)
 									run_file.write(run_data)
 	
-									result_data="python result.py %s/tbSar_capVal_%s_widthi_%s_widthc_%s_fsmpl_%s_config_%s.mt0 >> result_sorted\n"%(dir_name2, capVal[i], widthi[j], widthc[k], fsmpl[l], config)
+									result_data="python ./tools/result.py %s/tbSar_capVal_%s_widthi_%s_widthc_%s_fsmpl_%s_config_%s.mt0 >> result_sorted\n"%(dir_name, capVal[i], widthi[j], widthc[k], fsmpl[l], config)
 									result_file.write(result_data)
 	
-									netgen_data="python" +" %s/tools/auto_netgen.py %s %s %s %s\n"%(genDir,NBIT[ii],nisw[jj],ncsw[kk],ncv[ll])
+									netgen_data="python" +" %stools/auto_netgen.py %s %s %s %s\n"%(genDir,NBIT[ii],nisw[jj],ncsw[kk],ncv[ll])
 									netgen_file.write(netgen_data)
 	
 									#####

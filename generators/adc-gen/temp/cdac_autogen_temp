@@ -1,0 +1,409 @@
+.subckt SW_INPUT_SUB vdd vnw vpw vss in_l in_r out sw_ctrl
+xn1 out on_l in_l vpw nfet m=1 l=14e-9 nfin='sw_width*fxxx' nf=1 par=1 par_nf=1.0 asej='1.793e-15*(sw_width*fxxx)+((sw_width*fxxx)*int(500e-3))*1.793e-15' adej='((sw_width*fxxx)*(1+int(0.0)))*1.793e-15' psej='(((1*(sw_width*fxxx))*2)*163e-9+11e-9)+((((sw_width*fxxx)*int(500e-3))*1)*2)*163e-9' pdej='((((sw_width*fxxx)*(1+int(0.0)))*1)*2)*163e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=187e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=180e-9 lle_sb=180e-9 lle_rxrxa=187e-9 lle_rxrxb=187e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=81.5e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xn0 out on_r in_r vpw nfet m=1 l=14e-9 nfin='sw_width*fxxx' nf=1 par=1 par_nf=1.0 asej='1.793e-15*(sw_width*fxxx)+((sw_width*fxxx)*int(500e-3))*1.793e-15' adej='((sw_width*fxxx)*(1+int(0.0)))*1.793e-15' psej='(((1*(sw_width*fxxx))*2)*163e-9+11e-9)+((((sw_width*fxxx)*int(500e-3))*1)*2)*163e-9' pdej='((((sw_width*fxxx)*(1+int(0.0)))*1)*2)*163e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=187e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=180e-9 lle_sb=180e-9 lle_rxrxa=187e-9 lle_rxrxb=187e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=81.5e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xi1 on_l vdd vnw vpw vss sw_ctrl INV_X2N_A10P5PP84TR_C14
+xi0 on_r vdd vnw vpw vss on_l INV_X2N_A10P5PP84TR_C14
+xp1 in_l on_r out vnw pfet m=1 l=14e-9 nfin='sw_width*fxxx' nf=1 par=1 par_nf=1.0 asej='1.793e-15*(sw_width*fxxx)+((sw_width*fxxx)*int(500e-3))*1.793e-15' adej='((sw_width*fxxx)*(1+int(0.0)))*1.793e-15' psej='(((1*(sw_width*fxxx))*2)*163e-9+11e-9)+((((sw_width*fxxx)*int(500e-3))*1)*2)*163e-9' pdej='((((sw_width*fxxx)*(1+int(0.0)))*1)*2)*163e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=187e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=180e-9 lle_sb=180e-9 lle_rxrxa=187e-9 lle_rxrxb=187e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=81.5e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xp0 in_r on_l out vnw pfet m=1 l=14e-9 nfin='sw_width*fxxx' nf=1 par=1 par_nf=1.0 asej='1.793e-15*(sw_width*fxxx)+((sw_width*fxxx)*int(500e-3))*1.793e-15' adej='((sw_width*fxxx)*(1+int(0.0)))*1.793e-15' psej='(((1*(sw_width*fxxx))*2)*163e-9+11e-9)+((((sw_width*fxxx)*int(500e-3))*1)*2)*163e-9' pdej='((((sw_width*fxxx)*(1+int(0.0)))*1)*2)*163e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=187e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=180e-9 lle_sb=180e-9 lle_rxrxa=187e-9 lle_rxrxb=187e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=81.5e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+
+.ends SW_INPUT_SUB
+
+.subckt SW_INPUT vdd vnw vpw vss in0l in0r in1 out sw0 sw1
+xi3 vdd vnw vpw vss net2 net1 out sw1 SW_INPUT_SUB
+xi2 vdd vnw vpw vss in1 vss net2 vss SW_INPUT_SUB
+xi1 vdd vnw vpw vss in0l in0r net1 sw0 SW_INPUT_SUB
+.ends SW_INPUT
+
+.subckt SW_VCM vdd vnw vpw vss in out sw_ctrl
+xn9 net8 on out vpw hvtnfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xn8 net10 on net8 vpw hvtnfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xn7 net12 on net10 vpw hvtnfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xn6 net14 on net12 vpw hvtnfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xn5 net16 on net14 vpw hvtnfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xn4 net18 on net16 vpw hvtnfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xn3 net20 on net18 vpw hvtnfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xn2 net22 on net20 vpw hvtnfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xn1 net25 on net22 vpw hvtnfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xn0 in on net25 vpw hvtnfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xi1 onb vdd vnw vpw vss sw_ctrl INV_X2N_A10P5PP84TR_C14
+xi0 on vdd vnw vpw vss onb INV_X2N_A10P5PP84TR_C14
+xp9 out onb net9 vnw hvtpfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xp8 net9 onb net11 vnw hvtpfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xp7 net11 onb net13 vnw hvtpfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xp6 net13 onb net15 vnw hvtpfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xp5 net15 onb net17 vnw hvtpfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xp4 net17 onb net19 vnw hvtpfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xp3 net19 onb net21 vnw hvtpfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xp2 net21 onb net23 vnw hvtpfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xp1 net23 onb net24 vnw hvtpfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+xp0 net24 onb in vnw hvtpfet m=1 l=16e-9 nfin='sw_width_vcm*fxxx_vcm' nf=1 par=1 par_nf=1.0 asej='594e-18*(sw_width_vcm*fxxx_vcm)+((sw_width_vcm*fxxx_vcm)*int(500e-3))*572e-18' adej='((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*572e-18' psej='(((1*(sw_width_vcm*fxxx_vcm))*2)*54e-9+11e-9)+((((sw_width_vcm*fxxx_vcm)*int(500e-3))*1)*2)*52e-9' pdej='((((sw_width_vcm*fxxx_vcm)*(1+int(0.0)))*1)*2)*52e-9' pdevdops=1 pdevlgeos=1 pdevwgeos=1 psw_acv_sign=1 plnest=1 pldist=1 plorient=0 cpp=78e-9 fpitch=48e-9 xpos=-99 ypos=-99 ptwell=0 sca=0 scb=0 scc=0 pre_layout_local=-1 ngcon=1 p_vta=0 p_la=0 u0mult_fet=1 lle_sa=71e-9 lle_sb=71e-9 lle_rxrxa=78e-9 lle_rxrxb=78e-9 lle_rxrxn=192e-9 lle_rxrxs=192e-9 lle_pcrxn=55e-9 lle_pcrxs=55e-9 lle_nwa=2e-6 lle_nwb=2e-6 lle_nwn=192e-9 lle_nws=192e-9 lle_ctne=0 lle_ctnw=0 lle_ctse=0 lle_ctsw=0 lle_sctne=0 lle_sctnw=0 lle_sctse=0 lle_sctsw=0 lrsd=27e-9 dtemp=0 l_shape=0 l_shape_s=0 nsig_dop1=0 nsig_dop2=0 nsig_dibl=0 nsig_pc=0 nsig_rx=0 fc_index=0 fc_sigma=3 analog=-1 nf_pex=1
+
+.ends SW_VCM
+
+.SUBCKT UNIT_CAP VDD VNW VPW VSS top bot
+XC0 top bot apmom1v2 m=1 w=1.724u l=1.6u botlev=2 toplev=4 par=1
+.ENDS UNIT_CAP
+
+.subckt cap_x1 VDD VNW VPW VSS top bot
+
+xi0 VDD VNW VPW VSS top bot UNIT_CAP
+
+.ends cap_x1
+
+.subckt cap_x2 VDD VNW VPW VSS top bot
+
+xi0 VDD VNW VPW VSS top bot UNIT_CAP
+xi1 VDD VNW VPW VSS top bot UNIT_CAP
+
+.ends cap_x2
+
+.subckt cap_x4 VDD VNW VPW VSS top bot
+
+xi0 VDD VNW VPW VSS top bot UNIT_CAP
+xi1 VDD VNW VPW VSS top bot UNIT_CAP
+xi2 VDD VNW VPW VSS top bot UNIT_CAP
+xi3 VDD VNW VPW VSS top bot UNIT_CAP
+
+.ends cap_x4
+
+
+.subckt cap_x8 VDD VNW VPW VSS top bot
+
+xi0 VDD VNW VPW VSS top bot UNIT_CAP
+xi1 VDD VNW VPW VSS top bot UNIT_CAP
+xi2 VDD VNW VPW VSS top bot UNIT_CAP
+xi3 VDD VNW VPW VSS top bot UNIT_CAP
+xi4 VDD VNW VPW VSS top bot UNIT_CAP
+xi5 VDD VNW VPW VSS top bot UNIT_CAP
+xi6 VDD VNW VPW VSS top bot UNIT_CAP
+xi7 VDD VNW VPW VSS top bot UNIT_CAP
+
+.ends cap_x8
+
+.subckt cap_x16 VDD VNW VPW VSS top bot
+
+xi0	 VDD VNW VPW VSS top bot UNIT_CAP
+xi1	 VDD VNW VPW VSS top bot UNIT_CAP
+xi2	 VDD VNW VPW VSS top bot UNIT_CAP
+xi3	 VDD VNW VPW VSS top bot UNIT_CAP
+xi4	 VDD VNW VPW VSS top bot UNIT_CAP
+xi5	 VDD VNW VPW VSS top bot UNIT_CAP
+xi6	 VDD VNW VPW VSS top bot UNIT_CAP
+xi7	 VDD VNW VPW VSS top bot UNIT_CAP
+xi8	 VDD VNW VPW VSS top bot UNIT_CAP
+xi9	 VDD VNW VPW VSS top bot UNIT_CAP
+xi10 VDD VNW VPW VSS top bot UNIT_CAP
+xi11 VDD VNW VPW VSS top bot UNIT_CAP
+xi12 VDD VNW VPW VSS top bot UNIT_CAP
+xi13 VDD VNW VPW VSS top bot UNIT_CAP
+xi14 VDD VNW VPW VSS top bot UNIT_CAP
+xi15 VDD VNW VPW VSS top bot UNIT_CAP
+
+.ends cap_x16
+
+.subckt cap_x32 VDD VNW VPW VSS top bot
+
+xi0	 VDD VNW VPW VSS top bot UNIT_CAP
+xi1	 VDD VNW VPW VSS top bot UNIT_CAP
+xi2	 VDD VNW VPW VSS top bot UNIT_CAP
+xi3	 VDD VNW VPW VSS top bot UNIT_CAP
+xi4	 VDD VNW VPW VSS top bot UNIT_CAP
+xi5	 VDD VNW VPW VSS top bot UNIT_CAP
+xi6	 VDD VNW VPW VSS top bot UNIT_CAP
+xi7	 VDD VNW VPW VSS top bot UNIT_CAP
+xi8	 VDD VNW VPW VSS top bot UNIT_CAP
+xi9	 VDD VNW VPW VSS top bot UNIT_CAP
+xi10 VDD VNW VPW VSS top bot UNIT_CAP
+xi11 VDD VNW VPW VSS top bot UNIT_CAP
+xi12 VDD VNW VPW VSS top bot UNIT_CAP
+xi13 VDD VNW VPW VSS top bot UNIT_CAP
+xi14 VDD VNW VPW VSS top bot UNIT_CAP
+xi15 VDD VNW VPW VSS top bot UNIT_CAP
+xi16 VDD VNW VPW VSS top bot UNIT_CAP
+xi17 VDD VNW VPW VSS top bot UNIT_CAP
+xi18 VDD VNW VPW VSS top bot UNIT_CAP
+xi19 VDD VNW VPW VSS top bot UNIT_CAP
+xi20 VDD VNW VPW VSS top bot UNIT_CAP
+xi21 VDD VNW VPW VSS top bot UNIT_CAP
+xi22 VDD VNW VPW VSS top bot UNIT_CAP
+xi23 VDD VNW VPW VSS top bot UNIT_CAP
+xi24 VDD VNW VPW VSS top bot UNIT_CAP
+xi25 VDD VNW VPW VSS top bot UNIT_CAP
+xi26 VDD VNW VPW VSS top bot UNIT_CAP
+xi27 VDD VNW VPW VSS top bot UNIT_CAP
+xi28 VDD VNW VPW VSS top bot UNIT_CAP
+xi29 VDD VNW VPW VSS top bot UNIT_CAP
+xi30 VDD VNW VPW VSS top bot UNIT_CAP
+xi31 VDD VNW VPW VSS top bot UNIT_CAP
+
+.ends cap_x32
+
+.subckt cap_x64 VDD VNW VPW VSS top bot
+
+xi0	 VDD VNW VPW VSS top bot UNIT_CAP
+xi1	 VDD VNW VPW VSS top bot UNIT_CAP
+xi2	 VDD VNW VPW VSS top bot UNIT_CAP
+xi3	 VDD VNW VPW VSS top bot UNIT_CAP
+xi4	 VDD VNW VPW VSS top bot UNIT_CAP
+xi5	 VDD VNW VPW VSS top bot UNIT_CAP
+xi6	 VDD VNW VPW VSS top bot UNIT_CAP
+xi7	 VDD VNW VPW VSS top bot UNIT_CAP
+xi8	 VDD VNW VPW VSS top bot UNIT_CAP
+xi9	 VDD VNW VPW VSS top bot UNIT_CAP
+xi10 VDD VNW VPW VSS top bot UNIT_CAP
+xi11 VDD VNW VPW VSS top bot UNIT_CAP
+xi12 VDD VNW VPW VSS top bot UNIT_CAP
+xi13 VDD VNW VPW VSS top bot UNIT_CAP
+xi14 VDD VNW VPW VSS top bot UNIT_CAP
+xi15 VDD VNW VPW VSS top bot UNIT_CAP
+xi16 VDD VNW VPW VSS top bot UNIT_CAP
+xi17 VDD VNW VPW VSS top bot UNIT_CAP
+xi18 VDD VNW VPW VSS top bot UNIT_CAP
+xi19 VDD VNW VPW VSS top bot UNIT_CAP
+xi20 VDD VNW VPW VSS top bot UNIT_CAP
+xi21 VDD VNW VPW VSS top bot UNIT_CAP
+xi22 VDD VNW VPW VSS top bot UNIT_CAP
+xi23 VDD VNW VPW VSS top bot UNIT_CAP
+xi24 VDD VNW VPW VSS top bot UNIT_CAP
+xi25 VDD VNW VPW VSS top bot UNIT_CAP
+xi26 VDD VNW VPW VSS top bot UNIT_CAP
+xi27 VDD VNW VPW VSS top bot UNIT_CAP
+xi28 VDD VNW VPW VSS top bot UNIT_CAP
+xi29 VDD VNW VPW VSS top bot UNIT_CAP
+xi30 VDD VNW VPW VSS top bot UNIT_CAP
+xi31 VDD VNW VPW VSS top bot UNIT_CAP
+xi32 VDD VNW VPW VSS top bot UNIT_CAP
+xi33 VDD VNW VPW VSS top bot UNIT_CAP
+xi34 VDD VNW VPW VSS top bot UNIT_CAP
+xi35 VDD VNW VPW VSS top bot UNIT_CAP
+xi36 VDD VNW VPW VSS top bot UNIT_CAP
+xi37 VDD VNW VPW VSS top bot UNIT_CAP
+xi38 VDD VNW VPW VSS top bot UNIT_CAP
+xi39 VDD VNW VPW VSS top bot UNIT_CAP
+xi40 VDD VNW VPW VSS top bot UNIT_CAP
+xi41 VDD VNW VPW VSS top bot UNIT_CAP
+xi42 VDD VNW VPW VSS top bot UNIT_CAP
+xi43 VDD VNW VPW VSS top bot UNIT_CAP
+xi44 VDD VNW VPW VSS top bot UNIT_CAP
+xi45 VDD VNW VPW VSS top bot UNIT_CAP
+xi46 VDD VNW VPW VSS top bot UNIT_CAP
+xi47 VDD VNW VPW VSS top bot UNIT_CAP
+xi48 VDD VNW VPW VSS top bot UNIT_CAP
+xi49 VDD VNW VPW VSS top bot UNIT_CAP
+xi50 VDD VNW VPW VSS top bot UNIT_CAP
+xi51 VDD VNW VPW VSS top bot UNIT_CAP
+xi52 VDD VNW VPW VSS top bot UNIT_CAP
+xi53 VDD VNW VPW VSS top bot UNIT_CAP
+xi54 VDD VNW VPW VSS top bot UNIT_CAP
+xi55 VDD VNW VPW VSS top bot UNIT_CAP
+xi56 VDD VNW VPW VSS top bot UNIT_CAP
+xi57 VDD VNW VPW VSS top bot UNIT_CAP
+xi58 VDD VNW VPW VSS top bot UNIT_CAP
+xi59 VDD VNW VPW VSS top bot UNIT_CAP
+xi60 VDD VNW VPW VSS top bot UNIT_CAP
+xi61 VDD VNW VPW VSS top bot UNIT_CAP
+xi62 VDD VNW VPW VSS top bot UNIT_CAP
+xi63 VDD VNW VPW VSS top bot UNIT_CAP
+
+.ends cap_x64
+
+.subckt cap_x128 VDD VNW VPW VSS top bot
+
+xi0 VDD VNW VPW VSS top bot UNIT_CAP
+xi1 VDD VNW VPW VSS top bot UNIT_CAP
+xi2 VDD VNW VPW VSS top bot UNIT_CAP
+xi3 VDD VNW VPW VSS top bot UNIT_CAP
+xi4 VDD VNW VPW VSS top bot UNIT_CAP
+xi5 VDD VNW VPW VSS top bot UNIT_CAP
+xi6 VDD VNW VPW VSS top bot UNIT_CAP
+xi7 VDD VNW VPW VSS top bot UNIT_CAP
+xi8 VDD VNW VPW VSS top bot UNIT_CAP
+xi9 VDD VNW VPW VSS top bot UNIT_CAP
+xi10 VDD VNW VPW VSS top bot UNIT_CAP
+xi11 VDD VNW VPW VSS top bot UNIT_CAP
+xi12 VDD VNW VPW VSS top bot UNIT_CAP
+xi13 VDD VNW VPW VSS top bot UNIT_CAP
+xi14 VDD VNW VPW VSS top bot UNIT_CAP
+xi15 VDD VNW VPW VSS top bot UNIT_CAP
+xi16 VDD VNW VPW VSS top bot UNIT_CAP
+xi17 VDD VNW VPW VSS top bot UNIT_CAP
+xi18 VDD VNW VPW VSS top bot UNIT_CAP
+xi19 VDD VNW VPW VSS top bot UNIT_CAP
+xi20 VDD VNW VPW VSS top bot UNIT_CAP
+xi21 VDD VNW VPW VSS top bot UNIT_CAP
+xi22 VDD VNW VPW VSS top bot UNIT_CAP
+xi23 VDD VNW VPW VSS top bot UNIT_CAP
+xi24 VDD VNW VPW VSS top bot UNIT_CAP
+xi25 VDD VNW VPW VSS top bot UNIT_CAP
+xi26 VDD VNW VPW VSS top bot UNIT_CAP
+xi27 VDD VNW VPW VSS top bot UNIT_CAP
+xi28 VDD VNW VPW VSS top bot UNIT_CAP
+xi29 VDD VNW VPW VSS top bot UNIT_CAP
+xi30 VDD VNW VPW VSS top bot UNIT_CAP
+xi31 VDD VNW VPW VSS top bot UNIT_CAP
+xi32 VDD VNW VPW VSS top bot UNIT_CAP
+xi33 VDD VNW VPW VSS top bot UNIT_CAP
+xi34 VDD VNW VPW VSS top bot UNIT_CAP
+xi35 VDD VNW VPW VSS top bot UNIT_CAP
+xi36 VDD VNW VPW VSS top bot UNIT_CAP
+xi37 VDD VNW VPW VSS top bot UNIT_CAP
+xi38 VDD VNW VPW VSS top bot UNIT_CAP
+xi39 VDD VNW VPW VSS top bot UNIT_CAP
+xi40 VDD VNW VPW VSS top bot UNIT_CAP
+xi41 VDD VNW VPW VSS top bot UNIT_CAP
+xi42 VDD VNW VPW VSS top bot UNIT_CAP
+xi43 VDD VNW VPW VSS top bot UNIT_CAP
+xi44 VDD VNW VPW VSS top bot UNIT_CAP
+xi45 VDD VNW VPW VSS top bot UNIT_CAP
+xi46 VDD VNW VPW VSS top bot UNIT_CAP
+xi47 VDD VNW VPW VSS top bot UNIT_CAP
+xi48 VDD VNW VPW VSS top bot UNIT_CAP
+xi49 VDD VNW VPW VSS top bot UNIT_CAP
+xi50 VDD VNW VPW VSS top bot UNIT_CAP
+xi51 VDD VNW VPW VSS top bot UNIT_CAP
+xi52 VDD VNW VPW VSS top bot UNIT_CAP
+xi53 VDD VNW VPW VSS top bot UNIT_CAP
+xi54 VDD VNW VPW VSS top bot UNIT_CAP
+xi55 VDD VNW VPW VSS top bot UNIT_CAP
+xi56 VDD VNW VPW VSS top bot UNIT_CAP
+xi57 VDD VNW VPW VSS top bot UNIT_CAP
+xi58 VDD VNW VPW VSS top bot UNIT_CAP
+xi59 VDD VNW VPW VSS top bot UNIT_CAP
+xi60 VDD VNW VPW VSS top bot UNIT_CAP
+xi61 VDD VNW VPW VSS top bot UNIT_CAP
+xi62 VDD VNW VPW VSS top bot UNIT_CAP
+xi63 VDD VNW VPW VSS top bot UNIT_CAP
+xi64 VDD VNW VPW VSS top bot UNIT_CAP
+xi65 VDD VNW VPW VSS top bot UNIT_CAP
+xi66 VDD VNW VPW VSS top bot UNIT_CAP
+xi67 VDD VNW VPW VSS top bot UNIT_CAP
+xi68 VDD VNW VPW VSS top bot UNIT_CAP
+xi69 VDD VNW VPW VSS top bot UNIT_CAP
+xi70 VDD VNW VPW VSS top bot UNIT_CAP
+xi71 VDD VNW VPW VSS top bot UNIT_CAP
+xi72 VDD VNW VPW VSS top bot UNIT_CAP
+xi73 VDD VNW VPW VSS top bot UNIT_CAP
+xi74 VDD VNW VPW VSS top bot UNIT_CAP
+xi75 VDD VNW VPW VSS top bot UNIT_CAP
+xi76 VDD VNW VPW VSS top bot UNIT_CAP
+xi77 VDD VNW VPW VSS top bot UNIT_CAP
+xi78 VDD VNW VPW VSS top bot UNIT_CAP
+xi79 VDD VNW VPW VSS top bot UNIT_CAP
+xi80 VDD VNW VPW VSS top bot UNIT_CAP
+xi81 VDD VNW VPW VSS top bot UNIT_CAP
+xi82 VDD VNW VPW VSS top bot UNIT_CAP
+xi83 VDD VNW VPW VSS top bot UNIT_CAP
+xi84 VDD VNW VPW VSS top bot UNIT_CAP
+xi85 VDD VNW VPW VSS top bot UNIT_CAP
+xi86 VDD VNW VPW VSS top bot UNIT_CAP
+xi87 VDD VNW VPW VSS top bot UNIT_CAP
+xi88 VDD VNW VPW VSS top bot UNIT_CAP
+xi89 VDD VNW VPW VSS top bot UNIT_CAP
+xi90 VDD VNW VPW VSS top bot UNIT_CAP
+xi91 VDD VNW VPW VSS top bot UNIT_CAP
+xi92 VDD VNW VPW VSS top bot UNIT_CAP
+xi93 VDD VNW VPW VSS top bot UNIT_CAP
+xi94 VDD VNW VPW VSS top bot UNIT_CAP
+xi95 VDD VNW VPW VSS top bot UNIT_CAP
+xi96 VDD VNW VPW VSS top bot UNIT_CAP
+xi97 VDD VNW VPW VSS top bot UNIT_CAP
+xi98 VDD VNW VPW VSS top bot UNIT_CAP
+xi99 VDD VNW VPW VSS top bot UNIT_CAP
+xi100 VDD VNW VPW VSS top bot UNIT_CAP
+xi101 VDD VNW VPW VSS top bot UNIT_CAP
+xi102 VDD VNW VPW VSS top bot UNIT_CAP
+xi103 VDD VNW VPW VSS top bot UNIT_CAP
+xi104 VDD VNW VPW VSS top bot UNIT_CAP
+xi105 VDD VNW VPW VSS top bot UNIT_CAP
+xi106 VDD VNW VPW VSS top bot UNIT_CAP
+xi107 VDD VNW VPW VSS top bot UNIT_CAP
+xi108 VDD VNW VPW VSS top bot UNIT_CAP
+xi109 VDD VNW VPW VSS top bot UNIT_CAP
+xi110 VDD VNW VPW VSS top bot UNIT_CAP
+xi111 VDD VNW VPW VSS top bot UNIT_CAP
+xi112 VDD VNW VPW VSS top bot UNIT_CAP
+xi113 VDD VNW VPW VSS top bot UNIT_CAP
+xi114 VDD VNW VPW VSS top bot UNIT_CAP
+xi115 VDD VNW VPW VSS top bot UNIT_CAP
+xi116 VDD VNW VPW VSS top bot UNIT_CAP
+xi117 VDD VNW VPW VSS top bot UNIT_CAP
+xi118 VDD VNW VPW VSS top bot UNIT_CAP
+xi119 VDD VNW VPW VSS top bot UNIT_CAP
+xi120 VDD VNW VPW VSS top bot UNIT_CAP
+xi121 VDD VNW VPW VSS top bot UNIT_CAP
+xi122 VDD VNW VPW VSS top bot UNIT_CAP
+xi123 VDD VNW VPW VSS top bot UNIT_CAP
+xi124 VDD VNW VPW VSS top bot UNIT_CAP
+xi125 VDD VNW VPW VSS top bot UNIT_CAP
+xi126 VDD VNW VPW VSS top bot UNIT_CAP
+xi127 VDD VNW VPW VSS top bot UNIT_CAP
+
+.ends cap_x128
+
+.subckt cdac 
++ vcm_p vcm_n vin_p vin_n vrefh vrefl vtop_p vtop_n sample 
++ value<0> value<1> value<2> value<3> value<4> value<5> value<6> value<7>
++ vdd vnw vpw vss
+
+@in xsw_in_p0@ vdd vnw vpw vss vrefh vin_p vrefl vbot_p<0> sample value<0> SW_INPUT
+@in xsw_in_p1@ vdd vnw vpw vss vrefh vin_p vrefl vbot_p<1> sample value<1> SW_INPUT
+@in xsw_in_p2@ vdd vnw vpw vss vrefh vin_p vrefl vbot_p<2> sample value<2> SW_INPUT
+@in xsw_in_p3@ vdd vnw vpw vss vrefh vin_p vrefl vbot_p<3> sample value<3> SW_INPUT
+@in xsw_in_p4@ vdd vnw vpw vss vrefh vin_p vrefl vbot_p<4> sample value<4> SW_INPUT
+@in xsw_in_p5@ vdd vnw vpw vss vrefh vin_p vrefl vbot_p<5> sample value<5> SW_INPUT
+@in xsw_in_p6@ vdd vnw vpw vss vrefh vin_p vrefl vbot_p<6> sample value<6> SW_INPUT
+@in xsw_in_p7@ vdd vnw vpw vss vrefh vin_p vrefl vbot_p<7> sample value<7> SW_INPUT
+
+@in xsw_in_n0@ vdd vnw vpw vss vrefl vin_n vrefh vbot_n<0> sample value<0> SW_INPUT
+@in xsw_in_n1@ vdd vnw vpw vss vrefl vin_n vrefh vbot_n<1> sample value<1> SW_INPUT
+@in xsw_in_n2@ vdd vnw vpw vss vrefl vin_n vrefh vbot_n<2> sample value<2> SW_INPUT
+@in xsw_in_n3@ vdd vnw vpw vss vrefl vin_n vrefh vbot_n<3> sample value<3> SW_INPUT
+@in xsw_in_n4@ vdd vnw vpw vss vrefl vin_n vrefh vbot_n<7> sample value<7> SW_INPUT
+@in xsw_in_n5@ vdd vnw vpw vss vrefl vin_n vrefh vbot_n<6> sample value<6> SW_INPUT
+@in xsw_in_n6@ vdd vnw vpw vss vrefl vin_n vrefh vbot_n<5> sample value<5> SW_INPUT
+@in xsw_in_n7@ vdd vnw vpw vss vrefl vin_n vrefh vbot_n<4> sample value<4> SW_INPUT
+
+
+@cv xi_cdac_p0@ vdd vnw vpw vss vtop_p vbot_p<0> cap_x1
+@cv xi_cdac_p1@ vdd vnw vpw vss vtop_p vbot_p<1> cap_x2
+@cv xi_cdac_p2@ vdd vnw vpw vss vtop_p vbot_p<2> cap_x4
+@cv xi_cdac_p3@ vdd vnw vpw vss vtop_p vbot_p<3> cap_x8
+@cv xi_cdac_p4@ vdd vnw vpw vss vtop_p vbot_p<4> cap_x16
+@cv xi_cdac_p5@ vdd vnw vpw vss vtop_p vbot_p<5> cap_x32
+@cv xi_cdac_p6@ vdd vnw vpw vss vtop_p vbot_p<6> cap_x64
+@cv xi_cdac_p7@ vdd vnw vpw vss vtop_p vbot_p<7> cap_x128
+
+@cv xi_cdac_n0@ vdd vnw vpw vss vtop_n vbot_n<0> cap_x1
+@cv xi_cdac_n1@ vdd vnw vpw vss vtop_n vbot_n<1> cap_x2
+@cv xi_cdac_n2@ vdd vnw vpw vss vtop_n vbot_n<2> cap_x4
+@cv xi_cdac_n3@ vdd vnw vpw vss vtop_n vbot_n<3> cap_x8
+@cv xi_cdac_n4@ vdd vnw vpw vss vtop_n vbot_n<4> cap_x16
+@cv xi_cdac_n5@ vdd vnw vpw vss vtop_n vbot_n<5> cap_x32
+@cv xi_cdac_n6@ vdd vnw vpw vss vtop_n vbot_n<6> cap_x64
+@cv xi_cdac_n7@ vdd vnw vpw vss vtop_n vbot_n<7> cap_x128
+
+@cm xsw_vcmp@ vdd vnw vpw vss vcm_p vtop_p sample SW_VCM
+@cm xsw_vcmn@ vdd vnw vpw vss vcm_n vtop_n sample SW_VCM
+
+@cv x_inv_cm_up_p@ cm_up_p vdd vnw vpw vss sample INV_X4N_A10P5PP84TR_C14
+@cv x_inv_cm_up_n@ cm_up_n vdd vnw vpw vss sample INV_X4N_A10P5PP84TR_C14
+
+@cv xi_cm_up_p0@ vdd vnw vpw vss vtop_p cm_up_p cap_x1
+@cv xi_cm_up_p1@ vdd vnw vpw vss vtop_p cm_up_p cap_x1
+@cv xi_cm_up_p2@ vdd vnw vpw vss vtop_p cm_up_p cap_x1
+@cv xi_cm_up_p3@ vdd vnw vpw vss vtop_p cm_up_p cap_x2
+@cv xi_cm_up_p4@ vdd vnw vpw vss vtop_p cm_up_p cap_x4
+@cv xi_cm_up_p5@ vdd vnw vpw vss vtop_p cm_up_p cap_x8
+@cv xi_cm_up_p6@ vdd vnw vpw vss vtop_p cm_up_p cap_x16
+@cv xi_cm_up_p7@ vdd vnw vpw vss vtop_p cm_up_p cap_x32
+
+@cv xi_cm_up_n0@ vdd vnw vpw vss vtop_n cm_up_n cap_x1 
+@cv xi_cm_up_n1@ vdd vnw vpw vss vtop_n cm_up_n cap_x1 
+@cv xi_cm_up_n2@ vdd vnw vpw vss vtop_n cm_up_n cap_x1 
+@cv xi_cm_up_n3@ vdd vnw vpw vss vtop_n cm_up_n cap_x2 
+@cv xi_cm_up_n4@ vdd vnw vpw vss vtop_n cm_up_n cap_x4 
+@cv xi_cm_up_n5@ vdd vnw vpw vss vtop_n cm_up_n cap_x8 
+@cv xi_cm_up_n6@ vdd vnw vpw vss vtop_n cm_up_n cap_x16
+@cv xi_cm_up_n7@ vdd vnw vpw vss vtop_n cm_up_n cap_x32
+
+.ends cdac

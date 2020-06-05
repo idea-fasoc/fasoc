@@ -1,0 +1,12 @@
+.subckt comp_nand_ver0 clk_sar vinn vinp outn outp vdd vnw vpw vss
+xi3 outp vdd vnw vpw vss net10 INV_X0P6N_A10P5PP84TR_C14
+xi2 outn vdd vnw vpw vss net5 INV_X0P6N_A10P5PP84TR_C14
+xi1 net12 vdd vnw vpw vss op INV_X0P6N_A10P5PP84TR_C14
+xi0 net11 vdd vnw vpw vss on INV_X0P6N_A10P5PP84TR_C14
+xi5 op vdd vnw vpw vss on clk_sar vinn NAND3_X2N_A10P5PP84TR_C14
+xi4 on vdd vnw vpw vss op clk_sar vinp NAND3_X2N_A10P5PP84TR_C14
+xi7 net5 vdd vnw vpw vss net12 net10 NOR2_X2N_A10P5PP84TR_C14
+xi6 net10 vdd vnw vpw vss net11 net5 NOR2_X2N_A10P5PP84TR_C14
+
+.ends comp_nand_ver0
+

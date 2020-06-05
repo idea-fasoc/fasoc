@@ -1,0 +1,4 @@
+power_min,fsampling,resolution,enob,area,nisw,ncsw,search_param
+3.68e-06,1000000,7,6.930803,7492,1,1,"fsampling:1000000,enob:6.8,optimization:area"
+1.7262e-06,1000000,8,8.026176,18781,1,2,"fsampling:1000000,enob:7.8,optimization:area"
+1.7095e-06,1000000,8,7.652437,18269,1,1,"fsampling:1000000,enob:7.4,optimization:area"

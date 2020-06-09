@@ -387,7 +387,7 @@ time.sleep(2)
 print()
 if args.mode == 'macro':
   print("Exiting tool....")
-  sys.exit(1)
+  exit()
 
 
 time.sleep(2)
@@ -397,7 +397,7 @@ time.sleep(1)
 
 p = sp.Popen(['make','export'], cwd=flowDir)
 p.wait()
-  
+
 # if platform != 'gf12lp':
 #   p = sp.Popen(['make','export'], cwd=flowDir)
 #   p.wait()

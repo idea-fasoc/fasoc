@@ -1,5 +1,5 @@
 gen:
-	python tools/adc-gen.py --specfile adc_data.json --output ./work --platform gf12lp --mode full
+	python tools/adc-gen.py --specfile adc_data.json --output ./work --platform gf12lp --mode macro
 	#python tools/adc-gen.py --specfile adc_data.json --output ./work --platform gf12lp --mode verilog
 
 model:

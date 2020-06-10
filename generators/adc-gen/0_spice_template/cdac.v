@@ -133,7 +133,7 @@ module cdac (inout vcm_p,
 			output vtop_p, 
 			output vtop_n, 
 			input sample, 
-			output [@NBIT-1:0] value);
+			input [@NBIT-1:0] value);
 
 //inout vcm_p;
 //inout vcm_n;

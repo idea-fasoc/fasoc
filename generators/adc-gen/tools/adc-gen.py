@@ -214,13 +214,16 @@ else:
 
 # Calculate and update the core cell area dimensions
 #coreDim = 100
-coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*5
+#coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*5
+coreHeight = math.ceil(math.sqrt(coreCellArea*2.5)/5/1.25)*5
+coreWidth = math.ceil(math.sqrt(coreCellArea*2.5)/5)*5*2.1
+
 with open(flowDir + '/scripts/innovus/always_source.tcl', 'r') as file:
    filedata = file.read()
 filedata = re.sub(r'set core_width.*', r'set core_width    ' + \
-        str(coreDim) + ' ;# Core Area Width', filedata)
+        str(coreWidth) + ' ;# Core Area Width', filedata)
 filedata = re.sub(r'set core_height.*', r'set core_height   ' + \
-        str(coreDim) + ' ;# Core Area Height', filedata)
+        str(coreHeight) + ' ;# Core Area Height', filedata)
 with open(flowDir + '/scripts/innovus/always_source.tcl', 'w') as file:
    file.write(filedata)
 
@@ -233,19 +236,6 @@ p.wait()
 print('#----------------------------------------------------------------------')
 print('# Place and Route finished')
 print('#----------------------------------------------------------------------')
-
-
-time.sleep(2)
-
-p = sp.Popen(['make','lvs'], cwd=flowDir)
-p.wait()
-
-
-print('#----------------------------------------------------------------------')
-print('# LVS finished')
-print('#----------------------------------------------------------------------')
-
-
 time.sleep(2)
 
 p = sp.Popen(['make','drc'], cwd=flowDir)
@@ -257,7 +247,57 @@ print('#----------------------------------------------------------------------')
 print('# DRC finished')
 print('#----------------------------------------------------------------------')
 
+
 time.sleep(2)
+
+p = sp.Popen(['make','lvs'], cwd=flowDir)
+p.wait()
+
+# modify UNIT_CAP.cdl to fix lvs bug
+with open(flowPtExportDir + "/" + aux3 + '.cdl', 'r') as file:
+   filedata = file.read()
+filedata = re.sub('C0', 'X0', filedata)
+with open(flowPtExportDir + "/" + aux3 + '.cdl', 'w') as file:
+   file.write(filedata)
+
+
+#run lvs on the fixed cdl
+p = sp.Popen(['rm', '-f', 'vpath/lvs_rerun'], cwd=flowDir)
+p.wait()
+p = sp.Popen(['make', 'lvs_rerun'], cwd=flowDir)
+p.wait()
+
+#change UNIT_CAP.cdl back
+with open(flowPtExportDir + "/" + aux3 + '.cdl', 'r') as file:
+   filedata = file.read()
+filedata = re.sub('X0', 'C0', filedata)
+with open(flowPtExportDir + "/" + aux3 + '.cdl', 'w') as file:
+   file.write(filedata)
+
+print('#----------------------------------------------------------------------')
+print('# LVS finished')
+print('#----------------------------------------------------------------------')
+
+
+
+time.sleep(2)
+
+
+print('# Exporting files....')
+time.sleep(1)
+
+p = sp.Popen(['make','export'], cwd=flowDir)
+p.wait()
+
+with open(flowDir + '/reports/innovus/' + designName + \
+     '.main.htm.ascii', 'r') as file:
+   filedata = file.read()
+m = re.search('Total area of Chip: ([0-9.]*)', filedata)
+if m:
+   designArea = float(m.group(1))
+else:
+   print('APR Failed')
+   sys.exit(1)
 
 print()
 if args.mode == 'macro':
@@ -267,10 +307,97 @@ if args.mode == 'macro':
 time.sleep(2)
 
 
+#------------------------------------------------------------------------------
+# Generate post PEX netlist
+#------------------------------------------------------------------------------
+#Generate pre PEX netlist and gds files
+# cdlInclude = ''
+# cdlParse   = ''
+# with open(flowDir + '/scripts/innovus/generated/' + designName + \
+#      '.cdlList', 'r') as file:
+#    filedata = file.readlines()
+# for line in filedata:
+#    cdlInclude = cdlInclude + ' -s ' + line.rstrip()
+#    cdlParse   = cdlParse + ' -lsr ' + line.rstrip()
+
+# # NOTE: The exported version of the gds is not merged (i.e. doesn't include standard cells)
+#  p = sp.Popen(['cp', flowDir+'/export/'+designName+'.gds.gz', \
+#          extDir+'/layout/'+designName+'.gds.gz'])
+# p = sp.Popen(['cp', flowDir+'/results/calibre/'+designName+'.merged.gds.gz', \
+#          extDir+'/layout/'+designName+'.gds.gz'])
+# p.wait()
+
+# Copy the cdl netlist to extraction directory
+for file in glob.glob(flowDir+'/results/calibre/lvs/_'+designName+'*.sp'):
+   shutil.copy(file, extDir+'/sch/'+designName+'.spi')
+
+# Copy the merged gds file to extraction directory
+p = sp.Popen(['cp', flowDir+'/results/calibre/'+designName+'.merged.gds.gz', \
+         extDir+'/layout/'+designName+'.gds.gz'])
+p.wait()
 
 
+# Clean the space
+if os.path.isfile(extDir + '/run/svdb/' + designName + '.dv'):
+   os.remove(extDir + '/run/svdb/' + designName + '.dv')
+if os.path.isfile(extDir + '/run/svdb/' + designName + '.extf'):
+   os.remove(extDir + '/run/svdb/' + designName + '.extf')
+if os.path.isfile(extDir + '/run/svdb/' + designName + '.lvsf'):
+   os.remove(extDir + '/run/svdb/' + designName + '.lvsf')
+if os.path.isfile(extDir + '/run/svdb/' + designName + '.pdsp'):
+   os.remove(extDir + '/run/svdb/' + designName + '.pdsp')
+if os.path.isfile(extDir + '/run/svdb/' + designName + '.sp'):
+   os.remove(extDir + '/run/svdb/' + designName + '.sp')
+
+if os.path.isdir(extDir + '/run/svdb/' + designName + '.phdb'):
+   shutil.rmtree(extDir + '/run/svdb/' + designName + '.phdb',
+                 ignore_errors=True)
+if os.path.isdir(extDir + '/run/svdb/' + designName + '.xdb'):
+   shutil.rmtree(extDir + '/run/svdb/' + designName + '.xdb',
+                 ignore_errors=True)
+if os.path.isdir(extDir + '/run/svdb/' + designName + '.pdb'):
+   shutil.rmtree(extDir + '/run/svdb/' + designName + '.pdb',
+                 ignore_errors=True)
+if os.path.isdir(extDir + '/run/svdb/' + 'template'):
+   shutil.rmtree(extDir + '/run/svdb/' + 'template',
+                 ignore_errors=True)
 
 
+# Configure the PEX rule files
+for file in os.listdir(calibreRulesDir + '/'):
+   if not os.path.isdir(simDir + '/' + file):
+      shutil.copy2(calibreRulesDir+'/'+file, extDir+'/run/')
+
+with open(extDir+'/ruleFiles/_calibre.rcx_'+args.platform, 'r') as file:
+   filedata = file.read()
+filedata = filedata.replace('design', designName)
+with open(extDir+'/run/_calibre.rcx_', 'w') as file:
+   file.write(filedata)
+
+
+# Run Calibre RCX
+p = sp.Popen(['calibre','-xrc','-phdb','-nowait','-turbo','1',
+             '_calibre.rcx_'],cwd=extDir+'/run')
+p.wait()
+p = sp.Popen(['calibre','-xrc','-pdb','-rcc','-turbo','1','-nowait',
+             '_calibre.rcx_'],cwd=extDir+'/run')
+p.wait()
+p = sp.Popen(['calibre','-xrc','-fmt','-all','-nowait','_calibre.rcx_'],
+             cwd=extDir+'/run')
+p.wait()
+print('# SAR - Post PEX netlist Generated')
+
+#------------------------------------------------------------------------------
+# Run Hspice Sims
+#------------------------------------------------------------------------------
+
+
+p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.pex',
+             simDir+'/spice/'])
+p.wait()
+p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.'+
+             designName+'.pxi', simDir+'/spice/'])
+p.wait()
 
 
 

@@ -1,9 +1,9 @@
 {
-    "instance_name": "dcdcInst",
+    "module_name": "DCDC_TOP_0p56V_0p2mA",
     "generator": "dcdc-gen",
     "specifications": {
-    	"ILOAD": { "min": 0.00001, "max": 0.0001 },
-    	"output voltage": 0.8,
-    	"model" :"SCdata_1MHz_modified.xlsx"
+    	"Iload (mA)": 0.2,
+    	"Output voltage (V)": 0.56,
+        "Clock frequency (kHz)" : 30000
 	}
 }

@@ -48,7 +48,7 @@ Ensure that your machine has all of the required tools setup and have access to 
     }
  
     ```
-  
+ 
 # Tool Directory Structure
 ```bash
     dcdc-gen
@@ -67,4 +67,4 @@ Ensure that your machine has all of the required tools setup and have access to 
    - Read me file with the instructions for running the tool.
 
    __test.json__
-   - Sample DCDC input specification file in json format. Makefile uses this file to perform a test run of the tool. 
+   - Sample DCDC input specification file in json format. Makefile uses this file to perform a test run. 

@@ -44,11 +44,11 @@ module CNT_1_OE (CLK, OE, RESETn, NEXT, OUT);
 	
 	wire qb, out_pre, nextb;
 	
-DFFRPQ_X1M_A9TR DFF0 (.Q(nextb), .D(qb), .CK(CLK), .R(RESETn));
-INV_X1M_A9TR INVX1_0 (.Y(qb), .A(nextb));
-INV_X1M_A9TR INVX1_1 (.Y(NEXT), .A(nextb));
-NAND2_X1M_A9TR NAND0 (.Y(out_pre), .A(OE), .B(qb));
-BUF_X4M_A9TR BUFX4_0 (.Y(OUT), .A(out_pre));
+DFFRPQ_X1N_A10P5PP84TR_C14 DFF0 (.Q(nextb), .D(qb), .CK(CLK), .R(RESETn));
+INVP_X0P4N_A10P5PP84TR_C14 INVX1_0 (.Y(qb), .A(nextb));
+INVP_X0P4N_A10P5PP84TR_C14 INVX1_1 (.Y(NEXT), .A(nextb));
+NAND2_X0P4N_A10P5PP84TR_C14 NAND0 (.Y(out_pre), .A(OE), .B(qb));
+BUF_X0P4N_A10P5PP84TR_C14 BUFX4_0 (.Y(OUT), .A(out_pre));
 endmodule
 
 

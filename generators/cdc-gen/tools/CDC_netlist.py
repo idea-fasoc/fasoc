@@ -1,11 +1,17 @@
 ##for HSPICE netlist
 import function
+from readparamgen import check_search_done, platformConfig, designName, args, jsonSpec
 
 
 def gen_cdc_invchainiso(ninv,aux1,aux2,srcDir):
-	r_netlist=open(srcDir + "/INVCHAIN_ISOVDD_template.nl.v","r")
-	lines=list(r_netlist.readlines())
-	w_netlist=open(srcDir + "/INVCHAIN_ISOVDD.nl.v","w")
+	if args.platform == 'tsmc65lp' :
+		r_netlist=open(srcDir + "/INVCHAIN_ISOVDD_template.nl.v","r")
+		lines=list(r_netlist.readlines())
+		w_netlist=open(srcDir + "/INVCHAIN_ISOVDD.nl.v","w")
+	if args.platform == 'gf12lp' :
+		r_netlist=open(srcDir + "/INVCHAIN_ISOVDD_template_generic.nl.v","r")
+		lines=list(r_netlist.readlines())
+		w_netlist=open(srcDir + "/INVCHAIN_ISOVDD.nl.v","w")
 	
 	
 	netmap1=function.netmap() #modify here
@@ -72,11 +78,16 @@ def gen_cdc_dly_comp(aux1,aux2,aux3,aux4,aux5,srcDir):
 	for line in lines:
 		netmap4.printline(line,w_netlist)
 
-def gen_cdc_analog(npre,aux1,aux2,srcDir):
-	r_netlist=open(srcDir + "/CDC_ANALOG_template.nl.v","r")
-	lines=list(r_netlist.readlines())
-	w_netlist=open(srcDir + "/CDC_ANALOG.nl.v","w")
-	
+def gen_cdc_analog(npre,aux1,aux2,srcDir):	
+	if args.platform == 'tsmc65lp' :
+		r_netlist=open(srcDir + "/CDC_ANALOG_template.nl.v","r")
+		lines=list(r_netlist.readlines())
+		w_netlist=open(srcDir + "/CDC_ANALOG.nl.v","w")
+	if args.platform == 'gf12lp' :
+		r_netlist=open(srcDir + "/CDC_ANALOG_template_generic.nl.v","r")
+		lines=list(r_netlist.readlines())
+		w_netlist=open(srcDir + "/CDC_ANALOG.nl.v","w")
+
 	netmap5=function.netmap() #modify here
 	netmap5.get_net('na',aux1,1,npre,1)
 	netmap5.get_net('ni',None,1,npre,1)

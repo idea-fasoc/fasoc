@@ -1,0 +1,21 @@
+{
+ "module_name": "tempsenseInst_error",
+ "generator": "temp-sense-gen",
+ "specifications": {
+  "temperature": {
+   "min": -20,
+   "max": 100
+  },
+  "power": "",
+  "error": "",
+  "area": "",
+  "optimization": "error",
+  "model": "modelfile.csv"
+ },
+ "results": {
+  "platform": "gf12lp",
+  "area": 2639.7898,
+  "error": -0.031256129,
+  "power": 1.65e-09
+ }
+}

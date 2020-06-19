@@ -6,7 +6,7 @@ output OSEN, LCOUT;
 
 wire pre;
 
-INVCHAIN_ISOVDD a_iniso_0 (.IN(LCOUT), .in_vin(in_vin), .OUT(OSEN)); 
+INVCHAIN_ISOVDD a_iniso_0 (.IN(LCOUT), .OUT(OSEN)); 
 //INVCHAIN a_iniso_1 (.IN(LCOUT), .OUT(OREF));
 
 PRECHARGEX1 a_precharge_1 (.IN(pre), .VIN(in_vin));
@@ -110,8 +110,8 @@ PRECHARGEX1 a_precharge_98 (.IN(pre), .VIN(in_vin));
 PRECHARGEX1 a_precharge_99 (.IN(pre), .VIN(in_vin));
 PRECHARGEX1 a_precharge_100 (.IN(pre), .VIN(in_vin));
 
-LC1P2TO3P6X1RVT_VDDX4 a_lc_2 (.A(PRECHARGE), .AB(PRECHARGEB), .VIN(vin_in), .Y(pre));
-LC1P2TO3P6X1RVT_VDDX4 a_lc_1 (.A(IN), .AB(INB), .VIN(vin_in), .Y(LCOUT));
+SLC_cell a_lc_2 (.A(PRECHARGE), .AB(PRECHARGEB), .Y(pre));
+SLC_cell a_lc_1 (.A(IN), .AB(INB), .Y(LCOUT));
 
 
 //BUFX4HVT_ISOVDD a_buf_0 (.A(lc_out), .Y(LCOUT));

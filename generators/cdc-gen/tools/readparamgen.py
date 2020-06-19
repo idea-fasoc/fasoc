@@ -35,6 +35,14 @@ print( sys.argv)
 
 genDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../")
 
+head_tail_0 = os.path.split(os.path.abspath(genDir))
+head_tail_1 = os.path.split(head_tail_0[0])
+privateGenDir = os.path.relpath(os.path.join(genDir, '../../', 'private', head_tail_1[1], head_tail_0[1]))
+print(head_tail_0)
+print(head_tail_1)
+print(privateGenDir)
+
+
 parser = argparse.ArgumentParser(description='CDC design generator')
 parser.add_argument('--specfile', required=True,
                     help='File containing the specification for the generator')
@@ -52,10 +60,16 @@ if not os.path.isfile(args.specfile):
    print('Error: specfile does not exist')
    print('File Path: ' + args.specfile)
    sys.exit(1)
-
-if args.platform != 'tsmc65lp':
-  print("Error: tsmc65lp is the only platform supported")
+if args.platform != 'tsmc65lp' and args.platform != 'gf12lp':
+  print("Error: tsmc65lp and gf12lp are the only platform supported as of now")
   sys.exit(1)
+
+if args.mode != 'verilog':
+   if not os.path.isdir(privateGenDir):   
+      print('Error. Private directory does not exist. ' + \
+            'Please use only \'verilog\' mode.')
+      sys.exit(1)
+
 
 # Load json spec file
 print("Loading specfile...")
@@ -77,6 +91,8 @@ except KeyError as e:
 if jsonSpec['generator'] != 'cdc-gen':
   print("Error: Generator specification must be \"cdc-gen\".")
 
+
+
 # Load json config file
 print("Loading platform_config file...")
 try:
@@ -88,24 +104,43 @@ except ValueError as e:
   sys.exit(1)
 
 
-
 # Get the config variable from platfom config file
-simTool = jsonConfig['simTool']
-if simTool != 'hspice':
-   print("Error: Only support hspice simulator now")
-   sys.exit(1)
+if args.mode != 'verilog':
+   simTool = jsonConfig['simTool']
+   if simTool != 'hspice' and simTool != 'finesim':
+      print('Error: Supported simulators are \'hspice\' or \'finesim\' ' + \
+            'as of now')
+      sys.exit(1)
 
-extTool = jsonConfig['extractionTool']
-if extTool != 'calibre':
-   print("Error: Only support calibre extraction now")
-   sys.exit(1)
+   if args.mode == 'full':
+      extTool = jsonConfig['extractionTool']
+      if extTool != 'calibre':
+         print('Error: Only support calibre extraction now')
+         sys.exit(1)
+      
+      netlistTool = jsonConfig['netlistTool']
+      if netlistTool != 'calibredrv':
+         print('Error: Only support calibredrv netlist tool now')
+         sys.exit(1)
 
-netlistTool = jsonConfig['netlistTool']
-if netlistTool != 'calibredrv':
-   print("Error: Only support calibredrv netlist tool now")
-   sys.exit(1)
+# # Get the config variable from platfom config file
+# simTool = jsonConfig['simTool']
+# if simTool != 'hspice':
+#    print("Error: Only support hspice simulator now")
+#    sys.exit(1)
 
-calibreRulesDir = jsonConfig['calibreRules']
+# extTool = jsonConfig['extractionTool']
+# if extTool != 'calibre':
+#    print("Error: Only support calibre extraction now")
+#    sys.exit(1)
+
+# netlistTool = jsonConfig['netlistTool']
+# if netlistTool != 'calibredrv':
+#    print("Error: Only support calibredrv netlist tool now")
+#    sys.exit(1)
+if args.mode == 'full':
+   calibreRulesDir = platformConfig['calibreRules']
+
 
 try:
    platformConfig = jsonConfig['platforms'][args.platform]
@@ -113,15 +148,11 @@ except ValueError as e:
    print("Error: \"' + args.platform + '\" config not available")
    sys.exit(1)
 
-try:
-   platformConfig = jsonConfig['platforms'][args.platform]
-except KeyError as e:
-   print("Error: \"' + args.platform + '\" config not available")
-   sys.exit(1)
+
 
 
 try:
-   designName = jsonSpec['instance_name']
+   designName = jsonSpec['module_name']
 except KeyError as e:
    print('Error: Bad Input Specfile. \'module_name\' variable is missing.')
    sys.exit(1)
@@ -186,7 +217,7 @@ Model1= mFile1
 Model2= mFile2
 
 # Get the design spec & parameters from spec file
-designName = jsonSpec['instance_name']
+designName = jsonSpec['module_name']
 
 df_sheet1 = pd.read_csv(Model1, delimiter=',')
 df_sheet2bis = pd.read_csv(Model2, delimiter=',')

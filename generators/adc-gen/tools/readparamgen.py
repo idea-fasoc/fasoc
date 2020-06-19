@@ -55,8 +55,8 @@ if not os.path.isfile(args.specfile):
    sys.exit(1)
 
 
-if args.platform != 'tsmc65lp':
-  print("Error: tsmc65lp is the only platform supported")
+if args.platform != 'tsmc65lp' and args.platform != 'gf12lp':
+  print("Error: tsmc65lp and gf12lp are the only platforms supported")
   sys.exit(1)
 
 
@@ -147,19 +147,22 @@ if optimization != "area" and optimization != "power":
 
 
 mFile1 = platformConfig['model_lib'] + '/SAR_ADC_modelfile.xlsx'
-mFilePublic1 = genDir + '/models/' + args.platform + '.model_adc.xslx'
+mFilePublic1 = genDir + 'models/' + args.platform + '.model_adc.xlsx'
 
 
-if not os.path.isfile(mFile1):
-   if args.mode == 'verilog':
-      print('Model file \'' + mFile1 + '\' is not valid. ' + \
-            'Using the model file provided in the repo.')
-      mFile1 = mFilePublic1
-   else:
-      print('Please provide/generate a model file')
-      p.wait()
+#if not os.path.isfile(mFile1):
+#   if args.mode == 'verilog':
+#      print('Model file \'' + mFile1 + '\' is not valid. ' + \
+#            'Using the model file provided in the repo.')
+#      mFile1 = mFilePublic1
+#   else:
+#      print('Please provide/generate a model file')
+#      p.wait()
 
 
+print('Model file \'' + mFile1 + '\' is not valid. ' + \
+      'Using the model file provided in the repo.')
+mFile1 = mFilePublic1
 
 Model = mFile1
 

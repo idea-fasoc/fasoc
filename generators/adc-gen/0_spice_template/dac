@@ -7,7 +7,7 @@ module dac(out, in, clk);
     parameter real vmax = pow(2,@NBIT) from (vmin:inf);	// maximum input voltage (V)
     parameter real td = 0;			// delay from clock edge to output (s)
     parameter real tt = 0;			// transition time of output (s)
-    parameter real vdd = 1.0;			// voltage level of logic 1 (V)
+    parameter real vdd = 0.8;			// voltage level of logic 0.8 (V)
     parameter real vss = 0;			// voltage level of logic 0 (V)
     parameter real thresh = (vdd+vss)/2;	// logic threshold level (V)
     parameter integer dir = +1 from [-1:1] exclude 0;

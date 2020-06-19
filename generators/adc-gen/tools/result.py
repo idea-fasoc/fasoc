@@ -38,7 +38,7 @@ fft_data_abs = np.abs(fft_data_complex)
 fft_pden = np.square(fft_data_abs)/len(fft_data_abs)/len(fft_data_abs)
 
 ### fft plot range set ( 0~128) : 129ea
-fft_pden = fft_pden[0:len(fft_pden)/2+1]
+fft_pden = fft_pden[0:len(fft_pden)//2+1]
 
 ### fft => log conversion
 fft_pden_log = 10*np.log10(fft_pden)
@@ -75,12 +75,12 @@ nisw=file_name_parse[11]
 ncsw=file_name_parse[12]
 ncv=file_name_parse[13]
 
-fxxx=4
-fxxx_vcm=4
-
+fxxx=2
+fxxx_vcm=1
+#remember that widthi and widthc are all number of fins, rather than actual xtor width
 cap_area = 9*2*float(capVal)*1e15*float(ncv)*(2**float(nbit))
-sw_input_area = 0.5*1e6*float(widthi)*fxxx*float(nisw)*(2**float(nbit))
-sw_vcm_area = 0.5*1e6*float(widthc)*fxxx_vcm*float(ncsw)*(2**float(nbit))
+sw_input_area = float(widthi)*fxxx*float(nisw)*(2**float(nbit))
+sw_vcm_area = float(widthc)*fxxx_vcm*float(ncsw)*(2**float(nbit))
 logic_area = 2500
 
 area = int(cap_area + sw_input_area + sw_vcm_area + logic_area)

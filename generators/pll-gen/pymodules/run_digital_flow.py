@@ -40,8 +40,8 @@ def pll_verilog_gen(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,
 		shutil.copyfile(verilogSrcDir+'SSC_GENERATOR.v',outDir+'/SSC_GENERATOR.v')	
 		shutil.copyfile(verilogSrcDir+'dco_CC.v',outDir+'/dco_CC.v')	
 		shutil.copyfile(verilogSrcDir+'dco_FC.v',outDir+'/dco_FC.v')	
-		shutil.copyfile(verilogSrcDir+'synth_pll_dco_interp_'+platform+'.v',flowDir+'/src/synth_pll_dco_interp.v')	
-		shutil.copyfile(verilogSrcDir+'synth_pll_dco_outbuff_'+platform+'.v',flowDir+'/src/synth_pll_dco_outbuff.v')	
+		shutil.copyfile(verilogSrcDir+'synth_pll_dco_interp_'+platform+'.v',outDir+'/synth_pll_dco_interp.v')	
+		shutil.copyfile(verilogSrcDir+'synth_pll_dco_outbuff_'+platform+'.v',outDir+'/synth_pll_dco_outbuff.v')	
 		print(outMode,'mode: verilog sources are generated in ',outDir)
 		print('verilog mode: verilog sources are generated in '+outDir)
 		#--- generate verilog file ---
@@ -58,7 +58,7 @@ def pll_verilog_gen(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,
 			for line in lines_pll:
 				nm1.printline(line,wvfile)
 		#--- generate verilog file ---
-		rvfile=open(formatDir+'/form_dco.v','r')
+		rvfile=open(formatDir+'/form_ffdco.v','r')
 		nm1=txt_mds.netmap()
 		if edge_sel==1:
 			nm1.get_net('IE','INCLUDE_EDGE_SEL',None,None,None)
@@ -217,6 +217,7 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 		p = sp.Popen(['make','design'], cwd=flowDir)
 		p.wait()
 		
+		sys.exit(1)		
 		p = sp.Popen(['make','lvs'], cwd=flowDir)
 		p.wait()
 		

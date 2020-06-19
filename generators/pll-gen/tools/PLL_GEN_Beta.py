@@ -146,6 +146,9 @@ if outMode=='macro' or outMode=='full':
 	W_CC,H_CC,W_FC,H_FC=preparations.aux_parse_size(dco_CC_lib,dco_FC_lib)
 	A_CC=W_CC*H_CC
 	A_FC=W_FC*H_FC
+else: # dummy areas for verilog mode
+	A_CC=0.01;
+	A_FC=0.01;
 
 #--------------------------------------------------------
 # read input

@@ -193,9 +193,19 @@ def gen_pll_prepex_wrapper(design_name,netlist_dir,format_dir,input_array,vdd):
 		netmap1.printline(line,w_netlist)
 
 	
-def gen_dco_pex_wrapper(extDir,netlistDir,format_dir,ncc,ndrv,nfc,nstg,ninterp,designName,fc_en_type):
-	r_netlist=open(format_dir+"/form_pex_dco.sp","r")
-	w_netlist=open(netlistDir+"/"+"wrapped_"+designName+".sp","w")
+def gen_dco_pex_wrapper(extDir,netlistDir,format_dir,ncc,ndrv,nfc,nstg,ninterp,designName,fc_en_type, FC_half, pex_spectre):
+	if pex_spectre==0:
+		if FC_half==0:
+			r_netlist=open(format_dir+"/form_pex_wrapped_dco.sp","r")
+		elif FC_half==1:
+			r_netlist=open(format_dir+"/form_pex_wrapped_dco_halfFC.sp","r")
+		w_netlist=open(netlistDir+"/"+"wrapped_"+designName+".sp","w")
+	elif pex_spectre==1:
+		if FC_half==0:
+			r_netlist=open(format_dir+"/form_pex_wrapped_dco.scs","r")
+		elif FC_half==1:
+			r_netlist=open(format_dir+"/form_pex_wrapped_dco_halfFC.scs","r")
+		w_netlist=open(netlistDir+"/"+"wrapped_"+designName+".scs","w")
 	lines=list(r_netlist.readlines())
 	
 	netmap1=txt_mds.netmap() 
@@ -207,38 +217,67 @@ def gen_dco_pex_wrapper(extDir,netlistDir,format_dir,ncc,ndrv,nfc,nstg,ninterp,d
 	
 	### enable voltages for CC,FC ###
 	netmap1.get_net('vf',None,0,nfc*nstg-1,1)	
-	netmap1.get_net('nf',None,0,nfc*nstg-1,1)	
-	netmap1.get_net('Vf','vf',0,nfc*nstg-1,1) #for v2	
+	netmap1.get_net('nf',None,0,nfc*nstg-1,1)
+	if pex_spectre==0:
+		netmap1.get_net('Vf','vf',0,nfc*nstg-1,1) #for v2	
+	if FC_half==1:	
+		netmap1.get_net('vB',None,0,nfc*nstg-1,1)	
+		netmap1.get_net('fb',None,0,nfc*nstg-1,1)
+		if pex_spectre==0:
+			netmap1.get_net('Vb','vb',0,nfc*nstg-1,1) #for v2	
 	netmap1.get_net('vc',None,0,ncc*nstg-1,1)	
 	netmap1.get_net('nc',None,0,ncc*nstg-1,1)	
-	netmap1.get_net('Vc','vc',0,ncc*nstg-1,1) #for v2
+	if pex_spectre==0:
+		netmap1.get_net('Vc','vc',0,ncc*nstg-1,1) #for v2
 
-	r_raw_netlist=open(extDir+"run/"+designName+".pex.netlist","r")
+	if pex_spectre==0:
+		r_raw_netlist=open(extDir+"run/"+designName+".pex.netlist","r")
+	elif pex_spectre==1:
+		r_raw_netlist=open(extDir+"run_scs/"+designName+".pex.netlist","r")
 	w_raw_netlist=open(netlistDir+"/"+designName+".pex.netlist","w")
 	raw_lines=list(r_raw_netlist.readlines())
 	
 	nm2=txt_mds.netmap()	
 	### modify the .include file path in pex.netlist ###
-	for line in raw_lines:
-		if line[0:8]=='.include':
-			line='.include '+ '"'+netlistDir+line[10:len(line)] #--- absolute path ---
-			nm2.printline(line,w_raw_netlist)	
-		else:
-			nm2.printline(line,w_raw_netlist)	
+	if pex_spectre==0:
+		for line in raw_lines:
+			if line[0:8]=='.include':
+				line='.include '+ '"'+netlistDir+line[10:len(line)] #--- absolute path ---
+				nm2.printline(line,w_raw_netlist)	
+			else:
+				nm2.printline(line,w_raw_netlist)	
+	elif pex_spectre==1:
+		for line in raw_lines:
+			if line[0:7]=='include':
+				line='include '+ '"'+netlistDir+line[9:len(line)] #--- absolute path ---
+				nm2.printline(line,w_raw_netlist)	
+			else:
+				nm2.printline(line,w_raw_netlist)	
 
 
 	### copies the first defined instant into inst_def for matching input sequence of pex.netlist###
 	inst_def=[]
 	inst_start=0
-	for line in raw_lines:
-		if inst_start==1 and line[0:1]!='+': #instance def end
-			inst_start=0	
-		elif line[0:7]=='.SUBCKT' or line[0:7]=='.subckt':
-			inst_start=1	
-			print('found subckt')
-			inst_def.append(line)
-		elif inst_start==1 and line[0:1]=='+':
-			inst_def.append(line)
+	if pex_spectre==0:
+		for line in raw_lines:
+			if inst_start==1 and line[0:1]!='+': #instance def end
+				inst_start=0	
+			elif line[0:7]=='.SUBCKT' or line[0:7]=='.subckt':
+				inst_start=1	
+				print('found subckt')
+				inst_def.append(line)
+			elif inst_start==1 and line[0:1]=='+':
+				inst_def.append(line)
+	elif pex_spectre==1:
+		for line in raw_lines:
+			if inst_start==1 and line[len(line)-1:len(line)]!=')': #instance def end
+				inst_start=0	
+			elif line[0:6]=='SUBCKT' or line[0:6]=='subckt':
+				inst_start=1	
+				print('found subckt')
+				inst_def.append(line)
+			elif inst_start==1 and line[len(line)-1:len(line)]==')':
+				inst_def.append(line)
 
 	### cut out '.SUBCKT test_synth_pll2' ###
 	inst_def_words=inst_def[0].split()
@@ -269,7 +308,7 @@ def gen_dco_pex_wrapper(extDir,netlistDir,format_dir,ncc,ndrv,nfc,nstg,ninterp,d
 	#p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.pex',netlistDir+'/'+designName+'.pex.netlist.pex'])
 	#p.wait()
 
-def gen_tb_wrapped(hspiceModel,tb_dir,format_dir,ncell,ndrv,nfc,nstg,vdd,temp,fc_en_type,sim_time,corner_lib,designName,netlistDir):
+def gen_tb_wrapped(hspiceModel,tb_dir,format_dir,ncell,ndrv,nfc,nstg,vdd,temp,fc_en_type,sim_time,corner_lib,designName,netlistDir,finesim,single_ended,FC_half,pex_spectre,tapeout_mode):
 	#=====================================================
 	# model constants for trans simulation time calculation 
 	#=====================================================
@@ -284,7 +323,24 @@ def gen_tb_wrapped(hspiceModel,tb_dir,format_dir,ncell,ndrv,nfc,nstg,vdd,temp,fc
 		temp_min=temp[0]
 		temp_max=temp[0]
 
-	r_file=open(format_dir+"form_tb_ring_osc.sp","r")
+	if pex_spectre==0:
+		if finesim==0:
+			if single_ended==0:
+				r_file=open(format_dir+"form_pex_tb_dco.sp","r")
+			else:
+				r_file=open(format_dir+"form_pex_tb_dco_se.sp","r")
+		else:
+			if single_ended==0:
+				r_file=open(format_dir+"form_fs_pex_tb_dco.sp","r")
+			elif FC_half==0:
+				r_file=open(format_dir+"form_fs_pex_tb_dco_se.sp","r")
+			elif FC_half==1:
+				r_file=open(format_dir+"form_fs_pex_tb_dco_se_halfFC.sp","r")
+	elif pex_spectre==1:
+		if finesim==0:
+			if single_ended==0:
+				r_file=open(format_dir+"form_pex_tb_dco.sp","r")
+		
 	lines=list(r_file.readlines())
 	
 	#===============================================
@@ -324,33 +380,81 @@ def gen_tb_wrapped(hspiceModel,tb_dir,format_dir,ncell,ndrv,nfc,nstg,vdd,temp,fc
 	vm2.cal_nbigcy()
 	vm2.combinate()  #vdd/temp combination
 	var_list=[[[] for x in range(7)] for y in range(len(vm2.comblist[0])-1)]
-	if fc_en_type==1:
-		for i in range(1,len(vm2.comblist[0])):
-			var_list[i-1][0]=[0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][1]=[0,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][2]=[1,0,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][3]=[N_ctrl_cc//2,0,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][5]=[N_ctrl_cc//2,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][6]=[N_ctrl_cc,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
-	else:
-		for i in range(1,len(vm2.comblist[0])):
-			var_list[i-1][0]=[0,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][1]=[0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][2]=[1,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][3]=[N_ctrl_cc//2,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][5]=[N_ctrl_cc//2,0,vm2.comblist[0][i],vm2.comblist[1][i]]
-			var_list[i-1][6]=[N_ctrl_cc,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+	if tapeout_mode==0:
+		if fc_en_type==1:
+			for i in range(1,len(vm2.comblist[0])):
+				var_list[i-1][0]=[0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][1]=[0,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][2]=[1,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][3]=[N_ctrl_cc//2,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][5]=[N_ctrl_cc//2,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][6]=[N_ctrl_cc,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+		elif FC_half==0:
+			for i in range(1,len(vm2.comblist[0])):
+				var_list[i-1][0]=[0,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][1]=[0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][2]=[1,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][3]=[N_ctrl_cc//2,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][5]=[N_ctrl_cc//2,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][6]=[N_ctrl_cc,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+		elif FC_half==1:
+			for i in range(1,len(vm2.comblist[0])):
+				var_list[i-1][0]=[0,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][1]=[0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][2]=[1,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][3]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][5]=[N_ctrl_cc//2,N_ctrl_fc//2+1,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][6]=[N_ctrl_cc,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+	if tapeout_mode==1: # customized testing points for tapeout
+		if fc_en_type==1:
+			for i in range(1,len(vm2.comblist[0])):
+				var_list[i-1][0]=[0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][1]=[0,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][2]=[1,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][3]=[N_ctrl_cc//2,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][5]=[N_ctrl_cc//2,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][6]=[N_ctrl_cc,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+		elif FC_half==0:
+			for i in range(1,len(vm2.comblist[0])):
+				var_list=[[[] for x in range(12)] for y in range(len(vm2.comblist[0])-1)]
+				var_list[i-1][0]=[0,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][1]=[0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][2]=[1,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][3]=[N_ctrl_cc//2,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2-2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][5]=[N_ctrl_cc//2,N_ctrl_fc//2-1,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][6]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][7]=[N_ctrl_cc//2,N_ctrl_fc//2+1,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][8]=[N_ctrl_cc//2,N_ctrl_fc//2+2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][9]=[N_ctrl_cc//2,N_ctrl_fc//2+3,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][10]=[N_ctrl_cc//2,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][11]=[N_ctrl_cc,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+		elif FC_half==1:
+			for i in range(1,len(vm2.comblist[0])):
+				var_list[i-1][0]=[0,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][1]=[0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][2]=[1,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][3]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][5]=[N_ctrl_cc//2,N_ctrl_fc//2+1,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][6]=[N_ctrl_cc,0,vm2.comblist[0][i],vm2.comblist[1][i]]
 	#===================================================================
 	#   DATA table gen for parametric sweep
 	#===================================================================
 	#----- lateral stuffs: names --------
 	netmap1.get_net('vf','vf',0,N_ctrl_fc-1,1) #for v2
+	if FC_half==1:
+		netmap1.get_net('vb','vb',0,N_ctrl_fc-1,1) #for v2
 	netmap1.get_net('vc','vc',0,N_ctrl_cc-1,1) #for v2
 
 	#----- lateral stuffs: FCW values --------
 	#with open(tb_dir+"tb_%dring%d_osc%d_FC%d.sp"%(ndrv,ncell,nstg,nfc),"w") as w_file:
+	print("INFO: generating"+ tb_dir+"tb_"+designName+".sp")
+	UF_flag=0 # ultra fine flag	
 	with open(tb_dir+"tb_"+designName+".sp","w") as w_file:
 		for line in lines:
 			if line[0:4]=='@L@W':
@@ -358,7 +462,15 @@ def gen_tb_wrapped(hspiceModel,tb_dir,format_dir,ncell,ndrv,nfc,nstg,vdd,temp,fc
 				for ivt in range(len(var_list)):
 					for ifcw in range(len(var_list[0])):
 						netmap2=txt_mds.netmap()
-						netmap2.get_net('f1',None,'d2o',N_ctrl_fc,var_list[ivt][ifcw][1])	 
+						netmap2.get_net('f1',None,'d2o',N_ctrl_fc,var_list[ivt][ifcw][1])	
+						if  var_list[ivt][ifcw][1]==N_ctrl_fc//2:
+							if UF_flag==0:
+								netmap2.get_net('fb',None,'d2oi',N_ctrl_fc,var_list[ivt][ifcw][1])
+								UF_flag=1	
+							else:
+								netmap2.get_net('fb',None,'d2oi',N_ctrl_fc,var_list[ivt][ifcw][1]+1)
+						else:
+							netmap2.get_net('fb',None,'d2oi',N_ctrl_fc,var_list[ivt][ifcw][1])
 						netmap2.get_net('c1',None,'d2o',N_ctrl_cc,var_list[ivt][ifcw][0])	 
 						netmap2.get_net('vd',None,var_list[ivt][ifcw][2],var_list[ivt][ifcw][2],1)	 
 						netmap2.get_net('tm',None,var_list[ivt][ifcw][3],var_list[ivt][ifcw][3],1)	 
@@ -505,8 +617,11 @@ def gen_tb_pex(CF,Cc,Cf,PDK,finesim,tb_dir,format_dir,ncell,ndrv,nfc,nstg_start,
 # gen_mkfile_pex: generates pex_makefile for pex hspice sim 
 # receives inputs as a list
 #===================================================================
-def gen_mkfile_pex(formatDir,hspiceDir,hspiceResDir,tbDir,num_core,designNames,tech_node):
-	r_file=open(formatDir+"form_pex_hspicesim.mk","r")
+def gen_mkfile_pex(formatDir,hspiceDir,hspiceResDir,tbDir,num_core,designNames,tech_node,finesim):
+	if finesim==0:
+		r_file=open(formatDir+"form_pex_hspicesim.mk","r")
+	else:	
+		r_file=open(formatDir+"form_pex_finesim.mk","r")
 
 	netmap1=txt_mds.netmap()
 	#----- stuffs for transient sim ------ 
@@ -517,13 +632,19 @@ def gen_mkfile_pex(formatDir,hspiceDir,hspiceResDir,tbDir,num_core,designNames,t
 		netmap1.get_net('Rd',hspiceResDir,None,None,1)  #exclude ncell[0] name
 		netmap1.get_net('mp',None,None,num_core,1)   #number of core
 		netmap1.get_net('Td',tbDir,None,None,1)  #exclude ncell[0] name
-		netmap1.get_net('dn',designName,None,None,1)
+		netmap1.get_net('dn',None,None,designName,1)
 
 	lines=list(r_file.readlines())
-	with open(hspiceDir+"pex_hspicesim.mk","w") as w_file:
-		for line in lines:
-			netmap1.printline(line,w_file)	
-	print('pex_hspicesim.mk ready')
+	if finesim==0:
+		with open(hspiceDir+"pex_hspicesim.mk","w") as w_file:
+			for line in lines:
+				netmap1.printline(line,w_file)	
+		print('pex_hspicesim.mk ready')
+	else:
+		with open(hspiceDir+"pex_finesim.mk","w") as w_file:
+			for line in lines:
+				netmap1.printline(line,w_file)	
+		print('pex_finesim.mk ready')
 
 def gen_result(result_dir,design_name,ncell,ndrv,nfc,nstg,num_meas,index,show,VDD,TEMP):
 

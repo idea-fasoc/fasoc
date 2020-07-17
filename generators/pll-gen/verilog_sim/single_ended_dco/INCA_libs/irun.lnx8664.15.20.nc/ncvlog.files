@@ -1,0 +1,12 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
+/afs/eecs.umich.edu/wics/users/kmkwon/IDEA/fasoc/fasoc/generators/pll-gen/verilog_sim/single_ended_dco/verilog/tb_pll_controller_tdc_counter.sv
+/afs/eecs.umich.edu/wics/users/kmkwon/IDEA/fasoc/fasoc/generators/pll-gen/verilog_sim/single_ended_dco/verilog/analog_core.v
+/afs/eecs.umich.edu/wics/users/kmkwon/IDEA/fasoc/fasoc/generators/pll-gen/verilog_sim/single_ended_dco/verilog/pll_controller_tdc_counter.sv
+/afs/eecs.umich.edu/wics/users/kmkwon/IDEA/fasoc/fasoc/generators/pll-gen/verilog_sim/single_ended_dco/verilog/pll_controller.sv
+/afs/eecs.umich.edu/wics/users/kmkwon/IDEA/fasoc/fasoc/generators/pll-gen/verilog_sim/single_ended_dco/verilog/tdc_counter.v
+/afs/eecs.umich.edu/wics/users/kmkwon/IDEA/fasoc/fasoc/generators/pll-gen/verilog_sim/single_ended_dco/verilog/dco_model_noise.v
+/afs/eecs.umich.edu/wics/users/kmkwon/IDEA/fasoc/fasoc/generators/pll-gen/verilog_sim/single_ended_dco/verilog/ssc_generator.v
+/afs/eecs.umich.edu/wics/users/kmkwon/IDEA/fasoc/fasoc/generators/pll-gen/verilog_sim/single_ended_dco/verilog/functions.v

@@ -3,12 +3,15 @@
 "module_name": "pll6",
 "specifications": 
    {
-"Fnom_min":7.80e9,
-"Fnom_max":9.00e9,
-"FCR_min":1,
-"Fmax":11e9,
-"Fmin":6e9,
-"Fres":2e6,
-"dco_PWR":8e-3
+"frequency":
+	{
+"nom_min":2.00e9,
+"nom_max":2.80e9,
+"max":4e9,
+"min":1e9,
+"res":45e3
+	},
+"FCR_min":0.1,
+"dco_PWR":10
    }
 }

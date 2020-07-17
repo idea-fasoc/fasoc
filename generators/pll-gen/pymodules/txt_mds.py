@@ -167,7 +167,7 @@ class netmap:
 				self.name[self.nn]=1
 			self.map[self.nn]=list([netname])
 			self.flag[self.nn]=(flag)
-			if start!=None and start!='d2o':    #normal n1 n2 n3 ... 
+			if start!=None and start!='d2o' and start!='d2oi':    #normal n1 n2 n3 ... 
 				self.nnet[self.nn]=int((end-start+step/10)//step+1)
 				for i in range(1,self.nnet[self.nn]+1):
 					self.map[self.nn].append(start+step*(i-1))
@@ -178,10 +178,17 @@ class netmap:
 					else:
 						self.map[self.nn].append(0)
 					i+=1
+			elif start=='d2oi':                    #decimal to thermal inversed 
+				for i in range(0,end):
+					if step-i>0:
+						self.map[self.nn].append(0)
+					else:
+						self.map[self.nn].append(1)
+					i+=1
 			elif start==None and end==None and step==None:  #write only string
 				self.stringOnly[self.nn]=1
 				self.map[self.nn].append(netname) #this is just to make len(self.map[])=2 to make it operate 
-			elif self.name[self.nn]!=None and start==None and end!=None and step==None:  #repeatedely printing string
+			elif self.name[self.nn]!=None and start==None and end!=None and step==None:  #repeatedely printing string (write name x end)
 				for i in range(1,end+1):
 					self.map[self.nn].append(netname)
 			else:					# start==None : repeat 'end' for 'step' times
@@ -228,6 +235,8 @@ class netmap:
 								#print (self.pvar)
 								if self.name[varidx]:
 									wrfile.write(self.map[varidx][0])
+								if type(self.map[varidx][self.pvar])==str: 
+									wrfile.write('%s'%(self.map[varidx][self.pvar]))      #modify here!!!!
 								if type(self.map[varidx][self.pvar])==float: 
 									wrfile.write('%e'%(self.map[varidx][self.pvar]))      #modify here!!!!
 									#wrfile.write('%.2f'%(self.map[varidx][self.pvar]))      #modify here!!!!
@@ -269,7 +278,7 @@ class netmap:
 						if self.name[varidx]:
 							wrfile.write(self.map[varidx][0])
 						if type(self.map[varidx][iv])==int:
-							wrfile.write('%d   '%(self.map[varidx][iv])) #this is added for edit pin
+							wrfile.write('%d	'%(self.map[varidx][iv])) #this is added for edit pin
 						elif type(self.map[varidx][iv])==float:
 							wrfile.write('%.1f	'%(self.map[varidx][iv]))
 					self.ci_at=ci

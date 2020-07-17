@@ -1,0 +1,13 @@
+//
+// File created by:  irun
+// Do not modify this file
+
+s1::(14Jul2020:21:47:15):( irun -64bit -R -sv -sem2009 -access +rwc -input dump_irun.tcl +delay_mode_unit -timescale 1ns/1ps -l irun_run.log )
+s2::(14Jul2020:21:47:51):( irun -64bit -elaborate -sv -sem2009 -sysv_ext +.vh -access +rwc -timescale 1ns/1ps -f ./flist.f -l irun_comp.log )
+s3::(14Jul2020:21:47:53):( irun -64bit -R -sv -sem2009 -access +rwc -input dump_irun.tcl +delay_mode_unit -timescale 1ns/1ps -l irun_run.log )
+s4::(14Jul2020:21:48:17):( irun -64bit -elaborate -sv -sem2009 -sysv_ext +.vh -access +rwc -timescale 1ns/1ps -f ./flist.f -l irun_comp.log )
+s5::(14Jul2020:21:48:17):( irun -64bit -R -sv -sem2009 -access +rwc -input dump_irun.tcl +delay_mode_unit -timescale 1ns/1ps -l irun_run.log )
+s6::(14Jul2020:21:52:51):( irun -64bit -elaborate -sv -sem2009 -sysv_ext +.vh -access +rwc -timescale 1ns/1ps -f ./flist.f -l irun_comp.log )
+s7::(14Jul2020:21:52:51):( irun -64bit -R -sv -sem2009 -access +rwc -input dump_irun.tcl +delay_mode_unit -timescale 1ns/1ps -l irun_run.log )
+s8::(14Jul2020:21:53:18):( irun -64bit -elaborate -sv -sem2009 -sysv_ext +.vh -access +rwc -timescale 1ns/1ps -f ./flist.f -l irun_comp.log )
+s9::(14Jul2020:21:53:22):( irun -64bit -R -sv -sem2009 -access +rwc -input dump_irun.tcl +delay_mode_unit -timescale 1ns/1ps -l irun_run.log )

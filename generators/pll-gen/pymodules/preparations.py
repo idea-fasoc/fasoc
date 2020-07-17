@@ -12,7 +12,7 @@ import json
 import shutil
 import subprocess as sp
 import txt_mds
-
+import glob
 
 def config_parse(outMode,configFile,platform):
 	print ('#----------------------------------------------------------------------')
@@ -139,12 +139,14 @@ def command_parse(parseList):
 
 def aux_copy_spice (dco_CC_lib, dco_FC_lib, targetDir):
 	try:
-		shutil.copyfile(dco_CC_lib + '/DCO_CC.sp',  targetDir + '/DCO_CC.sp')
+		for CC_sp in glob.glob(dco_CC_lib+'*.sp'):
+			shutil.copy(CC_sp,  targetDir + '/')
 	except:
 		print("failed to copy "+ dco_CC_lib + '/DCO_CC.sp to ' +  targetDir + '/DCO_CC.sp')
 		sys.exit(1)
 	try:
-		shutil.copyfile(dco_FC_lib + '/DCO_FC.sp',  targetDir + '/DCO_FC.sp')
+		for FC_sp in glob.glob(dco_FC_lib+'*.sp'):
+			shutil.copy(FC_sp,  targetDir + '/')
 	except:
 		print("failed to copy "+ dco_FC_lib + '/DCO_FC.sp to ' +  targetDir + '/DCO_FC.sp')
 		sys.exit(1)
@@ -156,6 +158,10 @@ def aux_copy_export(flowDir,dco_CC_lib,dco_FC_lib):
 	print ('#----------------------------------------------------------------------')
 	print ('# Parsing DCO aux-cells dimensions and generating blocks/ directory in '+flowDir)
 	print ('#----------------------------------------------------------------------')
+	dco_CC_lib_spt=dco_CC_lib.split("/")
+	dco_CC_name=dco_CC_lib_spt[len(dco_CC_lib_spt)-3]
+	dco_FC_lib_spt=dco_FC_lib.split("/")
+	dco_FC_name=dco_FC_lib_spt[len(dco_FC_lib_spt)-3]
 	if os.path.isdir(flowDir+'blocks/'):
 		print('INFO: '+flowDir+'blocks/ already exists')
 	else:
@@ -163,61 +169,77 @@ def aux_copy_export(flowDir,dco_CC_lib,dco_FC_lib):
 			os.mkdir(flowDir+'/blocks')
 		except OSError:
 			print('Error: unable to create '+flowDir+'/blocks/')
-	if os.path.isdir(flowDir+'/blocks/dco_CC/export/'):
-		print('INFO: '+flowDir+'/blocks/dco_CC/export already exists')
+	if os.path.isdir(flowDir+'/blocks/'+dco_CC_name+'/export/'):
+		print('INFO: '+flowDir+'/blocks/'+dco_CC_name+'/export already exists')
 	else:
 		try:
-			os.mkdir(flowDir+'/blocks/dco_CC')
-			os.mkdir(flowDir+'/blocks/dco_CC/export/')
-			print(flowDir+'/blocks/dco_CC/export/'+' generated')
+			os.mkdir(flowDir+'/blocks/'+dco_CC_name)
+			os.mkdir(flowDir+'/blocks/'+dco_CC_name+'/export/')
+			print(flowDir+'/blocks/'+dco_CC_name+'/export/'+' generated')
 		except OSError:
-			print('Error: unable to create '+flowDir+'/blocks/dco_CC/export/')
-	if os.path.isdir(flowDir+'/blocks/dco_FC/export/'):
-		print('INFO: '+flowDir+'/blocks/dco_FC/export already exists')
+			print('Error: unable to create '+flowDir+'/blocks/'+dco_CC_name+'/export/')
+	if os.path.isdir(flowDir+'/blocks/'+dco_FC_name+'/export/'):
+		print('INFO: '+flowDir+'/blocks/'+dco_FC_name+'/export already exists')
 	else:
 		try:
-			os.mkdir(flowDir+'/blocks/dco_FC')
-			os.mkdir(flowDir+'/blocks/dco_FC/export/')
-			print(flowDir+'/blocks/dco_FC/export/'+' generated')
+			os.mkdir(flowDir+'/blocks/'+dco_FC_name)
+			os.mkdir(flowDir+'/blocks/'+dco_FC_name+'/export/')
+			print(flowDir+'/blocks/'+dco_FC_name+'/export/'+' generated')
 		except OSError:
-			print('Error: unable to create '+flowDir+'/blocks/dco_FC/export/')
+			print('Error: unable to create '+flowDir+'/blocks/'+dco_FC_name+'/export/')
 
 	try:
-		shutil.copyfile(dco_CC_lib + '/dco_CC.cdl',  flowDir + '/blocks/dco_CC/export/dco_CC.cdl')
-		shutil.copyfile(dco_CC_lib + '/dco_CC.gds', flowDir + '/blocks/dco_CC/export/dco_CC.gds')
-		shutil.copyfile(dco_CC_lib + '/dco_CC.lef',  flowDir + '/blocks/dco_CC/export/dco_CC.lef')
-		shutil.copyfile(dco_CC_lib + '/dco_CC.lib',  flowDir + '/blocks/dco_CC/export/dco_CC.lib')
+		for CC_file in os.listdir(dco_CC_lib):
+			print("INFO: copying aux-cell file:"+dco_CC_lib+CC_file)
+			shutil.copy(dco_CC_lib+CC_file,flowDir+'blocks/'+dco_CC_name+'/export/')
+#		shutil.copyfile(dco_CC_lib + '/dco_CC.cdl',  flowDir + '/blocks/dco_CC/export/dco_CC.cdl')
+#		shutil.copyfile(dco_CC_lib + '/dco_CC.gds', flowDir + '/blocks/dco_CC/export/dco_CC.gds')
+#		shutil.copyfile(dco_CC_lib + '/dco_CC.lef',  flowDir + '/blocks/dco_CC/export/dco_CC.lef')
+#		shutil.copyfile(dco_CC_lib + '/dco_CC.lib',  flowDir + '/blocks/dco_CC/export/dco_CC.lib')
+		for FC_file in os.listdir(dco_FC_lib):
+			shutil.copy(dco_FC_lib+FC_file,flowDir+'blocks/'+dco_FC_name+'/export/')
 
-		shutil.copyfile(dco_FC_lib + '/dco_FC.cdl',  flowDir + '/blocks/dco_FC/export/dco_FC.cdl')
-		shutil.copyfile(dco_FC_lib + '/dco_FC.gds', flowDir + '/blocks/dco_FC/export/dco_FC.gds')
-		shutil.copyfile(dco_FC_lib + '/dco_FC.lef',  flowDir + '/blocks/dco_FC/export/dco_FC.lef')
-		shutil.copyfile(dco_FC_lib + '/dco_FC.lib',  flowDir + '/blocks/dco_FC/export/dco_FC.lib')
+		#shutil.copyfile(dco_FC_lib + '/dco_FC.cdl',  flowDir + '/blocks/dco_FC/export/dco_FC.cdl')
+		#shutil.copyfile(dco_FC_lib + '/dco_FC.gds', flowDir + '/blocks/dco_FC/export/dco_FC.gds')
+		#shutil.copyfile(dco_FC_lib + '/dco_FC.lef',  flowDir + '/blocks/dco_FC/export/dco_FC.lef')
+		#shutil.copyfile(dco_FC_lib + '/dco_FC.lib',  flowDir + '/blocks/dco_FC/export/dco_FC.lib')
 	except OSError:
 		print('Error: unable to copy aux-cell files in '+flowDir+'/blocks/')
 		sys.exit(1)
-
+	return dco_CC_name, dco_FC_name
 
 def aux_parse_size(dco_CC_lib,dco_FC_lib):
-	dco_CC_lef=open(dco_CC_lib+'dco_CC.lef','r')
+	dco_CC_lib_spt=dco_CC_lib.split("/")
+	dco_CC_name=dco_CC_lib_spt[len(dco_CC_lib_spt)-3]
+	dco_FC_lib_spt=dco_FC_lib.split("/")
+	dco_FC_name=dco_FC_lib_spt[len(dco_FC_lib_spt)-3]
+
+	print("INFO: dco coarse cell name is:"+dco_CC_name)
+	print("INFO: dco fine cell name is:"+dco_FC_name)
+	for CC_lef in glob.glob(dco_CC_lib+'*.lef'):
+		dco_CC_lef=open(CC_lef,'r')
+#	dco_CC_lef=open(dco_CC_lib+'dco_CC.lef','r')
 	lines_CC=list(dco_CC_lef.readlines())
 	inCC=0
 	for line in lines_CC:
 		words=line.split()
 		for word in words:
-			if word=='dco_CC':
+			if word==dco_CC_name:
 				inCC=1
 			if inCC==1 and word=='SIZE':
 				sizes=line.split()
 				W_CC=float(sizes[1])
 				H_CC=float(sizes[3])
 
-	dco_FC_lef=open(dco_FC_lib+'dco_FC.lef','r')
+	for FC_lef in glob.glob(dco_FC_lib+'*.lef'):
+		dco_FC_lef=open(FC_lef,'r')
+	#dco_FC_lef=open(dco_FC_lib+'dco_FC.lef','r')
 	lines_FC=list(dco_FC_lef.readlines())
 	inFC=0
 	for line in lines_FC:
 		words=line.split()
 		for word in words:
-			if word=='dco_FC':
+			if word==dco_FC_name:
 				inFC=1
 			if inFC==1 and word=='SIZE':
 				sizes=line.split()
@@ -238,17 +260,17 @@ def gen_subDirs (subDirs):
 				print('unable to create'+Dir)
 				sys.exit(1)
 
-def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir):
+def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform):
 	if outMode=="macro" or outMode=="full":
 		gen_subDirs([absPvtDir_plat])
 
-		hspiceDirs=[hspiceDir,hspiceDir+'/NETLIST',hspiceDir+'/TB',hspiceDir+'/DUMP_result',hspiceDir+'/TBrf',hspiceDir+'/DUMPrf_result',hspiceDir+'/pex_NETLIST',hspiceDir+'/pex_TB',hspiceDir+'/pex_DUMP_result']
+		hspiceDirs=[hspiceDir,hspiceDir+'/NETLIST',hspiceDir+'/TB',hspiceDir+'/DUMP_result',hspiceDir+'/TBrf',hspiceDir+'/DUMPrf_result',hspiceDir+'/pex_NETLIST',hspiceDir+'/pex_TB',hspiceDir+'/pex_DUMP_result',hspiceDir+'/pex_NETLIST_scs',hspiceDir+'/pex_TB_scs',hspiceDir+'/pex_DUMP_result_scs']
 		gen_subDirs(hspiceDirs)
 
 		finesimDirs=[finesimDir,finesimDir+'/NETLIST',finesimDir+'/TB',finesimDir+'/DUMP_result',finesimDir+'/TBrf',finesimDir+'/DUMPrf_result',finesimDir+'/pex_NETLIST',finesimDir+'/pex_TB',finesimDir+'/pex_DUMP_result']
 		gen_subDirs(finesimDirs)
 
-		extDirs=[extDir,extDir+'/run',extDir+'/sch',extDir+'/layout',extDir+'/runsets']
+		extDirs=[extDir,extDir+'/run',extDir+'/run_scs',extDir+'/sch',extDir+'/layout',extDir+'/runsets']
 		gen_subDirs(extDirs)
 
 		p=sp.Popen(['cp',calibreRulesDir+'/calibre.lvs',extDir+'/run/'])

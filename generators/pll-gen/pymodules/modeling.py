@@ -38,7 +38,7 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 	#===============================================================
 	if modelVersion=='Beta':
 		inSpecDic={"Fmax":Fmax,"Fnom_max":Fnom_max,"Fnom_min":Fnom_min,"Fmin":Fmin,"Fres":Fres,"FCR":FCR_min,"dco_PWR":dco_PWR,"IB_PN":IB_PN}					
-	elif modelVersion=='Alpha':
+	elif modelVersion=='Alpha' or modelVersion=='Alpha_pex':
 		inSpecDic={"Fmax":Fmax,"Fnom_max":Fnom_max,"Fnom_min":Fnom_min,"Fmin":Fmin,"Fres":Fres,"FCR":FCR_min,"dco_PWR":dco_PWR}					
 	#===============================================================
 	# generate dictionary list for failed spec ranges
@@ -56,7 +56,7 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 	#-- pex effect --
 	Cc_pre=Cc
 	Cf_pre=Cf
-	if modelVersion=='Beta':
+	if modelVersion=='Beta' or modelVersion=='Alpha_pex':
 		Cc=mult_Con*Cc
 		Cf=mult_Con*Cf
 	max_spec_depth=0
@@ -78,7 +78,7 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 					#===============================================================
 					if modelVersion=='Beta':
 						specDic={"Fnom":Fnom_mdl,"Fmax":Fmax_mdl,"Fmin":Fmin_mdl,"Fres":Fres_mdl,"FCR":freqCoverRatio,"dco_PWR":Pwr_mdl,"IB_PN":IB_PN_mdl}
-					elif modelVersion=='Alpha':
+					elif modelVersion=='Alpha' or modelVersion=='Alpha_pex':
 						specDic={"Fnom":Fnom_mdl,"Fmax":Fmax_mdl,"Fmin":Fmin_mdl,"Fres":Fres_mdl,"FCR":freqCoverRatio,"dco_PWR":Pwr_mdl}
 					spec_depth=0
 					for spec in spec_priority:
@@ -123,7 +123,7 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 						if modelVersion=='Beta':
 							passed_specs.append([Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,freqCoverRatio,Pwr_mdl,Area_mdl,IB_PN_mdl])
 							print ('INFO: passed model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, IB_PN=%.2f, pwr_mdl=%.2e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,IB_PN_mdl,Pwr_mdl))
-						elif modelVersion=='Alpha':
+						elif modelVersion=='Alpha' or  modelVersion=='Alpha_pex':
 							passed_specs.append([Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,freqCoverRatio,Pwr_mdl,Area_mdl])
 							print ('INFO: passed model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, pwr_mdl=%.2e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl))
 						pass_flag=1

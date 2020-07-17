@@ -3,7 +3,7 @@ import glob
 import shutil
 import subprocess as sp
 
-def gen_post_pex_netlist(platform, designName, formatDir, flowDir, extDir, calibreRulesDir, wellpin):
+def gen_post_pex_netlist(platform, designName, formatDir, flowDir, extDir, calibreRulesDir, wellpin, spectre):
 	# v2lvs netlist: 1. wellpin in cadre => copy from cadre 2. no wellpin in cadre => run v2lvs again with modified verilog
 	if wellpin==1:
 		for file in glob.glob(flowDir+'/results/calibre/lvs/_'+designName+'*.sp'):
@@ -88,17 +88,24 @@ def gen_post_pex_netlist(platform, designName, formatDir, flowDir, extDir, calib
 	with open(extDir+'/runsets/pex.runset.'+platform, 'r') as file:
 		filedata = file.read()
 	filedata = filedata.replace('design', designName)
-	with open(extDir+'/run/pex.runset', 'w') as file:
+	if spectre==0:
+		extRunDir=extDir+'/run/'
+		filedata = filedata.replace('netlistform', 'HSPICE')
+	elif spectre==1:
+		extRunDir=extDir+'/run_scs/'
+		filedata = filedata.replace('netlistform', 'SPECTRE')
+
+	with open(extRunDir+'pex.runset', 'w') as file:
 		file.write(filedata)
 	
 	# Run Calibre RCX
 	if platform == 'gf12lp':
 		p = sp.Popen(['calibre','-gui','-xact','-batch','-runset',
-						 'pex.runset'],cwd=extDir+'/run')
+						 'pex.runset'],cwd=extRunDir)
 		p.wait()
 	else:
 		p = sp.Popen(['calibre','-gui','-pex','-batch','-runset',
-						 'pex.runset'],cwd=extDir+'/run')
+						 'pex.runset'],cwd=extRunDir)
 		p.wait()
 
 	# tsmc65lp

@@ -44,8 +44,6 @@ specfile,platform,outputDir,pexVerify,runVsim,outMode=preparations.command_parse
 specIn=open(specfile,'r')
 
 aLib,mFile,calibreRulesDir,hspiceModel=preparations.config_parse(outMode,configFile,platform)
-dco_CC_lib=aLib+'/dco_CC/latest/'
-dco_FC_lib=aLib+'/dco_FC/latest/'
 
 #========================================================
 # directory path settings
@@ -98,9 +96,15 @@ if platform=='tsmc65lp':
 	tdc_dff='DFFRPQ_X0P5M_A9TR'
 	H_stdc=1.8
 	custom_lvs=1
+	cust_place=0
+	single_ended=0
+	CC_stack=2
+	FC_half=0
+	pex_spectre=0
+	vdd=[1.2]
 elif platform=='gf12lp':
 	fc_en_type = 2 # dco_FC en => decrease frequency
-	modelVersion='Alpha' 
+	modelVersion='Alpha_pex' 
 	dco_flowDir = absPvtDir_plat + 'flow_dco/'
 	fc_en_type = 2 # dco_FC en => decrease frequency
 	sim_time = 20e-9
@@ -123,13 +127,31 @@ elif platform=='gf12lp':
 	tdc_dff='DFFRPQL_X1N_A10P5PP84TR_C14'
 	H_stdc=0.672
 	custom_lvs=0
+	cust_place=0
+	single_ended=0
+	FC_half=0
+	CC_stack=2
+	pex_spectre=0
+	vdd=[0.8]
+if single_ended==0:
+	dco_CC_lib=aLib+'/dco_CC/latest/'
+	dco_FC_lib=aLib+'/dco_FC/latest/'
+else:
+	if CC_stack==2:
+		dco_CC_lib=aLib+'/dco_CC_se/latest/'
+	elif CC_stack==3:
+		dco_CC_lib=aLib+'/dco_CC_se_3st/latest/'
+	if FC_half==0:
+		dco_FC_lib=aLib+'/dco_FC_se/latest/'
+	elif FC_half==1:
+		dco_FC_lib=aLib+'/dco_FC_se_half/latest/'
 #========================================================
 # generate directory tree 
 #========================================================
 print ('#======================================================================')
 print ('# check directory tree and generate missing directories')
 print ('#======================================================================')
-preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir)
+preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform)
 
 #--------------------------------------------------------
 # check for private directory 
@@ -141,7 +163,7 @@ if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	#	read the aux-cells	
 	#--------------------------------------------------------
-	preparations.aux_copy_export(dco_flowDir,dco_CC_lib,dco_FC_lib)
+	dco_CC_name,dco_FC_name = preparations.aux_copy_export(dco_flowDir,dco_CC_lib,dco_FC_lib)
 	preparations.aux_copy_export(pll_flowDir,dco_CC_lib,dco_FC_lib)
 	W_CC,H_CC,W_FC,H_FC=preparations.aux_parse_size(dco_CC_lib,dco_FC_lib)
 	A_CC=W_CC*H_CC
@@ -165,13 +187,13 @@ if jsonSpec['generator'] != 'pll-gen':
 
 try:
 	designName = jsonSpec['module_name']
-	Fnom_min = float(jsonSpec['specifications']['Fnom_min'])
-	Fnom_max = float(jsonSpec['specifications']['Fnom_max'])
+	Fnom_min = float(jsonSpec['specifications']['frequency']['nom_min'])
+	Fnom_max = float(jsonSpec['specifications']['frequency']['nom_max'])
+	Fmax = float(jsonSpec['specifications']['frequency']['max'])
+	Fmin = float(jsonSpec['specifications']['frequency']['min'])
+	Fres = float(jsonSpec['specifications']['frequency']['res'])
 	FCR_min = float(jsonSpec['specifications']['FCR_min'])
-	Fmax = float(jsonSpec['specifications']['Fmax'])
-	Fmin = float(jsonSpec['specifications']['Fmin'])
-	Fres = float(jsonSpec['specifications']['Fres'])
-	dco_PWR = float(jsonSpec['specifications']['dco_PWR'])
+	dco_PWR = float(jsonSpec['specifications']['dco_PWR'])*1e-3 # pwr will be in (mW)
 	try: 
 		IB_PN = float(jsonSpec['specifications']['inband_PN']) #in dBc
 		spec_priority={"Fnom":"dummy","IB_PN":"lo","Fmax":"hi","Fmin":"lo","Fres":"lo","FCR":"hi","dco_PWR":"lo"}					
@@ -227,8 +249,8 @@ try:
 	PN_const= jsonModel['pll_model_constants']['1M_PN_const']
 	print("INFO: Current model is Beta version.")
 except: # dummies
-	mult_Con= 2
-	mult_Coff= 2 
+	mult_Con= 3.9
+	mult_Coff= 3.9 
 	pex_Iavg_const= 1
 	PN_const= 1 
 	print("INFO: Current model is Alpha version. Phase noise will not be supported. Generate Beta version model for phase noise.")
@@ -241,15 +263,13 @@ print ('# searching for design solution')
 print ('#======================================================================')
 
 # design space definition: [start,end,step]
-Ndrv_range=[2,22,4]
-Nfc_range=[10,30,4]
-Ncc_range=[10,30,4]
-Nstg_range=[4,16,4]
-vdd=[1.2]
+Ndrv_range=[2,42,2]
+Nfc_range=[10,40,2]
+Ncc_range=[10,40,2]
+Nstg_range=[4,32,2]
 temp=[25]
 
 pass_flag,passed_designs,passed_specs,specRangeDic=modeling.design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN,dco_PWR,CF,Cf,Cc,mult_Con,mult_Coff,Iavg_const,PN_const,vdd,Ndrv_range,Nfc_range,Ncc_range,Nstg_range,A_CC,A_FC,modelVersion)
-
 
 #--------------------------------------------------------
 # select the design with least area
@@ -270,14 +290,14 @@ if pass_flag==1:
 	[Ndrv,Ncc,Nfc,Nstg]=passed_designs[0]
 	if modelVersion=='Beta':
 		[Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,FCR_mdl,Pwr_mdl,Area_mdl,IB_PN_mdl]=passed_specs[0]
-	elif modelVersion=='Alpha':
+	elif modelVersion=='Alpha' or modelVersion=='Alpha_pex':
 		[Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,FCR_mdl,Pwr_mdl,Area_mdl]=passed_specs[0]
 	print ('#======================================================================')
 	print ('# selected design solution: ndrv=%d, ncc=%d, nfc=%d, nstg=%d'%(Ndrv,Ncc,Nfc,Nstg))
 	if modelVersion=='Beta':
 		print ('# expected specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, IB_PN=%.2e, Pwr=%e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,IB_PN_mdl,Pwr_mdl))
 		print ('# required specs: Fnom_min,max=%.2e,%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, IB_PN=%.2e'%(Fnom_min,Fnom_max,Fmax,Fmin,Fres,IB_PN))
-	elif modelVersion=='Alpha':
+	elif modelVersion=='Alpha' or modelVersion=='Alpha_pex':
 		print ('# expected specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, Pwr=%e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl))
 		print ('# required specs: Fnom_min,max=%.2e,%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e'%(Fnom_min,Fnom_max,Fmax,Fmin,Fres))
 	print ('#======================================================================')
@@ -286,12 +306,13 @@ if pass_flag==1:
 	# write output json file 
 	#------------------------------------------------------------------------------
 	jsonSpec['results']={'platform': 'tsmc65lp'}			
-	jsonSpec['results'].update({'Fnom':Fnom_mdl})	
+	jsonSpec['results']['frequency']={'nom': Fnom_mdl}			
+#	jsonSpec['results']['frequency'].update({'nom':Fnom_mdl})	
+	jsonSpec['results']['frequency'].update({'max':Fmax_mdl})	
+	jsonSpec['results']['frequency'].update({'min':Fmin_mdl})	
+	jsonSpec['results']['frequency'].update({'res':Fres_mdl})	
 	jsonSpec['results'].update({'FCR':FCR_mdl})	
-	jsonSpec['results'].update({'Fmax':Fmax_mdl})	
-	jsonSpec['results'].update({'Fmin':Fmin_mdl})	
-	jsonSpec['results'].update({'Fres':Fres_mdl})	
-	jsonSpec['results'].update({'dco_PWR':Pwr_mdl})
+	jsonSpec['results'].update({'dco_PWR':Pwr_mdl*1e3}) # in mW
 	if modelVersion=='Beta':	
 		jsonSpec['results'].update({'inband_PN':IB_PN_mdl})	
 	jsonSpec['results'].update({'area': Area_mdl})	
@@ -337,6 +358,7 @@ pll_name=designName
 dcoName=pll_name+'_dco'
 bufName='outbuff_div'
 run_digital_flow.pll_verilog_gen(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform)
+tapeout_mode=0
 
 if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
@@ -345,7 +367,7 @@ if outMode=='macro' or outMode=='full':
 	dco_bleach=0 # test switch
 	dco_synth=1
 	dco_apr=1
-	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l)
+	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name)
 	#--------------------------------------------------------
 	# generate output buffer, divider 
 	#--------------------------------------------------------
@@ -359,7 +381,7 @@ if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	# generate PDpll 
 	#--------------------------------------------------------
-	pdpll_bleach=1
+	pdpll_bleach=0
 	pdpll_synth=1 # test switch
 	pdpll_apr=1
 	W_dco,H_dco,W_pll,H_pll=run_digital_flow.pdpll_flow(pvtFormatDir,pll_flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,pdpll_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,pdpll_synth,pdpll_apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,pll_max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc)
@@ -381,9 +403,9 @@ if outMode=='macro' or outMode=='full':
 		print ('#======================================================================')
 		print ('# running post-pex analog sim for DCO alone')
 		print ('#======================================================================')
-		run_pex_flow.gen_post_pex_netlist(platform, dcoName, pvtFormatDir, dco_flowDir, extDir, calibreRulesDir, wellpin)
-		run_pex_sim.gen_dco_pex_wrapper(extDir,pex_netlistDir,pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,ninterp,dcoName,fc_en_type)
-		run_pex_sim.gen_tb_wrapped(hspiceModel,pex_tbDir,pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,vdd,temp,fc_en_type,pex_sim_time,corner_lib,dcoName,pex_netlistDir)
+		run_pex_flow.gen_post_pex_netlist(platform, dcoName, pvtFormatDir, dco_flowDir, extDir, calibreRulesDir, wellpin, pex_spectre)
+		run_pex_sim.gen_dco_pex_wrapper(extDir,pex_netlistDir,pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,ninterp,dcoName,fc_en_type,FC_half)
+		run_pex_sim.gen_tb_wrapped(hspiceModel,pex_tbDir,pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,vdd,temp,fc_en_type,pex_sim_time,corner_lib,dcoName,pex_netlistDir,single_ended, pex_spectre,tapeout_mode)
 		dcoNames=[dcoName]
 		run_pex_sim.gen_mkfile_pex(pvtFormatDir,hspiceDir,pex_resDir,pex_tbDir,num_core,dcoNames,tech_node)
 
@@ -403,11 +425,11 @@ if outMode=='macro' or outMode=='full':
 		idK,Kg,Fnom,Fmax,Fmin,Fres,FCR,Iavg,result_exist,dm=run_pex_sim.gen_result_v3(tbDir,Ncc,Ndrv,Nfc,Nstg,num_meas,index,show,vdd,temp)
 
 		jsonSpec['pex sim results']={'platform': 'tsmc65lp'}
-		jsonSpec['pex sim results'].update({'nominal frequency':Fnom})
-		jsonSpec['pex sim results'].update({'minimum frequency':Fmin})
-		jsonSpec['pex sim results'].update({'maximum frequency':Fmax})
-		jsonSpec['pex sim results'].update({'power':Iavg*vdd[0]})
-		jsonSpec['pex sim results'].update({'area':A_core})
+		jsonSpec['pex sim results']['frequency']={'nom':Fnom}
+		jsonSpec['pex sim results']['frequency'].update({'min':Fmin})
+		jsonSpec['pex sim results']['frequency'].update({'max':Fmax})
+		jsonSpec['pex sim results'].update({'power':Iavg*vdd[0]*1e3}) # in mW
+		jsonSpec['pex sim results'].update({'area':A_core}) # in um^2 (need to check)
 		print("measured specs generated on "+outputDir+'/pll_spec_out.json')
 
 		with open(outputDir+'/'+designName+'.json','w') as resultSpecfile:
@@ -445,13 +467,13 @@ if outMode!='full': #public
 	#== calculate estimated area ==
 	A_dco=1.5*(A_CC*Ncc*Nstg+A_FC*Nfc*Nstg)
 	A_pll=A_dco*1.5	
-	jsonSpec['results']={'platform': 'tsmc65lp'}
-	jsonSpec['results'].update({'nominal frequency':Fnom_mdl})
-	jsonSpec['results'].update({'minimum frequency':Fmin_mdl})
-	jsonSpec['results'].update({'maximum frequency':Fmax_mdl})
-	jsonSpec['results'].update({'power':Pwr_mdl})
-	jsonSpec['results'].update({'area':A_pll})
-	jsonSpec['results'].update({'aspect ratio':'1:1'})
+	jsonSpec['results']={'platform': platform}
+	jsonSpec['results']['frequency']={'nom':Fnom_mdl}
+	jsonSpec['results']['frequency'].update({'min':Fmin_mdl})
+	jsonSpec['results']['frequency'].update({'max':Fmax_mdl})
+	jsonSpec['results'].update({'power':Pwr_mdl*1e3}) # in mW
+	jsonSpec['results'].update({'area':A_pll}) # in um^2  (need to check)
+	jsonSpec['results'].update({'aspect_ratio':'1:1'})
 	if outMode=='macro' or outMode=='full':
 		jsonSpec['results'].update({'area':A_core})
 	print("model predicted specs generated on "+outputDir+'/'+designName+'.json')

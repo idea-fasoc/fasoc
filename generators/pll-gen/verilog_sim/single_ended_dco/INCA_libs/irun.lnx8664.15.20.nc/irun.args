@@ -1,0 +1,18 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
+-64bit
+-elaborate
+-sv
+-sem2009
+-sysv_ext
++.vh
+-access
++rwc
+-timescale
+1ns/1ps
+-f
+./flist.f
+-l
+irun_comp.log

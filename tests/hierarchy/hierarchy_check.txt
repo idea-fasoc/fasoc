@@ -1,4 +1,0 @@
-./cmsdk_fasoc_apb_subsystem_gen.v
-./cmsdk_fasoc_apb_subsystem_gen_backup.v
-./cmsdk_mcu_gen.v
-./cmsdk_mcu_gen_backup.v

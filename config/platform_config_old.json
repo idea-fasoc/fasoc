@@ -4,7 +4,7 @@
   "extractionTool": "calibre",
   "netlistTool": "calibredrv",
   "calibreRules": "/net/gaylord/l/yaswanth/Research/LDO_Automation/extraction/ruleFiles",
-  "socratesInstall": "/n/trenton/v/fayazi/ARM-Socrates",
+  "socratesInstall": "/afs/eecs.umich.edu/cadre/projects/fasoc/soft/arm-socrates-1.3.0",
   "socrates_DRC_config": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/socrates_DRC_config",
   "platforms": {
     "tsmc65lp": {

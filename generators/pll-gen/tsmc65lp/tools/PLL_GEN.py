@@ -337,9 +337,9 @@ if outMode!='full': #public
 	A_dco=1.5*(A_CC*Ncc*Nstg+A_FC*Nfc*Nstg)
 	A_pll=A_dco*1.5	
 	jsonSpec['results']={'platform': 'tsmc65lp'}
-	jsonSpec['results'].update({'nominal frequency':Fnom_mdl})
-	jsonSpec['results'].update({'minimum frequency':Fmin_mdl})
-	jsonSpec['results'].update({'maximum frequency':Fmax_mdl})
+	jsonSpec['results'].update({'nominal_frequency':Fnom_mdl})
+	jsonSpec['results'].update({'minimum_frequency':Fmin_mdl})
+	jsonSpec['results'].update({'maximum_frequency':Fmax_mdl})
 	jsonSpec['results'].update({'power':Pwr_mdl})
 	jsonSpec['results'].update({'area':A_pll})
 	jsonSpec['results'].update({'aspect ratio':'1:1'})
@@ -401,9 +401,9 @@ if outMode=='full': #public
 	idK,Kg,Fnom,Fmax,Fmin,Fres,FCR,Iavg,result_exist,dm=HSPICE_result.gen_result_v3(tbDir,Ncc,Ndrv,Nfc,Nstg,num_meas,index,show,vdd,temp)
 
 	jsonSpec['pex sim results']={'platform': 'tsmc65lp'}
-	jsonSpec['pex sim results'].update({'nominal frequency':Fnom})
-	jsonSpec['pex sim results'].update({'minimum frequency':Fmin})
-	jsonSpec['pex sim results'].update({'maximum frequency':Fmax})
+	jsonSpec['pex sim results'].update({'nominal_frequency':Fnom})
+	jsonSpec['pex sim results'].update({'minimum_frequency':Fmin})
+	jsonSpec['pex sim results'].update({'maximum_frequency':Fmax})
 	jsonSpec['pex sim results'].update({'power':Iavg*vdd[0]})
 	jsonSpec['pex sim results'].update({'area':A_core})
 	print("measured specs generated on "+outputDir+'/pll_spec_out.json')

@@ -51,3 +51,5 @@ def algebric_model_evaluator(inputPath,outName,genName,inputsName):
 		
 	r2Score = r2_score(y_real, y_pred)
 	print(r2Score)
+	# df_ypred = pd.DataFrame({"y_pred":y_pred})
+	# df_ypred.to_csv("y_pred.csv")

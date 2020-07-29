@@ -1,0 +1,16 @@
+{
+ "module_name": "memory2",
+ "generator": "memory-gen",
+ "specifications": {
+  "word_size": 32,
+  "nowords": 4096
+ },
+ "results": {
+  "platform": "tsmc65lp",
+  "area": 641775.6240000001,
+  "AspectRatio": 2.715790339833786,
+  "Power": 0.00096,
+  "word_size": 32,
+  "nowords": 4096
+ }
+}

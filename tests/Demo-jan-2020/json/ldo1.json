@@ -1,0 +1,15 @@
+{
+ "module_name": "ldo1",
+ "generator": "ldo-gen",
+ "specifications": {
+  "vin": 1.2,
+  "imax": 0.015
+ },
+ "results": {
+  "platform": "tsmc65lp",
+  "area": 14454.889734932396,
+  "power": 0.0009,
+  "vin": 1.2,
+  "imax": 0.015
+ }
+}

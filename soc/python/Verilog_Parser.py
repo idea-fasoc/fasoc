@@ -73,8 +73,8 @@ def Verilog_cleaner (port_segments,input_output,inout,path):
                 port_segments.append(port_segment_new)
             break
         elif '[' in port_segment:
-            normal=r'\[\d+\s*:\s*\d+\]'
-            un_normal_large=r'\[(\S+)\s*:'
+            normal=r'\[\s*\d+\s*:\s*\d+\s*\]'
+            un_normal_large=r'\[\s*(\S+)\s*:'
 
             if re.fullmatch(normal,port_segment):
                 large_text=r'(\d+):'
@@ -103,6 +103,10 @@ def Verilog_cleaner (port_segments,input_output,inout,path):
 
     port["direction"] = inout
     port_name = port_segments[-1]
+    if port_segments[-1] != ',':
+        port_name = port_segments[-1]
+    else:
+        port_name = port_segments[-2]
     for character in forbidden:
         port_name = (port_name.split(character))[0]
     port["name"] = port_name

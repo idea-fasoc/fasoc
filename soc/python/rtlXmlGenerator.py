@@ -159,12 +159,12 @@ def rtlXmlGenerator(configJson,designJson,outputDir,ipXactDir):
     filesetref_localname=root.createElement('spirit:localName')
     filesetref_localname.appendChild(root.createTextNode(designModule))#Verilog file name
     view_filesetref.appendChild(filesetref_localname)
-        
+
 
     model_ports=root.createElement('spirit:ports')
     component_model.appendChild(model_ports)
     jsn_ports = Verilog_Parser(designJson["src"])
-        
+
     if "interfaces" in configJson:
         for jsn_interface in jsn_interfaces:
             jsn_interface_name = jsn_interface["name"]

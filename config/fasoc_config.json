@@ -7,6 +7,7 @@
         {
           "name": "PLL_APBS",
           "type": "apb-slave",
+          "position": "E",
           "map":
             {
                "PCLK":"PCLK",
@@ -14,14 +15,14 @@
                "PSEL":"PSELx",
                "PADDR":{
                   "name":"PADDR",
-                  "width":4},
+                  "width":12},
                "PENABLE":"PENABLE",
                "PWRITE":"PWRITE",
-               "PWDATA":{
-                  "name":"PWDATA",
-                  "width":32},
                "PRDATA":{
                   "name":"PRDATA",
+                  "width":32},
+               "PWDATA":{
+                  "name":"PWDATA",
                   "width":32},
                "PREADY":"PREADY",
                "PSLVERR":"PSLVERR"
@@ -30,20 +31,26 @@
       ],
       "ports": [
         {
+          "position": "W",
+          "direction": "in",
+          "name": "CLKREF",
+          "type": "clock"
+        },
+        {
+          "position": "W",
           "direction": "out",
-          "name": "CLKOUT",
+          "name": "CLK_OUT",
           "type": "clock"
         }
       ]
     },
     "adc-gen": {
-      "path": "./generators/adc-gen",
+      "path": "./generators/adc-gen/tools/adc-gen.py",
       "interfaces": [
         {
-          "addrwidth": 4,
-          "datawidth": 32,
           "name": "ADC_APBS",
           "type": "apb-slave",
+          "position": "E",
           "map":
             {
                "PCLK":"PCLK",
@@ -101,22 +108,20 @@
       ]
     },
     "cdc-gen": {
-      "path": "./generators/cdc-gen",
+      "path": "./generators/cdc-gen/tools/cdc-gen.py",
+      "position": "E",
       "interfaces": [
         {
-          "addrwidth": 4,
-          "datawidth": 32,
           "name": "CDC_APBS",
           "type": "apb-slave",
           "map":
             {
                "PCLK":"PCLK",
-               "PRESETN":"PRESETn",
-               "PCLKEN":"PCLKEN",
+               "PRESETn":"PRESETn",
                "PSEL":"PSELx",
                "PADDR":{
                   "name":"PADDR",
-                  "width":4},
+                  "width":12},
                "PENABLE":"PENABLE",
                "PWRITE":"PWRITE",
                "PWDATA":{
@@ -132,82 +137,19 @@
       ],
       "ports": [
         {
-          "direction": "in",
-          "name": "PRECHARGE",
-          "type": "signal"
-        },
-        {
-          "direction": "in",
-          "name": "VIN",
-          "type": "power"
-        },
-        {
-          "direction": "in",
-          "name": "VDDH",
-          "type": "power"
-        },
-        {
           "direction": "out",
-          "name": "OUT_TOTAL",
-          "type": "signal",
-          "width": 23
-        },
-        {
-          "direction": "out",
-          "name": "OUT_RISE",
-          "type": "signal",
-          "width": 23
-        },
-        {
-          "direction": "out",
-          "name": "OUT_FALL",
-          "type": "signal",
-          "width": 23
-        },
-        {
-          "direction": "out",
-          "name": "OSEN",
+          "name": "CDC_CLKOUT_0",
           "type": "clock"
         },
         {
           "direction": "out",
-          "name": "OREF",
+          "name": "CDC_CLKOUT_1",
           "type": "clock"
         },
         {
-          "direction": "out",
-          "name": "FINISH",
-          "type": "signal"
-        },
-        {
-          "direction": "out",
-          "name": "CONVFINISH",
-          "type": "signal"
-        },
-        {
-          "direction": "out",
-          "name": "LCOUT",
-          "type": "signal"
-        },
-        {
-          "direction": "out",
-          "name": "CLKR",
-          "type": "signal"
-        },
-        {
-          "direction": "out",
-          "name": "CLKF",
-          "type": "signal"
-        },
-        {
-          "direction": "out",
-          "name": "CLK",
-          "type": "signal"
-        },
-        {
-          "direction": "out",
-          "name": "SENSE",
-          "type": "signal"
+          "direction": "inout",
+          "name": "VIN_CDC",
+          "type": "power"
         }
       ]
     },
@@ -296,31 +238,86 @@
     },
     "ldo-gen": {
       "path": "./generators/ldo-gen/tools/ldo_gen.py",
+      "position": "E",
+      "interfaces": [
+        {
+          "name": "LDO_APBS",
+          "type": "apb-slave",
+          "map":
+            {
+               "PCLK":"PCLK",
+               "PRESETn":"PRESETn",
+               "PSEL":"PSELx",
+               "PADDR":{
+                  "name":"PADDR",
+                  "width":12},
+               "PENABLE":"PENABLE",
+               "PWRITE":"PWRITE",
+               "PWDATA":{
+                  "name":"PWDATA",
+                  "width":32},
+               "PRDATA":{
+                  "name":"PRDATA",
+                  "width":32},
+               "PREADY":"PREADY",
+               "PSLVERR":"PSLVERR"
+            }
+        }
+      ],
       "ports": [
         {
+          "position": "N",
           "direction": "in",
-          "name": "PCLK",
+          "name": "SRESETn",
+          "type": "signal"
+        },
+        {
+          "position": "N",
+          "direction": "in",
+          "name": "SS",
+          "type": "signal"
+        },
+        {
+          "position": "N",
+          "direction": "in",
+          "name": "SCLK",
+          "type": "signal"
+        },
+        {
+          "position": "N",
+          "direction": "in",
+          "name": "MOSI",
+          "type": "signal"
+        },
+        {
+          "position": "N",
+          "direction": "out",
+          "name": "MISO",
+          "type": "signal"
+        },
+        {
+          "position": "N",
+          "direction": "in",
+          "name": "CLK",
           "type": "clock"
         },
         {
-          "direction": "in",
-          "name": "reset",
-          "type": "reset"
-        },
-        {
+          "position": "W",
           "direction": "in",
           "name": "Vref",
           "type": "power"
         },
         {
-          "direction": "out",
-          "name": "Vreg",
-          "type": "power"
+          "position": "W",
+          "direction": "in",
+          "name": "SPI_APB_SEL",
+          "type": "signal"
         }
       ]
     },
     "temp-sense-gen": {
       "path": "./generators/temp-sense-gen/tools/temp-sense-gen.py",
+      "position": "E",
       "interfaces": [
         {
           "name": "TEMP_APBS",
@@ -332,7 +329,7 @@
                "PSEL":"PSELx",
                "PADDR":{
                   "name":"PADDR",
-                  "width":4},
+                  "width":12},
                "PENABLE":"PENABLE",
                "PWRITE":"PWRITE",
                "PWDATA":{
@@ -346,20 +343,24 @@
             },
         "ports": [
           {
+          "position": "W",
           "direction": "in",
           "name": "CLK_REF",
           "type": "clock"
           },
           {
+          "position": "W",
           "direction": "out",
           "name": "CLKOUT",
           "type": "clock"
           },
           {
+          "position": "W",
           "direction": "in",
           "name": "VIN_TEMPSENSE",
           "type": "power"
-          }]
+          }
+         ]
         } 
       ]
     },
@@ -369,6 +370,7 @@
         {
           "name": "MEM_APBS",
           "type": "apb-slave",
+          "position": "S",
           "map":
             {
                "pclk":"PCLK",
@@ -376,7 +378,7 @@
                "psel":"PSELx",
                "paddr":{
                   "name":"PADDR",
-                  "width":4},
+                  "width":12},
                "penable":"PENABLE",
                "pwrite":"PWRITE",
                "pwdata":{
@@ -387,107 +389,224 @@
                   "width":32},
                "pready":"PREADY",
                "pslverr":"PSLVERR"
-            }
+            },
+        "ports": [
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "TEST_MODE_pad",
+          "type": "signal"
+          },
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "CLK_IN_pad",
+          "type": "clock"
+          },
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "RESET_pad",
+          "type": "reset"
+          },
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "DATA_REQ_pad",
+          "type": "signal"
+          },
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "WE_pad",
+          "type": "signal"
+          },
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "SPI_CLOCK_pad",
+          "type": "signal"
+          },
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "SPI_MOSI_pad",
+          "type": "signal"
+          },
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "SPI_RST_pad",
+          "type": "signal"
+          },
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "SPI_SCLK_pad",
+          "type": "signal"
+          },
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "SPI_SS_pad",
+          "type": "signal"
+          },
+          {
+          "position": "W",
+          "direction": "out",
+          "name": "DOUT32_PO",
+          "type": "signal"
+          },
+          {
+          "position": "W",
+          "direction": "out",
+          "name": "SPI_MISO_PO",
+          "type": "signal"
+          }
+         ]
         }
       ]
     },
-    "fasoc_m0mcu_rtl": {
-      "interfaces": [
-        {
-          "name": "M0MCU_AHBM",
-          "type": "ahb-master",
-          "map":
-            {
-               "ext_HCLK":"HCLK",
-               "ext_HBURST": "HBURST",
-               "ext_HRESETn":"HRESETn",
-               "ext_HSEL":"HSELx",
-               "ext_HADDR":{
-                  "name":"HADDR",
-                  "width":16},
-               "ext_HTRANS":{
-                  "name":"HTRANS",
-                  "width":2},
-               "ext_HWRITE":"HWRITE",
-               "ext_HSIZE":{
-                  "name":"HSIZE",
-                  "width":3},
-               "ext_HPROT":{
-                  "name":"HPROT",
-                  "width":4},
-               "ext_HREADY":"HREADY",
-               "ext_HWDATA":{
-                  "name":"HWDATA",
-                  "width":32},
-               "ext_HREADYOUT":"HREADYOUT",
-               "ext_HRDATA":{
-                  "name":"HRDATA",
-                  "width":32},
-               "ext_HRESP":"HRESP"
-            }
-        }
-      ]
+    "ldo_mux_rtl": {
+      "path": "./private/tests/tool/tape_out/fasoc_test/src/ldo_mux.v"
     },
-    "cmsdk_ahb_to_apb_rtl": {
+    "m0mcu_rtl": {
+      "path": "./private/tests/tool/tape_out/fasoc_test/m0sdk/systems/cortex_m0_mcu/verilog/m0_wrapper.v",
       "interfaces": [
         {
-          "name": "AHB_S",
-          "type": "ahb-slave",
+          "name": "M0_APB0",
+          "type": "apb-slave",
           "map":
             {
-               "HCLK":"HCLK",
-               "HBURST":"HBURST",
-               "HRESETn":"HRESETn",
-               "HADDR":{
-                  "name":"HADDR",
-                  "width":16},
-               "HSEL":"HSELx",
-               "HTRANS":{
-                  "name":"HTRANS",
-                  "width":2},
-               "HWRITE":"HWRITE",
-               "HPROT":{
-                  "name":"HPROT",
-                  "width":4},
-               "HSIZE":{
-                  "name":"HSIZE",
-                  "width":3},
-               "HREADY":"HREADY",
-               "HWDATA":{
-                  "name":"HWDATA",
-                  "width":32},
-               "HRDATA":{
-                  "name":"HRDATA",
-                  "width":32},
-               "HREADYOUT":"HREADYOUT",
-               "HRESP":"HRESP"
+               "apb0_psel":"PSELx"
             }
         },
         {
-          "name": "APB_M",
-          "type": "apb-master",
+          "name": "M0_APB1",
+          "type": "apb-slave",
           "map":
             {
-               "PPROT":"PPROT",
-               "PSTRB":"PSTRB",
-               "PCLKEN":"PCLKEN",
-               "PSEL":"PSELx",
-               "PADDR":{
-                  "name":"PADDR",
-                  "width":16},
-               "PENABLE":"PENABLE",
-               "PWRITE":"PWRITE",
-               "PWDATA":{
-                  "name":"PWDATA",
-                  "width":32},
-               "PRDATA":{
+               "apb1_psel":"PSELx",
+               "apb1_pready":"PREADY",
+               "apb1_prdata":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY":"PREADY",
-               "PSLVERR":"PSLVERR"
+               "apb1_pslverr":"PSLVERR"
+            }
+        },
+        {
+          "name": "M0_APB2",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb2_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB3",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb3_psel":"PSELx"
+            }
+        },
+                {
+          "name": "M0_APB4",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb4_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB5",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb5_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB6",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb6_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB7",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb7_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB8",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb8_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB9",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb9_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB10",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb10_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB11",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb11_psel":"PSELx"
+            }
+        },
+                {
+          "name": "M0_APB12",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb12_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB13",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb13_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB14",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb14_psel":"PSELx"
+            }
+        },
+        {
+          "name": "M0_APB15",
+          "type": "apb-slave",
+          "map":
+            {
+               "apb15_psel":"PSELx"
             }
         }
-      ]
+      ]  
     },
     "cmsdk_apb_slave_mux_rtl": {
       "interfaces": [
@@ -497,10 +616,10 @@
           "map":
             {
                "PSEL0":"PSELx",
+               "PREADY0":"PREADY",
                "PRDATA0":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY0":"PREADY",
                "PSLVERR0":"PSLVERR"
             }
         },
@@ -510,10 +629,10 @@
           "map":
             {
                "PSEL1":"PSELx",
+               "PREADY1":"PREADY",
                "PRDATA1":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY1":"PREADY",
                "PSLVERR1":"PSLVERR"
             }
         },
@@ -523,10 +642,10 @@
           "map":
             {
                "PSEL2":"PSELx",
+               "PREADY2":"PREADY",
                "PRDATA2":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY2":"PREADY",
                "PSLVERR2":"PSLVERR"
             }
         },
@@ -536,10 +655,10 @@
           "map":
             {
                "PSEL3":"PSELx",
+               "PREADY3":"PREADY",
                "PRDATA3":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY3":"PREADY",
                "PSLVERR3":"PSLVERR"
             }
         },
@@ -549,10 +668,10 @@
           "map":
             {
                "PSEL4":"PSELx",
+               "PREADY4":"PREADY",
                "PRDATA4":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY4":"PREADY",
                "PSLVERR4":"PSLVERR"
             }
         },
@@ -562,10 +681,10 @@
           "map":
             {
                "PSEL5":"PSELx",
+               "PREADY5":"PREADY",
                "PRDATA5":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY5":"PREADY",
                "PSLVERR5":"PSLVERR"
             }
         },
@@ -575,10 +694,10 @@
           "map":
             {
                "PSEL6":"PSELx",
+               "PREADY6":"PREADY",
                "PRDATA6":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY6":"PREADY",
                "PSLVERR6":"PSLVERR"
             }
         },
@@ -588,10 +707,10 @@
           "map":
             {
                "PSEL7":"PSELx",
+               "PREADY7":"PREADY",
                "PRDATA7":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY7":"PREADY",
                "PSLVERR7":"PSLVERR"
             }
         },
@@ -601,10 +720,10 @@
           "map":
             {
                "PSEL8":"PSELx",
+               "PREADY8":"PREADY",
                "PRDATA8":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY8":"PREADY",
                "PSLVERR8":"PSLVERR"
             }
         },
@@ -614,10 +733,10 @@
           "map":
             {
                "PSEL9":"PSELx",
+               "PREADY9":"PREADY",
                "PRDATA9":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY9":"PREADY",
                "PSLVERR9":"PSLVERR"
             }
         },
@@ -627,10 +746,10 @@
           "map":
             {
                "PSEL10":"PSELx",
+               "PREADY10":"PREADY",
                "PRDATA10":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY10":"PREADY",
                "PSLVERR10":"PSLVERR"
             }
         },
@@ -640,10 +759,10 @@
           "map":
             {
                "PSEL11":"PSELx",
+               "PREADY11":"PREADY",
                "PRDATA11":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY11":"PREADY",
                "PSLVERR11":"PSLVERR"
             }
         },
@@ -653,10 +772,10 @@
           "map":
             {
                "PSEL12":"PSELx",
+               "PREADY12":"PREADY",
                "PRDATA12":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY12":"PREADY",
                "PSLVERR12":"PSLVERR"
             }
         },
@@ -666,10 +785,10 @@
           "map":
             {
                "PSEL13":"PSELx",
+               "PREADY13":"PREADY",
                "PRDATA13":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY13":"PREADY",
                "PSLVERR13":"PSLVERR"
             }
         },
@@ -679,10 +798,10 @@
           "map":
             {
                "PSEL14":"PSELx",
+               "PREADY14":"PREADY",
                "PRDATA14":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY14":"PREADY",
                "PSLVERR14":"PSLVERR"
             }
         },
@@ -692,10 +811,10 @@
           "map":
             {
                "PSEL15":"PSELx",
+               "PREADY15":"PREADY",
                "PRDATA15":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY15":"PREADY",
                "PSLVERR15":"PSLVERR"
             }
         },
@@ -705,10 +824,10 @@
           "map":
             {
                "PSEL":"PSELx",
+               "PREADY":"PREADY",
                "PRDATA":{
                   "name":"PRDATA",
                   "width":32},
-               "PREADY":"PREADY",
                "PSLVERR":"PSLVERR"
             }
         }

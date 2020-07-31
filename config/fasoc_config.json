@@ -304,8 +304,8 @@
         {
           "position": "W",
           "direction": "in",
-          "name": "Vref",
-          "type": "power"
+          "name": "VREF",
+          "type": "signal"
         },
         {
           "position": "W",
@@ -340,7 +340,9 @@
                   "width":32},
                "PREADY":"PREADY",
                "PSLVERR":"PSLVERR"
-            },
+            }
+          }
+        ],
         "ports": [
           {
           "position": "W",
@@ -360,10 +362,8 @@
           "name": "VIN_TEMPSENSE",
           "type": "power"
           }
-         ]
-        } 
-      ]
-    },
+        ]
+      },
     "memory-gen": {
       "path": "./generators/memory-gen/bin/MemGen.py",
       "interfaces": [
@@ -389,7 +389,9 @@
                   "width":32},
                "pready":"PREADY",
                "pslverr":"PSLVERR"
-            },
+              }
+            }
+          ],
         "ports": [
           {
           "position": "W",
@@ -464,11 +466,47 @@
           "type": "signal"
           }
          ]
-        }
-      ]
-    },
+       },
     "ldo_mux_rtl": {
       "path": "./private/tests/tool/tape_out/fasoc_test/src/ldo_mux.v"
+    },
+    "gpio_rtl": {
+      "path": "./private/tests/tool/tape_out/fasoc_test/src/gpio_apb.v",
+      "position": "E",
+      "interfaces": [
+        {
+          "name": "GPIO_APBS",
+          "type": "apb-slave",
+          "map":
+            {
+               "PCLK":"PCLK",
+               "PRESETn":"PRESETn",
+               "PSEL":"PSELx",
+               "PADDR":{
+                  "name":"PADDR",
+                  "width":12},
+               "PENABLE":"PENABLE",
+               "PWRITE":"PWRITE",
+               "PWDATA":{
+                  "name":"PWDATA",
+                  "width":32},
+               "PRDATA":{
+                  "name":"PRDATA",
+                  "width":32},
+               "PREADY":"PREADY",
+               "PSLVERR":"PSLVERR"
+            }
+        }
+      ],
+      "ports": [
+        {
+          "position": "N",
+          "direction": "in",
+          "name": "GPIO_0",
+          "width": 32,
+          "type": "signal"
+        }
+      ]
     },
     "m0mcu_rtl": {
       "path": "./private/tests/tool/tape_out/fasoc_test/m0sdk/systems/cortex_m0_mcu/verilog/m0_wrapper.v",

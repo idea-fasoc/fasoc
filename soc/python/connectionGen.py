@@ -24,7 +24,7 @@
 
 import json
 
-def connectionGen(generator,instance,module_number,designJson,designDir):
+def connectionGen(generator,instance,module_number,designJson,designDir,ldo_number,pll_number):
 
 #------------------------------------------------------------------------------------
 
@@ -100,6 +100,14 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 			module_m0 = module["module_name"]
 			instance_m0 = module["instance_name"]
 
+		elif module["generator"] == "ldo_mux_rtl":
+			module_ldo_mux = module["module_name"]
+			instance_ldo_mux = module["instance_name"]
+
+		elif module["generator"] == "gpio_rtl":
+			module_gpio = module["module_name"]
+			instance_gpio = module["instance_name"]
+
 		else:
 			total_gen_numbers += 1
 
@@ -108,6 +116,8 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 		if "connections" in designJson:
 			del designJson["connections"]
 		connections = []
+
+# Toplevel Connections
 
 		addConnection_from_to("clock",False,"toplevel","XTAL1_PAD",[0,0],[instance_m0],["XTAL1_PAD"],[[0,0]],[False,0])
 		addConnection_from_to("clock",False,instance_m0,"XTAL2_PAD",[0,0],["toplevel"],["XTAL2_PAD"],[[0,0]],[False,0])
@@ -160,12 +170,38 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 		addConnection_from_to("adhoc",False,"toplevel","SWDIOTMS",[0,0],[instance_m0],["SWDIOTMS"],[[0,0]],[False,0])
 		addConnection_from_to("adhoc",False,"toplevel","SWCLKTCK",[0,0],[instance_m0],["SWCLKTCK"],[[0,0]],[False,0])
 		
+
+#RTL Connections
+		addConnection_from_to("adhoc",False,instance_slave,"PSEL0",[0,0],[instance_gpio],["PSEL"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",True,instance_slave,"PRDATA0",[31,0],[instance_gpio],["PRDATA"],[[31,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_slave,"PREADY0",[0,0],[instance_gpio],["PREADY"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_slave,"PSLVERR0",[0,0],[instance_gpio],["PSLVERR"],[[0,0]],[False,0])
+		
 		for i in range(0,16):
 			#addConnection_from_to("apb",False,instance_slave,"APBM" + str(i),[0,0],[instance_m0],["M0_APB" + str(i)],[[0,0]],[False,0])
 			if i != 1:
 				addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(i),[0,0],[instance_m0],["apb" + str(i) + "_psel"],[[0,0]],[False,0])
 		addConnection_from_to("apb",False,instance_slave,"APBM1",[0,0],[instance_m0],["M0_APB1"],[[0,0]],[False,0])
 
+		addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[15,12],[instance_slave],["DECODE4BIT"],[[3,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"i_psel",[0,0],[instance_slave],["PSEL"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",False,instance_m0,"i_pready_mux",[0,0],[instance_slave],["PREADY"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",True,instance_m0,"i_prdata_mux",[31,0],[instance_slave],["PRDATA"],[[31,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"i_pslverr_mux",[0,0],[instance_slave],["PSLVERR"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",True,instance_m0,"LDO_SPI_SS",[1,0],[instance_ldo_mux],["LDO_SPI_SS"],[[1,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_MISO",[0,0],[instance_ldo_mux],["LDO_SPI_MISO"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[11,0],[instance_gpio],["PADDR"],[[11,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance_gpio],["PWRITE"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance_gpio],["PENABLE"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance_gpio],["PWDATA"],[[31,0]],[False,0])
+
+		addConnection_from_to("clock",False,instance_m0,"PCLK",[0,0],[instance_gpio],["PCLK"],[[0,0]],[False,0])
+		addConnection_from_to("reset",False,instance_m0,"PRESETn",[0,0],[instance_gpio],["PRESETn"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",True,instance_m0,"GPIO_O",[31,0],[instance_gpio],["GPIO_O"],[[31,0]],[False,0])
 
 	if "connections" in designJson:
 		connections = designJson["connections"]
@@ -210,14 +246,22 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 		
 		if (generator == 'ldo-gen'):
 			#addConnection_from_to("apb",False,instance_slave,"APBM" + str(module_number),[0,0],[instance],["LDO_APBS"],[[0,0]],[False,0])
-			if module_number == 0:
-				module_no = 0
-			else:
-				module_no = module_number + 1
-			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_no),[0,0],[instance],["PSEL"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PRDATA" + str(module_no),[0,0],[instance],["PRDATA"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_no),[0,0],[instance],["PREADY"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_no),[0,0],[instance],["PSLVERR"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_number+2),[0,0],[instance],["PSEL"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_slave,"PRDATA" + str(module_number+2),[31,0],[instance],["PRDATA"],[[31,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_number+2),[0,0],[instance],["PREADY"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_number+2),[0,0],[instance],["PSLVERR"],[[0,0]],[False,0])
+
+			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[11,0],[instance],["PADDR"],[[11,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance],["PWRITE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance],["PENABLE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance],["PWDATA"],[[31,0]],[False,0])
+
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_RESETn",[0,0],[instance],["SRESETn"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_SCLK",[0,0],[instance],["SCLK"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_MOSI",[0,0],[instance],["MOSI"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_APB_SEL",[0,0],[instance],["SPI_APB_SEL"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_VREF",[0,0],[instance],["VREF"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_REFCLK",[0,0],[instance],["CLK"],[[0,0]],[False,0])
 
 			if not tag_top_PCLK:
 				addConnection_from_to("clock",False,instance_m0,"PCLK",[0,0],[instance],["PCLK"],[[0,0]],[False,0])
@@ -229,16 +273,33 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 			else:
 				addConnection_to(connection_top_PRESETn,False,[instance],["PRESETn"],[[0,0]])
 
+			addConnection_from_to("adhoc",False,instance_ldo_mux,"LDO_SPI_"+str(ldo_number)+"_MISO",[0,0],[instance],["MISO"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_ldo_mux,"LDO_SPI_"+str(ldo_number)+"_SS",[0,0],[instance],["SS"],[[0,0]],[False,0])
+
 		elif (generator == 'memory-gen'):
 			#addConnection_from_to("apb",False,instance_slave,"APBM" + str(module_number),[0,0],[instance],["MEM_APBS"],[[0,0]],[False,0])
-			if module_number == 0:
-				module_no = 0
-			else:
-				module_no = module_number + 1
-			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_no),[0,0],[instance],["psel"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PRDATA" + str(module_no),[0,0],[instance],["prdata"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_no),[0,0],[instance],["pready"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_no),[0,0],[instance],["pslverr"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_number+2),[0,0],[instance],["psel"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_slave,"PRDATA" + str(module_number+2),[31,0],[instance],["prdata"],[[31,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_number+2),[0,0],[instance],["pready"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_number+2),[0,0],[instance],["pslverr"],[[0,0]],[False,0])
+
+			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[13,0],[instance],["paddr"],[[11,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance],["pwrite"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance],["penable"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance],["pwdata"],[[31,0]],[False,0])
+
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_DATA_REQ",[0,0],[instance],["DATA_REQ_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_WE",[0,0],[instance],["WE_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_TEST_MODE",[0,0],[instance],["TEST_MODE_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_CLK_IN",[0,0],[instance],["CLK_IN_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_RESET",[0,0],[instance],["RESET_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_CLOCK",[0,0],[instance],["SPI_CLOCK_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_MOSI",[0,0],[instance],["SPI_MOSI_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_RST",[0,0],[instance],["SPI_RST_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_SCLK",[0,0],[instance],["SPI_SCLK_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_SS",[0,0],[instance],["SPI_SS_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_DOUT32",[0,0],[instance],["DOUT32_PO"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_MISO",[0,0],[instance],["SPI_MISO_PO"],[[0,0]],[False,0])
 
 			if not tag_top_PCLK:
 				addConnection_from_to("clock",False,instance_m0,"PCLK",[0,0],[instance],["pclk"],[[0,0]],[False,0])
@@ -252,16 +313,17 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 
 		elif (generator == 'pll-gen'):
 			#addConnection_from_to("apb",False,instance_slave,"APBM" + str(module_number),[0,0],[instance],["PLL_APBS"],[[0,0]],[False,0])
-			if module_number == 0:
-				module_no = 0
-			else:
-				module_no = module_number + 1
-			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_no),[0,0],[instance],["PSEL"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PRDATA" + str(module_no),[0,0],[instance],["PRDATA"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_no),[0,0],[instance],["PREADY"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_no),[0,0],[instance],["PSLVERR"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_number+2),[0,0],[instance],["PSEL"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_slave,"PRDATA" + str(module_number+2),[31,0],[instance],["PRDATA"],[[31,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_number+2),[0,0],[instance],["PREADY"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_number+2),[0,0],[instance],["PSLVERR"],[[0,0]],[False,0])
 
 			addConnection_from_to("clock",False,"toplevel","SYSCLKOUT" + str(module_number),[0,0],[instance],["CLKOUT"],[[0,0]],[False,0])
+
+			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[11,0],[instance],["PADDR"],[[11,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance],["PWRITE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance],["PENABLE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance],["PWDATA"],[[31,0]],[False,0])
 
 			if not tag_top_PCLK:
 				addConnection_from_to("clock",False,instance_m0,"PCLK",[0,0],[instance],["PCLK"],[[0,0]],[False,0])
@@ -273,18 +335,22 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 			else:
 				addConnection_to(connection_top_PRESETn,False,[instance],["PRESETn"],[[0,0]])
 
+			addConnection_from_to("adhoc",False,instance_m0,"PLL_CLKREF"+str(pll_number),[0,0],[instance],["CLKREF"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"PLL_CLKOUT"+str(pll_number),[0,0],[instance],["CLK_OUT"],[[0,0]],[False,0])
+
 		elif (generator == 'temp-sense-gen'):
 			#addConnection_from_to("apb",False,instance_slave,"APBM" + str(module_number),[0,0],[instance],["TEMP_APBS"],[[0,0]],[False,0])
-			if module_number == 0:
-				module_no = 0
-			else:
-				module_no = module_number + 1
-			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_no),[0,0],[instance],["PSEL"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PRDATA" + str(module_no),[0,0],[instance],["PRDATA"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_no),[0,0],[instance],["PREADY"],[[0,0]],[False,0])
-			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_no),[0,0],[instance],["PSLVERR"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_number+2),[0,0],[instance],["PSEL"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_slave,"PRDATA" + str(module_number+2),[31,0],[instance],["PRDATA"],[[31,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_number+2),[0,0],[instance],["PREADY"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_number+2),[0,0],[instance],["PSLVERR"],[[0,0]],[False,0])
 
 			addConnection_from_to("clock",False,"toplevel","SYSCLKOUT" + str(module_number),[0,0],[instance],["CLKOUT"],[[0,0]],[False,0])
+
+			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[11,0],[instance],["PADDR"],[[11,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance],["PWRITE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance],["PENABLE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance],["PWDATA"],[[31,0]],[False,0])
 
 			if not tag_top_PCLK:
 				addConnection_from_to("clock",False,instance_m0,"PCLK",[0,0],[instance],["PCLK"],[[0,0]],[False,0])

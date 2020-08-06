@@ -342,7 +342,7 @@ if outMode!='full': #public
 	jsonSpec['results'].update({'maximum_frequency':Fmax_mdl})
 	jsonSpec['results'].update({'power':Pwr_mdl})
 	jsonSpec['results'].update({'area':A_pll})
-	jsonSpec['results'].update({'aspect ratio':'1:1'})
+	jsonSpec['results'].update({'aspect_ratio':'1:1'})
 	if outMode=='macro' or outMode=='full':
 		jsonSpec['results'].update({'area':A_core})
 	print("model predicted specs generated on "+outputDir+'/'+designName+'.json')

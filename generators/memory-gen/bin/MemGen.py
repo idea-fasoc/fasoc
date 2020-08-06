@@ -445,8 +445,8 @@ class MemGen():
                        mem_ar = CORE_WIDTH/CORE_HEIGHT
                        mem_power =  nofbanks*100e-6*1.2 ;#Was in watts, changing the units to milli watts as per with top-level requirements. Sumanth, 9/26/2019 
                        self.config['results'].update({'area': mem_area}) 
-                       self.config['results'].update({'AspectRatio': mem_ar})
-                       self.config['results'].update({'Power': mem_power})
+                       self.config['results'].update({'aspect_ratio': str(mem_ar)+':1'})
+                       self.config['results'].update({'power': mem_power})
                        self.config['results'].update({'word_size': self.word_size })
                        self.config['results'].update({'nowords': self.nowords})
 
@@ -533,10 +533,10 @@ class MemGen():
                        mem_ar = CORE_WIDTH/CORE_HEIGHT
                        mem_power =  nofbanks*100e-6*1.2 ;#Was in watts, changing the units to milli watts as per the top-level requirements. Sumanth, 9/26/2019
                        self.config['results'].update({'area': mem_area})
-                       self.config['results'].update({'AspectRatio': mem_ar})
-                       self.config['results'].update({'Power': mem_power})
-                       self.config['results'].update({'AspectRatio': mem_ar})
-                       self.config['results'].update({'Power': mem_power})
+                       self.config['results'].update({'aspect_ratio': str(mem_ar)+':1'})
+                       self.config['results'].update({'power': mem_power})
+                       self.config['results'].update({'aspect_ratio': str(mem_ar)+':1'})
+                       self.config['results'].update({'power': mem_power})
                        self.config['results'].update({'word_size': self.word_size })
                        self.config['results'].update({'nowords': self.nowords})
 

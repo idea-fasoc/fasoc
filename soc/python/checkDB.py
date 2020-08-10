@@ -29,130 +29,130 @@ import sys
 from modifyDBFiles import modifyDBFiles
 
 def checkDB(moduleJson,databaseDir,outputDir,ipXactDir,module_number,designName):
-    genJson = moduleJson['generator']
-    searchDir = os.path.join(databaseDir,'JSN',genJson)
-    excluded_name = ['LDO_CONTROLLER','decoder_3to8','mux_8to1','ANALOG_CORE','bu_dco_8stg','dco_8stg','dco_10drv_10cc_30fc_18stg','dco_CC','dco_FC','DCO_MODEL','FUNCTIONS','PLL_CONTROLLER','PLL_CONTROLLER_TDC_COUNTER','SSC_GENERATOR','synth_dco','synth_pll_dco_interp','synth_pll_dco_outbuff','TB_synth_pll','TDC_COUNTER','test_synth_pll','counter','TEMP_ANALOG.nl','TEMP_ANALOG_test.nl','TEMP_AUTO_def','tempsenseInst']
-    if 'specifications' in moduleJson:
-        target_specsJson = moduleJson['specifications']
+	genJson = moduleJson['generator']
+	searchDir = os.path.join(databaseDir,'JSN',genJson)
+	excluded_name = ['LDO_CONTROLLER','decoder_3to8','mux_8to1','ANALOG_CORE','bu_dco_8stg','dco_8stg','dco_10drv_10cc_30fc_18stg','dco_CC','dco_FC','DCO_MODEL','FUNCTIONS','PLL_CONTROLLER','PLL_CONTROLLER_TDC_COUNTER','SSC_GENERATOR','synth_dco','synth_pll_dco_interp','synth_pll_dco_outbuff','TB_synth_pll','TDC_COUNTER','test_synth_pll','counter','TEMP_ANALOG.nl','TEMP_ANALOG_test.nl','TEMP_AUTO_def','tempsenseInst']
+	if 'specifications' in moduleJson:
+		target_specsJson = moduleJson['specifications']
 
-        if os.path.exists(searchDir):
-            if len(os.listdir(searchDir)) != 0:
-                for file in os.listdir(searchDir):
-                    overlap_tag = True
-                    with open(os.path.join(searchDir,file), 'r') as search_file:
-                        srchJson = json.load(search_file)
-                    if 'specifications' in srchJson:
-                        srch_specifications= srchJson['specifications']
+		if os.path.exists(searchDir):
+			if len(os.listdir(searchDir)) != 0:
+				for file in os.listdir(searchDir):
+					overlap_tag = True
+					with open(os.path.join(searchDir,file), 'r') as search_file:
+						srchJson = json.load(search_file)
+					if 'specifications' in srchJson:
+						srch_specifications= srchJson['specifications']
 
-                        for target_specName, target_specVal in target_specsJson.items():
+						for target_specName, target_specVal in target_specsJson.items():
 
-                            if target_specVal != "" and isinstance(target_specVal, str) != True:
-                                if target_specName in srch_specifications:
-                                    srch_specVal = srch_specifications[target_specName]
+							if target_specVal != "" and isinstance(target_specVal, str) != True:
+								if target_specName in srch_specifications:
+									srch_specVal = srch_specifications[target_specName]
 
-                                    if srch_specVal != "" and isinstance(srch_specVal, str) != True:
-                                        if isinstance(target_specVal, dict):
-                                            if "min" in target_specVal:
-                                                if isinstance(srch_specVal, dict):
-                                                    if srch_specVal["min"] < target_specVal["min"]:
-                                                        overlap_tag = False
-                                                        break
-                                                else:
-                                                    if srch_specVal < target_specVal["min"]:
-                                                        overlap_tag = False
-                                                        break 
+									if srch_specVal != "" and isinstance(srch_specVal, str) != True:
+										if isinstance(target_specVal, dict):
+											if "min" in target_specVal:
+												if isinstance(srch_specVal, dict):
+													if srch_specVal["min"] < target_specVal["min"]:
+														overlap_tag = False
+														break
+												else:
+													if srch_specVal < target_specVal["min"]:
+														overlap_tag = False
+														break 
 
-                                            if "max" in target_specVal:
-                                                if isinstance(srch_specVal, dict):
-                                                    if srch_specVal["max"] > target_specVal["max"]:
-                                                        overlap_tag = False
-                                                        break
-                                                else:
-                                                    if srch_specVal > target_specVal["max"]:
-                                                        overlap_tag = False
-                                                        break
+											if "max" in target_specVal:
+												if isinstance(srch_specVal, dict):
+													if srch_specVal["max"] > target_specVal["max"]:
+														overlap_tag = False
+														break
+												else:
+													if srch_specVal > target_specVal["max"]:
+														overlap_tag = False
+														break
 
-                                        else:
-                                            if "min" in target_specName:
-                                                if isinstance(srch_specVal, dict):
-                                                    if srch_specVal["min"] < target_specVal:
-                                                        overlap_tag = False
-                                                        break
-                                                else:
-                                                    if srch_specVal < target_specVal:
-                                                        overlap_tag = False
-                                                        break
-                                            elif "max" in target_specName:
-                                                if isinstance(srch_specVal, dict):
-                                                    if srch_specVal["max"] > target_specVal:
-                                                        overlap_tag = False
-                                                        break
-                                                else:
-                                                    if srch_specVal > target_specVal:
-                                                        overlap_tag = False
-                                                        break
-                                                    
-                                            else:
+										else:
+											if "min" in target_specName:
+												if isinstance(srch_specVal, dict):
+													if srch_specVal["min"] < target_specVal:
+														overlap_tag = False
+														break
+												else:
+													if srch_specVal < target_specVal:
+														overlap_tag = False
+														break
+											elif "max" in target_specName:
+												if isinstance(srch_specVal, dict):
+													if srch_specVal["max"] > target_specVal:
+														overlap_tag = False
+														break
+												else:
+													if srch_specVal > target_specVal:
+														overlap_tag = False
+														break
+													
+											else:
 
-                                                if isinstance(srch_specVal, dict):
-                                                    if srch_specVal["min"] != target_specVal:
-                                                        overlap_tag = False
-                                                        break
-                                                    if srch_specVal["max"] != target_specVal:
-                                                        overlap_tag = False
-                                                        break
-                                                else:
-                                                    if srch_specVal != target_specVal:
-                                                        overlap_tag = False
-                                                        break                 
+												if isinstance(srch_specVal, dict):
+													if srch_specVal["min"] != target_specVal:
+														overlap_tag = False
+														break
+													if srch_specVal["max"] != target_specVal:
+														overlap_tag = False
+														break
+												else:
+													if srch_specVal != target_specVal:
+														overlap_tag = False
+														break				 
 
-                        if overlap_tag:
-                            found_Filename = os.path.join(databaseDir,'ZIP',(file.split('.'))[0]+'.zip')
-                            if os.path.exists(found_Filename):
-                                print(moduleJson['module_name'] + " has been found at the database")
+						if overlap_tag:
+							found_Filename = os.path.join(databaseDir,'ZIP',(file.split('.'))[0]+'.zip')
+							if os.path.exists(found_Filename):
+								print(moduleJson['module_name'] + " has been found at the database")
 
-                                zip_ref = zipfile.ZipFile(found_Filename, 'r')
-                                zip_ref.extractall(outputDir)
-                                zip_ref.close()
-                                for output_file in os.listdir(outputDir):
-                                    output_file_name = (output_file.split('.'))[0]
-                                    postfix = (output_file.split(output_file_name))[-1] 
-                                    if (not postfix == '.v') or (postfix == '.v' and output_file_name not in excluded_name):
-                                        os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,moduleJson['module_name'] + postfix))
-                                        modifyDBFiles(os.path.join(outputDir,moduleJson['module_name'] + postfix),postfix,moduleJson['module_name'],srchJson["module_name"])
-                                return True
-                            else:#When there is no zipfile it means search was unsuccessfull
-                                return False
+								zip_ref = zipfile.ZipFile(found_Filename, 'r')
+								zip_ref.extractall(outputDir)
+								zip_ref.close()
+								for output_file in os.listdir(outputDir):
+									output_file_name = (output_file.split('.'))[0]
+									postfix = (output_file.split(output_file_name))[-1] 
+									if (not postfix == '.v') or (postfix == '.v' and output_file_name not in excluded_name):
+										os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,moduleJson['module_name'] + postfix))
+										modifyDBFiles(os.path.join(outputDir,moduleJson['module_name'] + postfix),postfix,moduleJson['module_name'],srchJson["module_name"])
+								return True
+							else:#When there is no zipfile it means search was unsuccessfull
+								return False
 
-                return False# when code reaches here it means it could not find the correct file
-            else:#if the database is empty => search was unsuccessfull
-                return False
-        
-        else:#If database does not exist it means search was unsuccessfull
-            return False
+				return False# when code reaches here it means it could not find the correct file
+			else:#if the database is empty => search was unsuccessfull
+				return False
+		
+		else:#If database does not exist it means search was unsuccessfull
+			return False
 
-    else:#If the target file has no specification, all files are acceptable
-        if os.path.exists(searchDir):
-            if len(os.listdir(searchDir)) != 0:
-                with open(os.path.join(searchDir,os.listdir(searchDir)[0]), 'r') as search_file:
-                    srchJson = json.load(search_file) 
-                found_Filename = os.path.join(databaseDir,'ZIP',(os.listdir(searchDir)[0].split('.'))[0]+'.zip')
-                if os.path.exists(found_Filename):
-                    print(moduleJson['module_name'] + " has been found at the database")
-                    zip_ref = zipfile.ZipFile(found_Filename, 'r')
-                    zip_ref.extractall(outputDir)
-                    zip_ref.close()
-                    for output_file in os.listdir(outputDir):
-                        output_file_name = (output_file.split('.'))[0]
-                        postfix = (output_file.split(output_file_name))[-1]
-                        if (not postfix == '.v') or (postfix == '.v' and output_file_name not in excluded_name):
-                            os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,moduleJson['module_name'] + postfix))
-                            modifyDBFiles(os.path.join(outputDir,moduleJson['module_name'] + postfix),postfix,moduleJson['module_name'],srchJson["module_name"])
-                    return True
-                else:#When there is no zipfile it means search was unsuccessfull
-                    return False
+	else:#If the target file has no specification, all files are acceptable
+		if os.path.exists(searchDir):
+			if len(os.listdir(searchDir)) != 0:
+				with open(os.path.join(searchDir,os.listdir(searchDir)[0]), 'r') as search_file:
+					srchJson = json.load(search_file) 
+				found_Filename = os.path.join(databaseDir,'ZIP',(os.listdir(searchDir)[0].split('.'))[0]+'.zip')
+				if os.path.exists(found_Filename):
+					print(moduleJson['module_name'] + " has been found at the database")
+					zip_ref = zipfile.ZipFile(found_Filename, 'r')
+					zip_ref.extractall(outputDir)
+					zip_ref.close()
+					for output_file in os.listdir(outputDir):
+						output_file_name = (output_file.split('.'))[0]
+						postfix = (output_file.split(output_file_name))[-1]
+						if (not postfix == '.v') or (postfix == '.v' and output_file_name not in excluded_name):
+							os.rename(os.path.join(outputDir,output_file),os.path.join(outputDir,moduleJson['module_name'] + postfix))
+							modifyDBFiles(os.path.join(outputDir,moduleJson['module_name'] + postfix),postfix,moduleJson['module_name'],srchJson["module_name"])
+					return True
+				else:#When there is no zipfile it means search was unsuccessfull
+					return False
 
-            else:#if the database is empty => search was unsuccessfull
-                return False
-        else:#If database does not exist it means search was unsuccessfull
-            return False
+			else:#if the database is empty => search was unsuccessfull
+				return False
+		else:#If database does not exist it means search was unsuccessfull
+			return False

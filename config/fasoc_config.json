@@ -467,8 +467,255 @@
           }
          ]
        },
+    "temp_sense_rtl": {
+      "path": "./private/tests/tool/tape_out/fasoc_test/src/temp0_apb.v",
+      "position": "E",
+      "interfaces": [
+        {
+          "name": "TEMP_APBS_rtl",
+          "type": "apb-slave",
+          "map":
+            {
+               "PCLK":"PCLK",
+               "PRESETn":"PRESETn",
+               "PSEL":"PSELx",
+               "PADDR":{
+                  "name":"PADDR",
+                  "width":12},
+               "PENABLE":"PENABLE",
+               "PWRITE":"PWRITE",
+               "PWDATA":{
+                  "name":"PWDATA",
+                  "width":32},
+               "PRDATA":{
+                  "name":"PRDATA",
+                  "width":32},
+               "PREADY":"PREADY",
+               "PSLVERR":"PSLVERR"
+            }
+          }
+        ],
+        "ports": [
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "CLK_REF",
+          "type": "clock"
+          },
+          {
+          "position": "W",
+          "direction": "out",
+          "name": "CLKOUT",
+          "type": "clock"
+          },
+          {
+          "position": "W",
+          "direction": "in",
+          "name": "VIN_TEMPSENSE",
+          "type": "power"
+          }
+        ]
+      },
+    "dcdc_rtl": {
+      "path": "./private/tests/tool/tape_out/fasoc_test/src/dcdc_apb.v",
+      "position": "E",
+      "interfaces": [
+        {
+          "name": "DCDC_APBS_rtl",
+          "type": "apb-slave",
+          "map":
+            {
+               "PCLK":"PCLK",
+               "PRESETN":"PRESETn",
+               "PCLKEN":"PCLKEN",
+               "PSEL":"PSELx",
+               "PADDR":{
+                  "name":"PADDR",
+                  "width":4},
+               "PENABLE":"PENABLE",
+               "PWRITE":"PWRITE",
+               "PWDATA":{
+                  "name":"PWDATA",
+                  "width":32},
+               "PRDATA":{
+                  "name":"PRDATA",
+                  "width":32},
+               "PREADY":"PREADY",
+               "PSLVERR":"PSLVERR"
+            }
+        }
+      ],
+      "ports": [
+        {
+          "direction": "in",
+          "name": "clk0",
+          "type": "clock"
+        },
+        {
+          "direction": "in",
+          "name": "clk0b",
+          "type": "clock"
+        },
+        {
+          "direction": "in",
+          "name": "clk1",
+          "type": "clock"
+        },
+        {
+          "direction": "in",
+          "name": "clk1b",
+          "type": "clock"
+        },
+        {
+          "direction": "in",
+          "name": "rst",
+          "type": "reset"
+        },
+        {
+          "direction": "in",
+          "name": "rstb",
+          "type": "reset"
+        },
+        {
+          "direction": "in",
+          "name": "NC",
+          "type": "power"
+        },
+        {
+          "direction": "out",
+          "name": "VOUT",
+          "type": "power"
+        },
+        {
+          "direction": "in",
+          "name": "VOUT2",
+          "type": "power"
+        },
+        {
+          "direction": "in",
+          "name": "VOUT3",
+          "type": "power"
+        }
+      ]
+    },
     "ldo_mux_rtl": {
       "path": "./private/tests/tool/tape_out/fasoc_test/src/ldo_mux.v"
+    },
+    "ble_rtl": {
+      "path": "./private/tests/tool/tape_out/fasoc_test/src/ble_apb.v",
+      "position": "E",
+      "interfaces": [
+        {
+          "name": "BLE_APBS",
+          "type": "apb-slave",
+          "map":
+            {
+               "PCLK":"PCLK",
+               "PRESETn":"PRESETn",
+               "PSEL":"PSELx",
+               "PADDR":{
+                  "name":"PADDR",
+                  "width":12},
+               "PENABLE":"PENABLE",
+               "PWRITE":"PWRITE",
+               "PWDATA":{
+                  "name":"PWDATA",
+                  "width":32},
+               "PRDATA":{
+                  "name":"PRDATA",
+                  "width":32},
+               "PREADY":"PREADY",
+               "PSLVERR":"PSLVERR"
+            }
+        }
+      ]
+    },
+    "iram_rtl": {
+      "path": "./private/tests/tool/tape_out/fasoc_test/src/iram_apb.v",
+      "position": "E",
+      "interfaces": [
+        {
+          "name": "IRAM_APBS",
+          "type": "apb-slave",
+          "map":
+            {
+               "PCLK":"PCLK",
+               "PRESETn":"PRESETn",
+               "PSEL":"PSELx",
+               "PADDR":{
+                  "name":"PADDR",
+                  "width":12},
+               "PENABLE":"PENABLE",
+               "PWRITE":"PWRITE",
+               "PWDATA":{
+                  "name":"PWDATA",
+                  "width":32},
+               "PRDATA":{
+                  "name":"PRDATA",
+                  "width":32},
+               "PREADY":"PREADY",
+               "PSLVERR":"PSLVERR"
+            }
+        }
+      ]
+    },
+    "dram_rtl": {
+      "path": "./private/tests/tool/tape_out/fasoc_test/src/dram_apb.v",
+      "position": "E",
+      "interfaces": [
+        {
+          "name": "DRAM_APBS",
+          "type": "apb-slave",
+          "map":
+            {
+               "PCLK":"PCLK",
+               "PRESETn":"PRESETn",
+               "PSEL":"PSELx",
+               "PADDR":{
+                  "name":"PADDR",
+                  "width":12},
+               "PENABLE":"PENABLE",
+               "PWRITE":"PWRITE",
+               "PWDATA":{
+                  "name":"PWDATA",
+                  "width":32},
+               "PRDATA":{
+                  "name":"PRDATA",
+                  "width":32},
+               "PREADY":"PREADY",
+               "PSLVERR":"PSLVERR"
+            }
+        }
+      ]
+    },
+    "rom_rtl": {
+      "path": "./private/tests/tool/tape_out/fasoc_test/src/rom_apb.v",
+      "position": "E",
+      "interfaces": [
+        {
+          "name": "ROM_APBS",
+          "type": "apb-slave",
+          "map":
+            {
+               "PCLK":"PCLK",
+               "PRESETn":"PRESETn",
+               "PSEL":"PSELx",
+               "PADDR":{
+                  "name":"PADDR",
+                  "width":12},
+               "PENABLE":"PENABLE",
+               "PWRITE":"PWRITE",
+               "PWDATA":{
+                  "name":"PWDATA",
+                  "width":32},
+               "PRDATA":{
+                  "name":"PRDATA",
+                  "width":32},
+               "PREADY":"PREADY",
+               "PSLVERR":"PSLVERR"
+            }
+        }
+      ]
     },
     "gpio_rtl": {
       "path": "./private/tests/tool/tape_out/fasoc_test/src/gpio_apb.v",

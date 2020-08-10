@@ -22,29 +22,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import argparse  # arguement parsing
-import sys  # exit function
-import shutil  # filesystem manipulation
-import os  # filesystem manipulation
-import subprocess  # process
+import argparse	# arguement parsing
+import sys	# exit function
+import shutil	# filesystem manipulation
+import os	# filesystem manipulation
+import subprocess	# process
 from subprocess import call
 
 soc_dir = os.path.dirname(__file__)
-fasoc_dir  = os.path.relpath(os.path.join(soc_dir,"../.."))
+fasoc_dir	= os.path.relpath(os.path.join(soc_dir,"../.."))
 
 parser = argparse.ArgumentParser(description='Hierarchy Checker Tool')
 parser.add_argument('--list', required=True,
-                    help='The file that include list of the files that shouldbe check')
+					help='The file that include list of the files that shouldbe check')
 args = parser.parse_args()
 
 print("Check list: ", args.list)
 try:
-  with open(args.list,'r') as text_hierarchy_file:
-    text_hierarchy_line = text_hierarchy_file.readlines()
+	with open(args.list,'r') as text_hierarchy_file:
+		text_hierarchy_line = text_hierarchy_file.readlines()
 except ValueError as e:
-  print("Error occurred opening or loading the check list file: ", args.list)
-  print("Exception: ", str(e))
-  sys.exit(1)
+	print("Error occurred opening or loading the check list file: ", args.list)
+	print("Exception: ", str(e))
+	sys.exit(1)
 
 for i in range(0,len(text_hierarchy_line)//2):
 	subprocess.call(['diff', (text_hierarchy_line[2*i].split('\n'))[0], (text_hierarchy_line[2*i+1].split('\n'))[0]])

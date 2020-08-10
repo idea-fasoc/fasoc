@@ -30,37 +30,37 @@ def connectionGen(generator,instance,module_number,designJson,designDir,ldo_numb
 
 	def addConnection_from_to(connection_type,range_tag,instance1,port1,range1,instance2,port2,range2,value):
 # Creating connections
-			connection = {}
-			connection["type"] = connection_type
+		connection = {}
+		connection["type"] = connection_type
 
-			connection_from = {}
-			if not value[0]:
-				connection_from["instance"] = instance1
-				connection_from["port"] = port1
-				if range_tag:
-					connection_from["range"] = {}
-					connection_from["range"]["max"] = range1[0]
-					connection_from["range"]["min"] = range1[1]
-			else:
-				connection_from["value"] = value[1]
-			connection["from"] = connection_from
+		connection_from = {}
+		if not value[0]:
+			connection_from["instance"] = instance1
+			connection_from["port"] = port1
+			if range_tag:
+				connection_from["range"] = {}
+				connection_from["range"]["max"] = range1[0]
+				connection_from["range"]["min"] = range1[1]
+		else:
+			connection_from["value"] = value[1]
+		connection["from"] = connection_from
 
-			connection_to_list = []
-			for i in range(0,len(instance2)):
-				connection_to_dict = {}
-				connection_to_dict["instance"] = instance2[i]
-				connection_to_dict["port"] = port2[i]
-				if range_tag:
-					connection_to_dict["range"] = {}
-					connection_to_dict["range"]["max"] = range2[i][0]
-					connection_to_dict["range"]["min"] = range2[i][1]
-				connection_to_list.append(connection_to_dict)
-			connection["to"] = connection_to_list
-			connections.append(connection)
+		connection_to_list = []
+		for i in range(0,len(instance2)):
+			connection_to_dict = {}
+			connection_to_dict["instance"] = instance2[i]
+			connection_to_dict["port"] = port2[i]
+			if range_tag:
+				connection_to_dict["range"] = {}
+				connection_to_dict["range"]["max"] = range2[i][0]
+				connection_to_dict["range"]["min"] = range2[i][1]
+			connection_to_list.append(connection_to_dict)
+		connection["to"] = connection_to_list
+		connections.append(connection)
 
-			designJson["connections"] = connections
-			with open(designDir, "w") as f:
-				json.dump(designJson, f, indent=True)
+		designJson["connections"] = connections
+		with open(designDir, "w") as f:
+			json.dump(designJson, f, indent=True)
 
 #------------------------------------------------------------------------------------
 

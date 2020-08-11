@@ -1,6 +1,6 @@
 {
  "schema_version": 0.1,
- "design_name": "3ldo_2pll_1mem_1m0",
+ "design_name": "1ldo_1pll_1mem_1m0",
  "tech": "tsmc65lp",
  "strategy": "power",
  "units": {
@@ -18,8 +18,8 @@
   "area": "um2"
  },
  "constraints": {
-  "power": 0.3,
-  "area": 500000
+  "power": 300,
+  "area": 14000000
  },
  "modules": [
   {
@@ -27,26 +27,8 @@
    "instance_name": "i_ldo1",
    "generator": "ldo-gen",
    "specifications": {
-    "vin": 1.2,
-    "imax": 0.015
-   }
-  },
-  {
-   "module_name": "ldo2",
-   "instance_name": "i_ldo2",
-   "generator": "ldo-gen",
-   "specifications": {
-    "vin": 1.2,
-    "imax": 0.003
-   }
-  },
-  {
-   "module_name": "ldo3",
-   "instance_name": "i_ldo3",
-   "generator": "ldo-gen",
-   "specifications": {
-    "vin": 1.2,
-    "imax": 0.025
+    "vin": 1.1,
+    "imax": 0.006
    }
   },
   {
@@ -54,7 +36,7 @@
    "instance_name": "i_mem2",
    "generator": "memory-gen",
    "specifications": {
-    "word_size": 32,
+    "word_size": 64,
     "nowords": 4096
    }
   },
@@ -63,24 +45,15 @@
    "instance_name": "i_pll1",
    "generator": "pll-gen",
    "specifications": {
-    "Fnom_min": 835000000.0,
-    "Fnom_max": 855000000.0
-   }
-  },
-  {
-   "module_name": "pll2",
-   "instance_name": "i_pll2",
-   "generator": "pll-gen",
-   "specifications": {
-    "Fnom_min": 840000000.0,
-    "Fnom_max": 860000000.0
+    "Fnom_min": 510000000,
+    "Fnom_max": 520000000
    }
   },
   {
    "module_name": "cmsdk_apb_slave_mux2",
    "instance_name": "u_apb_slave_mux2",
    "generator": "cmsdk_apb_slave_mux_rtl",
-   "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/cmsdk_apb_slave_mux.v",
+   "src": "/n/trenton/v/fayazi/fasoc/private/tests/fasoc_test/m0sdk/logical/cmsdk_apb_slave_mux/verilog/cmsdk_apb_slave_mux.v",
    "parameters": {
     "PORT0_ENABLE": 0,
     "PORT1_ENABLE": 1,
@@ -101,21 +74,16 @@
    }
   },
   {
-   "module_name": "cmsdk_ahb_to_apb2",
-   "instance_name": "u_ahb_to_apb2",
-   "generator": "cmsdk_ahb_to_apb_rtl",
-   "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/cmsdk_ahb_to_apb.v",
-   "parameters": {
-    "ADDRWIDTH": 16,
-    "REGISTER_RDATA": 1,
-    "REGISTER_WDATA": 0
-   }
+   "module_name": "m0mcu2",
+   "instance_name": "i_m0mcu2",
+   "generator": "m0mcu_rtl",
+   "src": "/n/trenton/v/fayazi/fasoc/private/tests/fasoc_test/m0sdk/systems/cortex_m0_mcu/verilog/m0_wrapper.v"
   },
   {
-   "module_name": "fasoc_m0mcu2",
-   "instance_name": "i_fasoc_m0mcu2",
-   "generator": "fasoc_m0mcu_rtl",
-   "src": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database/verilog/fasoc_m0mcu.v"
+   "module_name": "ldo_mux2",
+   "instance_name": "i_ldo_mux2",
+   "generator": "ldo_mux_rtl",
+   "src": "/n/trenton/v/fayazi/fasoc/private/tests/fasoc_test/src/ldo_mux.v"
   }
  ]
 }

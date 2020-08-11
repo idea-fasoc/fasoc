@@ -46,21 +46,28 @@ def getIDEA_VE(design_element, options = {}) # :nodoc:
     #prints general VEs
     if ve_name == "all" or ve_name == "general"
       vendor_extensions.each do |vendor_extension|
-        # get the correct index for general VEs
-        for ind0 in 0..vendor_extension.elements("VEElement")[0].elements("VEElement").length-1
-          if vendor_extension.elements("VEElement")[0].elements("VEElement")[ind0].get("VEName") == "general"
-            ve_ind = ind0
-            break
+        # get the correct index for instance VEs
+        for ind0 in 0..vendor_extension.elements("VEElement").length-1
+          if vendor_extension.elements("VEElement")[ind0].get("VEName") == design_element.get("Name")
+            # get the correct index for general VEs
+            for ind1 in 0..vendor_extension.elements("VEElement")[ind0].elements("VEElement").length-1
+              if vendor_extension.elements("VEElement")[ind0].elements("VEElement")[ind1].get("VEName") == "general"
+                ve_ind0 = ind0
+                ve_ind1 = ind1
+                break
+                break
+              end
+            end
           end
         end
         ve_value = ve_value + "\nGENERAL VEs\n\n"
-        for ind in 0..vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement").length-2
-          ve_value3 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind].get("VEValue")
-          ve_value = ve_value + "#{ve_value3}\n"
-          for ind1 in 0..vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement").length-1
-            ve_name7 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement")[ind1].elements("VEElement")[0].elements("VEElement")[0].get("VEName")
-            ve_value7 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement")[ind1].elements("VEElement")[0].elements("VEElement")[0].get("VEValue")
-            ve_value = ve_value + "#{ve_name7} : #{ve_value7}\n"
+        for ind2 in 0..vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement").length-1
+          ve_value5 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].get("VEName")
+          ve_value = ve_value + "#{ve_value5}\n"
+          for ind3 in 0..vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement").length-1
+            ve_name6 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement")[ind3].get("VEName")
+            ve_value6 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement")[ind3].get("VEValue")
+            ve_value = ve_value + "#{ve_name6} : #{ve_value6}\n"
           end
         end
       end
@@ -68,66 +75,92 @@ def getIDEA_VE(design_element, options = {}) # :nodoc:
     #prints specific VEs
     if ve_name == "all" or ve_name == "specific"
       vendor_extensions.each do |vendor_extension|
-        # get the correct index for specific VEs
-        for ind0 in 0..vendor_extension.elements("VEElement")[0].elements("VEElement").length-1
-          if vendor_extension.elements("VEElement")[0].elements("VEElement")[ind0].get("VEName") == "specific"
-            ve_ind = ind0
-            break
+        # get the correct index for instance VEs
+        for ind0 in 0..vendor_extension.elements("VEElement").length-1
+          if vendor_extension.elements("VEElement")[ind0].get("VEName") == design_element.get("Name")
+            # get the correct index for specific VEs
+            for ind1 in 0..vendor_extension.elements("VEElement")[ind0].elements("VEElement").length-1
+              if vendor_extension.elements("VEElement")[ind0].elements("VEElement")[ind1].get("VEName") == "specific"
+                ve_ind0 = ind0
+                ve_ind1 = ind1
+                break
+                break
+              end
+            end
           end
         end
         ve_value = ve_value + "\nSPECIFIC VEs\n\n"
-        for ind in 0..vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement").length-2
-          ve_value3 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind].get("VEValue")
-          ve_value = ve_value + "#{ve_value3}\n"
-          for ind1 in 0..vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement").length-1
-            ve_name7 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement")[ind1].elements("VEElement")[0].elements("VEElement")[0].get("VEName")
-            ve_value7 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement")[ind1].elements("VEElement")[0].elements("VEElement")[0].get("VEValue")
-            ve_value = ve_value + "#{ve_name7} : #{ve_value7}\n"
+        for ind2 in 0..vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement").length-1
+          ve_value5 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].get("VEName")
+          ve_value = ve_value + "#{ve_value5}\n"
+          for ind3 in 0..vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement").length-1
+            ve_name6 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement")[ind3].get("VEName")
+            ve_value6 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement")[ind3].get("VEValue")
+            ve_value = ve_value + "#{ve_name6} : #{ve_value6}\n"
           end
         end
       end
+
     #prints an individual VE (from general list)
-    elsif ve_name == "power" or ve_name == "area" or ve_name == "platform" or ve_name == "vin" or ve_name == "Aspect_Ratio"
+    elsif ve_name == "power" or ve_name == "area" or ve_name == "platform" or ve_name == "vin" or ve_name == "aspect_ratio"
       ve_value = ve_value + "\nGENERAL VE\n\n"
       vendor_extensions.each do |vendor_extension|
-        for ind0 in 0..vendor_extension.elements("VEElement")[0].elements("VEElement").length-1
-          if vendor_extension.elements("VEElement")[0].elements("VEElement")[ind0].get("VEName") == "general"
-            ve_ind = ind0
-            break
+        for ind0 in 0..vendor_extension.elements("VEElement").length-1
+          if vendor_extension.elements("VEElement")[ind0].get("VEName") == design_element.get("Name")
+            # get the correct index for general VEs
+            for ind1 in 0..vendor_extension.elements("VEElement")[ind0].elements("VEElement").length-1
+              if vendor_extension.elements("VEElement")[ind0].elements("VEElement")[ind1].get("VEName") == "general"
+                ve_ind0 = ind0
+                ve_ind1 = ind1
+                break
+                break
+              end
+            end
           end
         end
-        for ind in 0..vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement").length-1
-          ve_value3 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind].get("VEValue")
-          if ve_value3 == ve_name
-            ve_value = ve_value + "#{ve_value3}\n"
-            for ind1 in 0..vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement").length-1
-              ve_name7 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement")[ind1].elements("VEElement")[0].elements("VEElement")[0].get("VEName")
-              ve_value7 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement")[ind1].elements("VEElement")[0].elements("VEElement")[0].get("VEValue")
-              ve_value = ve_value + "#{ve_name7} : #{ve_value7}\n\n"
+
+        for ind2 in 0..vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement").length-1
+          ve_value5 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].get("VEName")
+          if ve_value5 == ve_name
+            ve_value = ve_value + "#{ve_value5}\n"
+            for ind3 in 0..vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement").length-1
+              ve_name6 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement")[ind3].get("VEName")
+              ve_value6 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement")[ind3].get("VEValue")
+              ve_value = ve_value + "#{ve_name6} : #{ve_value6}\n"
             end
             break
           end
         end
       end
+
     #prints an individual VE (from specific list)
     elsif ve_name != "all" and ve_name != "general" and ve_name != "specific"
       ve_value = ve_value + "\nSPECIFIC VE\n\n"
       vendor_extensions.each do |vendor_extension|
-        for ind0 in 0..vendor_extension.elements("VEElement")[0].elements("VEElement").length-1
-          if vendor_extension.elements("VEElement")[0].elements("VEElement")[ind0].get("VEName") == "specific"
-            ve_ind = ind0
-            break
+        for ind0 in 0..vendor_extension.elements("VEElement").length-1
+          if vendor_extension.elements("VEElement")[ind0].get("VEName") == design_element.get("Name")
+            # get the correct index for specific VEs
+            for ind1 in 0..vendor_extension.elements("VEElement")[ind0].elements("VEElement").length-1
+              if vendor_extension.elements("VEElement")[ind0].elements("VEElement")[ind1].get("VEName") == "specific"
+                ve_ind0 = ind0
+                ve_ind1 = ind1
+                break
+                break
+              end
+            end
           end
         end
-        for ind in 0..vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement").length-1
-          ve_value3 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind].get("VEValue")
-          if ve_value3 == ve_name
-            ve_value = ve_value + "#{ve_value3}\n"
-            for ind1 in 0..vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement").length-1
-              ve_name7 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement")[ind1].elements("VEElement")[0].elements("VEElement")[0].get("ve_name")
-              ve_value7 = vendor_extension.elements("VEElement")[0].elements("VEElement")[ve_ind].elements("VEElement")[ind+1].elements("VEElement")[ind1].elements("VEElement")[0].elements("VEElement")[0].get("VEValue")
-              ve_value = ve_value + "#{ve_name7} : #{ve_value7}\n"
+
+        for ind2 in 0..vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement").length-1
+          ve_value5 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].get("VEName")
+          if ve_value5 == ve_name
+            ve_value = ve_value + "#{ve_value5}\n"
+            for ind3 in 0..vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement").length-1
+              ve_name6 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement")[ind3].get("VEName")
+              ve_value6 = vendor_extension.elements("VEElement")[ve_ind0].elements("VEElement")[ve_ind1].elements("VEElement")[ind2].elements("VEElement")[ind3].get("VEValue")
+              ve_value = ve_value + "#{ve_name6} : #{ve_value6}\n"
             end
+            break
           end
         end
       end

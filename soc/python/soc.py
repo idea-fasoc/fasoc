@@ -22,12 +22,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import argparse  # arguement parsing
-import sys  # exit function
-import shutil  # filesystem manipulation
-import os  # filesystem manipulation
-import json  # json parsing
-import subprocess  # process
+import argparse	# arguement parsing
+import sys	# exit function
+import shutil	# filesystem manipulation
+import os	# filesystem manipulation
+import json	# json parsing
+import subprocess	# process
 from subprocess import call
 import webbrowser as wb
 
@@ -39,27 +39,27 @@ from closedLoop import closedLoop
 # ==============================================================================
 
 soc_dir = os.path.dirname(__file__)
-fasoc_dir  = os.path.relpath(os.path.join(soc_dir,"../.."))
+fasoc_dir	= os.path.relpath(os.path.join(soc_dir,"../.."))
 
 parser = argparse.ArgumentParser(description='FASoC Integration Tool')
 parser.add_argument('--design', required=True,
-                    help='Resolved design description json file path')
+										help='Resolved design description json file path')
 parser.add_argument('--platform', default="tsmc65lp",
-                    help='PDK/process kit for cadre flow (.e.g tsmc65lp)')
+										help='PDK/process kit for cadre flow (.e.g tsmc65lp)')
 parser.add_argument('--fasoc_config', default=os.path.join(fasoc_dir, "config/fasoc_config.json"),
-                    help='SoC tool configuration json file path')
+										help='SoC tool configuration json file path')
 parser.add_argument('--platform_config', default=os.path.join(fasoc_dir, "config/platform_config.json"),
-                    help='Platform configuration json file path')
+										help='Platform configuration json file path')
 parser.add_argument('--mode', default="verilog",
-                    help='Run Mode')
+										help='Run Mode')
 parser.add_argument('--database', default="add",
-                    help='Add to database')
+										help='Add to database')
 args = parser.parse_args()
 
 
 if args.platform != "tsmc65lp":
-  print("Error: tsmc65lp is the only platform supported")
-  sys.exit(1)
+	print("Error: tsmc65lp is the only platform supported")
+	sys.exit(1)
 
 
 # STEP 1: Load all user intent and all config files
@@ -67,31 +67,31 @@ if args.platform != "tsmc65lp":
 
 print("Loading design: ", args.design)
 try:
-  with open(args.design) as f:
-    designJson = json.load(f)
+	with open(args.design) as f:
+		designJson = json.load(f)
 except ValueError as e:
-  print("Error occurred opening or loading design json file: ", args.design)
-  print("Exception: ", str(e))
-  sys.exit(1)
+	print("Error occurred opening or loading design json file: ", args.design)
+	print("Exception: ", str(e))
+	sys.exit(1)
 
 print("Loading FASoC Config: ", args.fasoc_config)
 try:
-  with open(args.fasoc_config) as f:
-    configJson = json.load(f)
+	with open(args.fasoc_config) as f:
+		configJson = json.load(f)
 except ValueError as e:
-  print("Error occurred opening or loading fasoc_config json file: ", args.fasoc_config)
-  print("Exception: ", str(e))
-  sys.exit(1)
+	print("Error occurred opening or loading fasoc_config json file: ", args.fasoc_config)
+	print("Exception: ", str(e))
+	sys.exit(1)
 
 print("Loading platform Config: ", args.platform_config)
 try:
-  with open(args.platform_config) as f:
-    platformJson = json.load(f)
+	with open(args.platform_config) as f:
+		platformJson = json.load(f)
 except ValueError as e:
-  print("Error occurred opening or loading platform_config json file: ",
-        args.platform_config)
-  print("Exception: ", str(e))
-  sys.exit(1)
+	print("Error occurred opening or loading platform_config json file: ",
+				args.platform_config)
+	print("Exception: ", str(e))
+	sys.exit(1)
 
 design_dir = os.path.dirname(args.design)
 databaseDir = platformJson["platforms"]["tsmc65lp"]["database"]
@@ -102,31 +102,31 @@ rubiDir = os.path.join(soc_dir,'..','rubi')
 jsnDir = os.path.join(design_dir,'json')
 
 try:
-  os.mkdir(ipXactDir)
-  print("Directory " , ipXactDir ,  " Created ") 
+	os.mkdir(ipXactDir)
+	print("Directory " , ipXactDir ,	" Created ") 
 except FileExistsError:
-  print("Directory " , ipXactDir ,  " already exists")
-  print("Cleaning ipxact directory ...")
-  if len(os.listdir(ipXactDir)) != 0:
-    for file in os.listdir(ipXactDir):
-      os.remove(os.path.join(ipXactDir,file))
+	print("Directory " , ipXactDir ,	" already exists")
+	print("Cleaning ipxact directory ...")
+	if len(os.listdir(ipXactDir)) != 0:
+		for file in os.listdir(ipXactDir):
+			os.remove(os.path.join(ipXactDir,file))
 
 try:
-  os.mkdir(jsnDir)
-  print("Directory " , jsnDir ,  " Created ") 
+	os.mkdir(jsnDir)
+	print("Directory " , jsnDir ,	" Created ") 
 except FileExistsError:
-  print("Directory " , jsnDir ,  " already exists")
-  print("Cleaning ipxact directory ...")
-  if len(os.listdir(jsnDir)) != 0:
-    for file in os.listdir(jsnDir):
-      os.remove(os.path.join(jsnDir,file))
+	print("Directory " , jsnDir ,	" already exists")
+	print("Cleaning ipxact directory ...")
+	if len(os.listdir(jsnDir)) != 0:
+		for file in os.listdir(jsnDir):
+			os.remove(os.path.join(jsnDir,file))
 
 try:
-  units = designJson["units"]
+	units = designJson["units"]
 except KeyError:
-  print("units is not mentioned in the design file")
-  units = {}
-  
+	print("units is not mentioned in the design file")
+	units = {}
+	
 # STEP 2: Run the design solver
 # ==============================================================================
 
@@ -138,59 +138,65 @@ except KeyError:
 # ==============================================================================
 module_list = []
 module_number = 0
+ldo_number = 0
+pll_number = 0
 connection_done_flag = False
 
 for module in designJson["modules"]:
 # ----------------------------------------------------------------------------------------
 # Environment preparing
-  print("Processing module " + module['module_name'] + " instace " + module['instance_name'])
+	print("Processing module " + module['module_name'] + " instace " + module['instance_name'])
 
-  if module['module_name'] not in module_list:
-    module_list.append(module['module_name'])
-    outputDir = os.path.join(design_dir, module["module_name"], "export")
-    try:
-      os.makedirs(outputDir)
-      print("Directory " + outputDir + " Created ") 
-    except FileExistsError:
-      print("Directory " + outputDir + " already exists")
-      if len(os.listdir(outputDir)) != 0:
-        print("Cleaning output directory:" + outputDir + " ...")
-        for output_file in os.listdir(outputDir):
-          os.remove(os.path.join(outputDir,output_file))
+	if module['module_name'] not in module_list:
+		module_list.append(module['module_name'])
+		outputDir = os.path.join(design_dir, module["module_name"], "export")
+		try:
+			os.makedirs(outputDir)
+			print("Directory " + outputDir + " Created ") 
+		except FileExistsError:
+			print("Directory " + outputDir + " already exists")
+			if len(os.listdir(outputDir)) != 0:
+				print("Cleaning output directory:" + outputDir + " ...")
+				for output_file in os.listdir(outputDir):
+					os.remove(os.path.join(outputDir,output_file))
 
-    inputDir = os.path.join(design_dir, module["module_name"], "import")
-    try:
-      os.makedirs(inputDir)
-      print("Directory " + inputDir + " Created ") 
-    except FileExistsError:
-      print("Directory " + inputDir + " already exists")
-      print("Cleaning input directory:" + inputDir + " ...")
-      if len(os.listdir(inputDir)) != 0:
-        for file in os.listdir(inputDir):
-          os.remove(os.path.join(inputDir,file))
+		inputDir = os.path.join(design_dir, module["module_name"], "import")
+		try:
+			os.makedirs(inputDir)
+			print("Directory " + inputDir + " Created ") 
+		except FileExistsError:
+			print("Directory " + inputDir + " already exists")
+			print("Cleaning input directory:" + inputDir + " ...")
+			if len(os.listdir(inputDir)) != 0:
+				for file in os.listdir(inputDir):
+					os.remove(os.path.join(inputDir,file))
 
-    moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args.platform,args.mode,args.database,units,module_number,designJson,args.design,connection_done_flag)
+		moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args.platform,args.mode,args.database,units,module_number,designJson,args.design,connection_done_flag,ldo_number,pll_number)
 
-    module_number += 1
-#---------------------------------------------------------------------------------------      
+		module_number += 1
+		if module["generator"] == "ldo-gen":
+			ldo_number += 1
+		elif module["generator"] == "pll-gen":
+			pll_number += 1
+#---------------------------------------------------------------------------------------			
 
-#---------------------------------------------------------------------------------------     
+#---------------------------------------------------------------------------------------		 
 # If generator is rtl
-    if not moduleIsGenerator and "rtl" in module["generator"]:
-      shutil.copy(module['src'],outputDir)
-      rtlXmlGenerator(configJson["generators"][module["generator"]],module,outputDir,ipXactDir)
+		if not moduleIsGenerator and "rtl" in module["generator"]:
+			shutil.copy(module['src'],outputDir)
+			rtlXmlGenerator(configJson["generators"][module["generator"]],module,outputDir,ipXactDir)
 #--------------------------------------------------------------------------------------- 
 
 #--------------------------------------------------------------------------------------- 
 # If moduel generator is not rtl nor in our generators
-    if not moduleIsGenerator and "rtl" not in module["generator"]:
-      print("WARNING: Unsupported generator type", module["generator"])
+		if not moduleIsGenerator and "rtl" not in module["generator"]:
+			print("WARNING: Unsupported generator type", module["generator"])
 #---------------------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------------------
 # The other instance of a module
-  else:
-    shutil.copy(os.path.join(ipXactDir,moduleJson['module_name'] + '.xml'),os.path.join(ipXactDir,moduleJson['instance_name'] + '.xml'))
+	else:
+		shutil.copy(os.path.join(ipXactDir,moduleJson['module_name'] + '.xml'),os.path.join(ipXactDir,moduleJson['instance_name'] + '.xml'))
 #---------------------------------------------------------------------------------------
 
 # STEP 6: Check constraints and close the loop
@@ -203,20 +209,20 @@ closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,ipXa
 workplaceDir = design_dir
 projectName = designName + '_socrates_proj'
 projectDir = os.path.join(workplaceDir,projectName)
-design_vendor =  'arm.com'
+design_vendor =	'arm.com'
 design_library = projectName
 design_version = 'r0p0'
 subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,
 '--project', projectName,'--flow', 'AddNewProject'])
 
 for file in os.listdir(ipXactDir):
-  shutil.copy(os.path.join(ipXactDir,file), projectDir)
+	shutil.copy(os.path.join(ipXactDir,file), projectDir)
 shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4.xml'), projectDir)
 shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4_rtl.xml'), projectDir)
 shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite.xml'), projectDir)
 shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite_rtl.xml'), projectDir)
 for file in os.listdir(platformJson["socrates_DRC_config"]):
-  shutil.copy(os.path.join(platformJson["socrates_DRC_config"],file), workplaceDir)
+	shutil.copy(os.path.join(platformJson["socrates_DRC_config"],file), workplaceDir)
 
 subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'--project', projectName,
 '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/clean.rb?arg1='+designName,
@@ -232,13 +238,13 @@ subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'-
 
 # Unifying names
 with open (os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'r') as socrates_verilog:
-  soc_ver=socrates_verilog.read()
+	soc_ver=socrates_verilog.read()
 with open(args.design) as fdesign:
-  designJson = json.load(fdesign)
+	designJson = json.load(fdesign)
 for module in designJson["modules"]:
-  soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
+	soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
 with open(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'w') as socrates_verilog:
-  socrates_verilog.write(soc_ver)
+	socrates_verilog.write(soc_ver)
 
 # Opening Socrates outputs 
 wb.open_new(os.path.join(projectDir,'logical','Schematic','schematic_Connections_'+designName+'_'+design_version+'.pdf'))

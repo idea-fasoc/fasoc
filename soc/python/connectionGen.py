@@ -24,7 +24,67 @@
 
 import json
 
-def connectionGen(generator,instance,module_number,designJson,designDir):
+def connectionGen(generator,instance,module_number,designJson,designDir,ldo_number,pll_number):
+
+#------------------------------------------------------------------------------------
+
+	def addConnection_from_to(connection_type,range_tag,instance1,port1,range1,instance2,port2,range2,value):
+# Creating connections
+		connection = {}
+		connection["type"] = connection_type
+
+		connection_from = {}
+		if not value[0]:
+			connection_from["instance"] = instance1
+			connection_from["port"] = port1
+			if range_tag:
+				connection_from["range"] = {}
+				connection_from["range"]["max"] = range1[0]
+				connection_from["range"]["min"] = range1[1]
+		else:
+			connection_from["value"] = value[1]
+		connection["from"] = connection_from
+
+		connection_to_list = []
+		for i in range(0,len(instance2)):
+			connection_to_dict = {}
+			connection_to_dict["instance"] = instance2[i]
+			connection_to_dict["port"] = port2[i]
+			if range_tag:
+				connection_to_dict["range"] = {}
+				connection_to_dict["range"]["max"] = range2[i][0]
+				connection_to_dict["range"]["min"] = range2[i][1]
+			connection_to_list.append(connection_to_dict)
+		connection["to"] = connection_to_list
+		connections.append(connection)
+
+		designJson["connections"] = connections
+		with open(designDir, "w") as f:
+			json.dump(designJson, f, indent=True)
+
+#------------------------------------------------------------------------------------
+
+	def addConnection_to(existed_connection,range_tag,instance2,port2,range2):
+# Creating connections
+
+		connection = existed_connection
+		connection_to_list = existed_connection["to"]
+		for i in range(0,len(instance2)):
+			connection_to_dict = {}
+			connection_to_dict["instance"] = instance2[i]
+			connection_to_dict["port"] = port2[i]
+			connection_to_list.append(connection_to_dict)
+			if range_tag:
+				connection_to_dict["range"] = {}
+				connection_to_dict["range"]["max"] = range2[i][0]
+				connection_to_dict["range"]["min"] = range2[i][1]
+			connection["to"] = connection_to_list
+			connections.append(connection)
+
+			designJson["connections"] = connections
+			with open(designDir, "w") as f:
+				json.dump(designJson, f, indent=True)
+#------------------------------------------------------------------------------------
 
 	with open(designDir, "r") as f:
 		designJson = json.load(f)
@@ -36,13 +96,17 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 			module_slave = module["module_name"]
 			instance_slave = module["instance_name"]
 
-		elif module["generator"] == "cmsdk_ahb_to_apb_rtl":
-			module_ahp = module["module_name"]
-			instance_ahp = module["instance_name"]
-
-		elif module["generator"] == "fasoc_m0mcu_rtl":
+		elif module["generator"] == "m0mcu_rtl":
 			module_m0 = module["module_name"]
 			instance_m0 = module["instance_name"]
+
+		elif module["generator"] == "ldo_mux_rtl":
+			module_ldo_mux = module["module_name"]
+			instance_ldo_mux = module["instance_name"]
+
+		elif module["generator"] == "gpio_rtl":
+			module_gpio = module["module_name"]
+			instance_gpio = module["instance_name"]
 
 		else:
 			total_gen_numbers += 1
@@ -53,299 +117,96 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 			del designJson["connections"]
 		connections = []
 
-		connection_m0_ahp_M0MCU_AHBM = {}
-		connection_m0_ahp_M0MCU_AHBM["type"] = "ahb"
+# Toplevel Connections
+
+		addConnection_from_to("clock",False,"toplevel","XTAL1_PAD",[0,0],[instance_m0],["XTAL1_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("clock",False,instance_m0,"XTAL2_PAD",[0,0],["toplevel"],["XTAL2_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","NRST_PAD",[0,0],[instance_m0],["NRST_PAD"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",False,instance_m0,"GPIO_INIT_PAD",[0,0],["toplevel"],["GPIO_INIT_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"GPIO_USER0_PAD",[0,0],["toplevel"],["GPIO_USER0_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"GPIO_USER1_PAD",[0,0],["toplevel"],["GPIO_USER1_PAD"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",False,"toplevel","UART_RXD_PAD",[0,0],[instance_m0],["UART_RXD_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"UART_TXD_PAD",[0,0],["toplevel"],["UART_TXD_PAD"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",False,"toplevel","LDO_SPI_RESETn_PAD",[0,0],[instance_m0],["LDO_SPI_RESETn_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",True,"toplevel","LDO_SPI_SS_PAD",[1,0],[instance_m0],["LDO_SPI_SS_PAD"],[[1,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","LDO_SPI_SCLK_PAD",[0,0],[instance_m0],["LDO_SPI_SCLK_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","LDO_SPI_MOSI_PAD",[0,0],[instance_m0],["LDO_SPI_MOSI_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_MISO_PAD",[0,0],["toplevel"],["LDO_SPI_MISO_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","LDO_SPI_APB_SEL_PAD",[0,0],[instance_m0],["LDO_SPI_APB_SEL_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","LDO_VREF_PAD",[0,0],[instance_m0],["LDO_VREF_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","LDO_REFCLK_PAD",[0,0],[instance_m0],["LDO_REFCLK_PAD"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",False,"toplevel","MEM_DATA_REQ_PAD",[0,0],[instance_m0],["MEM_DATA_REQ_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","MEM_WE_PAD",[0,0],[instance_m0],["MEM_WE_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","MEM_TEST_MODE_PAD",[0,0],[instance_m0],["MEM_TEST_MODE_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","MEM_CLK_IN_PAD",[0,0],[instance_m0],["MEM_CLK_IN_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","MEM_RESET_PAD",[0,0],[instance_m0],["MEM_RESET_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","MEM_SPI_CLOCK_PAD",[0,0],[instance_m0],["MEM_SPI_CLOCK_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","MEM_SPI_MOSI_PAD",[0,0],[instance_m0],["MEM_SPI_MOSI_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","MEM_SPI_RST_PAD",[0,0],[instance_m0],["MEM_SPI_RST_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","MEM_SPI_SCLK_PAD",[0,0],[instance_m0],["MEM_SPI_SCLK_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","MEM_SPI_SS_PAD",[0,0],[instance_m0],["MEM_SPI_SS_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"MEM_DOUT32_PAD",[0,0],["toplevel"],["MEM_DOUT32_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_MISO_PAD",[0,0],["toplevel"],["MEM_SPI_MISO_PAD"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",False,"toplevel","PLL_CLKREF0_PAD",[0,0],[instance_m0],["PLL_CLKREF0_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","PLL_CLKREF1_PAD",[0,0],[instance_m0],["PLL_CLKREF1_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"PLL_CLKOUT0_PAD",[0,0],["toplevel"],["PLL_CLKOUT0_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"PLL_CLKOUT1_PAD",[0,0],["toplevel"],["PLL_CLKOUT1_PAD"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",False,instance_m0,"TEMP_0_CLKOUT_PAD",[0,0],["toplevel"],["TEMP_0_CLKOUT_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"TEMP_1_CLKOUT_PAD",[0,0],["toplevel"],["TEMP_1_CLKOUT_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","TEMP_0_REFCLK_PAD",[0,0],[instance_m0],["TEMP_0_REFCLK_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","TEMP_1_REFCLK_PAD",[0,0],[instance_m0],["TEMP_1_REFCLK_PAD"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","VIN_TEMPSENSE_PAD",[0,0],[instance_m0],["VIN_TEMPSENSE_PAD"],[[0,0]],[False,0])
+
+		addConnection_from_to("reset",False,"toplevel","nTRST",[0,0],[instance_m0],["nTRST"],[[0,0]],[False,0])
+		addConnection_from_to("reset",False,"toplevel","TDI",[0,0],[instance_m0],["TDI"],[[0,0]],[False,0])
+		addConnection_from_to("reset",False,instance_m0,"TDO",[0,0],["toplevel"],["TDO"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",False,"toplevel","SWDIOTMS",[0,0],[instance_m0],["SWDIOTMS"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,"toplevel","SWCLKTCK",[0,0],[instance_m0],["SWCLKTCK"],[[0,0]],[False,0])
+		
+
+#RTL Connections
+		addConnection_from_to("adhoc",False,instance_slave,"PSEL0",[0,0],[instance_gpio],["PSEL"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",True,instance_slave,"PRDATA0",[31,0],[instance_gpio],["PRDATA"],[[31,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_slave,"PREADY0",[0,0],[instance_gpio],["PREADY"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_slave,"PSLVERR0",[0,0],[instance_gpio],["PSLVERR"],[[0,0]],[False,0])
+		
+		for i in range(0,16):
+			#addConnection_from_to("apb",False,instance_slave,"APBM" + str(i),[0,0],[instance_m0],["M0_APB" + str(i)],[[0,0]],[False,0])
+			if i != 1:
+				addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(i),[0,0],[instance_m0],["apb" + str(i) + "_psel"],[[0,0]],[False,0])
+		addConnection_from_to("apb",False,instance_slave,"APBM1",[0,0],[instance_m0],["M0_APB1"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[15,12],[instance_slave],["DECODE4BIT"],[[3,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"i_psel",[0,0],[instance_slave],["PSEL"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",False,instance_m0,"i_pready_mux",[0,0],[instance_slave],["PREADY"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",True,instance_m0,"i_prdata_mux",[31,0],[instance_slave],["PRDATA"],[[31,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"i_pslverr_mux",[0,0],[instance_slave],["PSLVERR"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",True,instance_m0,"LDO_SPI_SS",[1,0],[instance_ldo_mux],["LDO_SPI_SS"],[[1,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_MISO",[0,0],[instance_ldo_mux],["LDO_SPI_MISO"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[11,0],[instance_gpio],["PADDR"],[[11,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance_gpio],["PWRITE"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance_gpio],["PENABLE"],[[0,0]],[False,0])
+		addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance_gpio],["PWDATA"],[[31,0]],[False,0])
+
+		addConnection_from_to("clock",False,instance_m0,"PCLK",[0,0],[instance_gpio],["PCLK"],[[0,0]],[False,0])
+		addConnection_from_to("reset",False,instance_m0,"PRESETn",[0,0],[instance_gpio],["PRESETn"],[[0,0]],[False,0])
+
+		addConnection_from_to("adhoc",True,instance_m0,"GPIO_O",[31,0],[instance_gpio],["GPIO_O"],[[31,0]],[False,0])
 
-		connection_from_m0_ahp_M0MCU_AHBM = {}
-		connection_from_m0_ahp_M0MCU_AHBM["instance"] = instance_m0
-		connection_from_m0_ahp_M0MCU_AHBM["port"] = "M0MCU_AHBM"
-		connection_m0_ahp_M0MCU_AHBM["from"] = connection_from_m0_ahp_M0MCU_AHBM
-
-		connection_to_m0_ahp_AHB_S_list = []
-		connection_to_m0_ahp_AHB_S_dict = {}
-		connection_to_m0_ahp_AHB_S_dict["instance"] = instance_ahp
-		connection_to_m0_ahp_AHB_S_dict["port"] = "AHB_S"
-		connection_to_m0_ahp_AHB_S_list.append(connection_to_m0_ahp_AHB_S_dict)
-		connection_m0_ahp_M0MCU_AHBM["to"] = connection_to_m0_ahp_AHB_S_list
-		connections.append(connection_m0_ahp_M0MCU_AHBM)
-
-
-
-		connection_ahp_slave_APB_M = {}
-		connection_ahp_slave_APB_M["type"] = "apb"
-
-		connection_from_ahp_slave_APB_M = {}
-		connection_from_ahp_slave_APB_M["instance"] = instance_ahp
-		connection_from_ahp_slave_APB_M["port"] = "APB_M"
-		connection_ahp_slave_APB_M["from"] = connection_from_ahp_slave_APB_M
-
-		connection_to_ahp_slave_APBS_list = []
-		connection_to_ahp_slave_APBS_dict = {}
-		connection_to_ahp_slave_APBS_dict["instance"] = instance_slave
-		connection_to_ahp_slave_APBS_dict["port"] = "APBS"
-		connection_to_ahp_slave_APBS_list.append(connection_to_ahp_slave_APBS_dict)
-		connection_ahp_slave_APB_M["to"] = connection_to_ahp_slave_APBS_list
-		connections.append(connection_ahp_slave_APB_M)
-
-
-
-		connection_top_m0_XTAL1 = {}
-		connection_top_m0_XTAL1["type"] = "clock"
-
-		connection_from_top_m0_XTAL1 = {}
-		connection_from_top_m0_XTAL1["instance"] = "toplevel"
-		connection_from_top_m0_XTAL1["port"] = "XTAL1"
-		connection_top_m0_XTAL1["from"] = connection_from_top_m0_XTAL1
-
-		connection_to_top_m0_XTAL1_list = []
-		connection_to_top_m0_XTAL1_dict = {}
-		connection_to_top_m0_XTAL1_dict["instance"] = instance_m0
-		connection_to_top_m0_XTAL1_dict["port"] = "XTAL1"
-		connection_to_top_m0_XTAL1_list.append(connection_to_top_m0_XTAL1_dict)
-		connection_top_m0_XTAL1["to"] = connection_to_top_m0_XTAL1_list
-		connections.append(connection_top_m0_XTAL1)
-
-
-
-		connection_m0_top_XTAL2 = {}
-		connection_m0_top_XTAL2["type"] = "clock"
-
-		connection_from_m0_top_XTAL2 = {}
-		connection_from_m0_top_XTAL2["instance"] = instance_m0
-		connection_from_m0_top_XTAL2["port"] = "XTAL2"
-		connection_m0_top_XTAL2["from"] = connection_from_m0_top_XTAL2
-
-		connection_to_m0_top_XTAL2_list = []
-		connection_to_m0_top_XTAL2_dict = {}
-		connection_to_m0_top_XTAL2_dict["instance"] = "toplevel"
-		connection_to_m0_top_XTAL2_dict["port"] = "XTAL2"
-		connection_to_m0_top_XTAL2_list.append(connection_to_m0_top_XTAL2_dict)
-		connection_m0_top_XTAL2["to"] = connection_to_m0_top_XTAL2_list
-		connections.append(connection_m0_top_XTAL2)
-
-
-
-		connection_top_m0_nTRST = {}
-		connection_top_m0_nTRST["type"] = "reset"
-
-		connection_from_top_m0_nTRST = {}
-		connection_from_top_m0_nTRST["instance"] = "toplevel"
-		connection_from_top_m0_nTRST["port"] = "nTRST"
-		connection_top_m0_nTRST["from"] = connection_from_top_m0_nTRST
-
-		connection_to_top_m0_nTRST_list = []
-		connection_to_top_m0_nTRST_dict = {}
-		connection_to_top_m0_nTRST_dict["instance"] = instance_m0
-		connection_to_top_m0_nTRST_dict["port"] = "nTRST"
-		connection_to_top_m0_nTRST_list.append(connection_to_top_m0_nTRST_dict)
-		connection_top_m0_nTRST["to"] = connection_to_top_m0_nTRST_list
-		connections.append(connection_top_m0_nTRST)
-
-
-
-		connection_m0_top_P0 = {}
-		connection_m0_top_P0["type"] = "adhoc"
-
-		connection_from_m0_top_P0 = {}
-		connection_from_m0_top_P0["instance"] = instance_m0
-		connection_from_m0_top_P0["port"] = "P0"
-		connection_from_m0_top_P0["range"] = {}
-		connection_from_m0_top_P0["range"]["max"] = 15
-		connection_from_m0_top_P0["range"]["min"] = 0
-		connection_m0_top_P0["from"] = connection_from_m0_top_P0
-
-		connection_to_m0_top_P0_list = []
-		connection_to_m0_top_P0_dict = {}
-		connection_to_m0_top_P0_dict["instance"] = "toplevel"
-		connection_to_m0_top_P0_dict["port"] = "P0"
-		connection_to_m0_top_P0_dict["range"] = {}
-		connection_to_m0_top_P0_dict["range"]["max"] = 15
-		connection_to_m0_top_P0_dict["range"]["min"] = 0
-		connection_to_m0_top_P0_list.append(connection_to_m0_top_P0_dict)
-		connection_m0_top_P0["to"] = connection_to_m0_top_P0_list
-		connections.append(connection_m0_top_P0)
-
-
-
-		connection_m0_top_P1 = {}
-		connection_m0_top_P1["type"] = "adhoc"
-
-		connection_from_m0_top_P1 = {}
-		connection_from_m0_top_P1["instance"] = instance_m0
-		connection_from_m0_top_P1["port"] = "P1"
-		connection_from_m0_top_P1["range"] = {}
-		connection_from_m0_top_P1["range"]["max"] = 15
-		connection_from_m0_top_P1["range"]["min"] = 0
-		connection_m0_top_P1["from"] = connection_from_m0_top_P1
-
-		connection_to_m0_top_P1_list = []
-		connection_to_m0_top_P1_dict = {}
-		connection_to_m0_top_P1_dict["instance"] = "toplevel"
-		connection_to_m0_top_P1_dict["port"] = "P1"
-		connection_to_m0_top_P1_dict["range"] = {}
-		connection_to_m0_top_P1_dict["range"]["max"] = 15
-		connection_to_m0_top_P1_dict["range"]["min"] = 0
-		connection_to_m0_top_P1_list.append(connection_to_m0_top_P1_dict)
-		connection_m0_top_P1["to"] = connection_to_m0_top_P1_list
-		connections.append(connection_m0_top_P1)
-
-		connection_m0_top_SWDIOTMS = {}
-		connection_m0_top_SWDIOTMS["type"] = "adhoc"
-
-		connection_from_m0_top_SWDIOTMS = {}
-		connection_from_m0_top_SWDIOTMS["instance"] = instance_m0
-		connection_from_m0_top_SWDIOTMS["port"] = "SWDIOTMS"
-		connection_m0_top_SWDIOTMS["from"] = connection_from_m0_top_SWDIOTMS
-
-		connection_to_m0_top_SWDIOTMS_list = []
-		connection_to_m0_top_SWDIOTMS_dict = {}
-		connection_to_m0_top_SWDIOTMS_dict["instance"] = "toplevel"
-		connection_to_m0_top_SWDIOTMS_dict["port"] = "SWDIOTMS"
-		connection_to_m0_top_SWDIOTMS_list.append(connection_to_m0_top_SWDIOTMS_dict)
-		connection_m0_top_SWDIOTMS["to"] = connection_to_m0_top_SWDIOTMS_list
-		connections.append(connection_m0_top_SWDIOTMS)
-
-
-
-		connection_top_m0_SWCLKTCK = {}
-		connection_top_m0_SWCLKTCK["type"] = "adhoc"
-
-		connection_from_top_m0_SWCLKTCK = {}
-		connection_from_top_m0_SWCLKTCK["instance"] = "toplevel"
-		connection_from_top_m0_SWCLKTCK["port"] = "SWCLKTCK"
-		connection_top_m0_SWCLKTCK["from"] = connection_from_top_m0_SWCLKTCK
-
-		connection_to_top_m0_SWCLKTCK_list = []
-		connection_to_top_m0_SWCLKTCK_dict = {}
-		connection_to_top_m0_SWCLKTCK_dict["instance"] = instance_m0
-		connection_to_top_m0_SWCLKTCK_dict["port"] = "SWCLKTCK"
-		connection_to_top_m0_SWCLKTCK_list.append(connection_to_top_m0_SWCLKTCK_dict)
-		connection_top_m0_SWCLKTCK["to"] = connection_to_top_m0_SWCLKTCK_list
-		connections.append(connection_top_m0_SWCLKTCK)
-
-
-
-		connection_top_m0_SYSCLK = {}
-		connection_top_m0_SYSCLK["type"] = "clock"
-
-		connection_from_top_m0_SYSCLK = {}
-		connection_from_top_m0_SYSCLK["instance"] = "toplevel"
-		connection_from_top_m0_SYSCLK["port"] = "SYSCLK"
-		connection_top_m0_SYSCLK["from"] = connection_from_top_m0_SYSCLK
-
-		connection_to_top_m0_SYSCLK_list = []
-		connection_to_top_m0_ext_HCLK_dict = {}
-		connection_to_top_m0_ext_HCLK_dict["instance"] = instance_m0
-		connection_to_top_m0_ext_HCLK_dict["port"] = "ext_HCLK"
-		connection_to_top_m0_SYSCLK_list.append(connection_to_top_m0_ext_HCLK_dict)
-
-		connection_to_top_m0_HCLK_dict = {}
-		connection_to_top_m0_HCLK_dict["instance"] = instance_ahp
-		connection_to_top_m0_HCLK_dict["port"] = "HCLK"
-		connection_to_top_m0_SYSCLK_list.append(connection_to_top_m0_HCLK_dict)
-
-		connection_to_top_m0_PCLK_dict = {}
-		connection_to_top_m0_PCLK_dict["instance"] = instance_m0
-		connection_to_top_m0_PCLK_dict["port"] = "PCLK"
-		connection_to_top_m0_SYSCLK_list.append(connection_to_top_m0_PCLK_dict)
-		connection_top_m0_SYSCLK["to"] = connection_to_top_m0_SYSCLK_list
-		connections.append(connection_top_m0_SYSCLK)
-
-
-
-		connection_top_m0_SYSRESETN = {}
-		connection_top_m0_SYSRESETN["type"] = "reset"
-
-		connection_from_top_m0_SYSRESETN = {}
-		connection_from_top_m0_SYSRESETN["instance"] = "toplevel"
-		connection_from_top_m0_SYSRESETN["port"] = "SYSRESETN"
-		connection_top_m0_SYSRESETN["from"] = connection_from_top_m0_SYSRESETN
-
-		connection_to_top_m0_SYSRESETN_list = []
-		connection_to_top_m0_HRESETn_dict = {}
-		connection_to_top_m0_HRESETn_dict["instance"] = instance_ahp
-		connection_to_top_m0_HRESETn_dict["port"] = "HRESETn"
-		connection_to_top_m0_SYSRESETN_list.append(connection_to_top_m0_HRESETn_dict)
-
-		connection_to_top_m0_ext_HRESETn_dict = {}
-		connection_to_top_m0_ext_HRESETn_dict["instance"] = instance_m0
-		connection_to_top_m0_ext_HRESETn_dict["port"] = "ext_HRESETn"
-		connection_to_top_m0_SYSRESETN_list.append(connection_to_top_m0_ext_HRESETn_dict)
-
-		connection_to_top_m0_PRESETn_dict = {}
-		connection_to_top_m0_PRESETn_dict["instance"] = instance_m0
-		connection_to_top_m0_PRESETn_dict["port"] = "PRESETn"
-		connection_to_top_m0_SYSRESETN_list.append(connection_to_top_m0_PRESETn_dict)
-		connection_top_m0_SYSRESETN["to"] = connection_to_top_m0_SYSRESETN_list
-		connections.append(connection_top_m0_SYSRESETN)
-
-
-
-		connection_m0_ahp_APBACTIVE = {}
-		connection_m0_ahp_APBACTIVE["type"] = "adhoc"
-
-		connection_from_m0_ahp_APBACTIVE = {}
-		connection_from_m0_ahp_APBACTIVE["instance"] = instance_m0
-		connection_from_m0_ahp_APBACTIVE["port"] = "APBACTIVE"
-		connection_m0_ahp_APBACTIVE["from"] = connection_from_m0_ahp_APBACTIVE
-
-		connection_to_m0_ahp_APBACTIVE_list = []
-		connection_to_m0_ahp_APBACTIVE_dict = {}
-		connection_to_m0_ahp_APBACTIVE_dict["instance"] = instance_ahp
-		connection_to_m0_ahp_APBACTIVE_dict["port"] = "APBACTIVE"
-		connection_to_m0_ahp_APBACTIVE_list.append(connection_to_m0_ahp_APBACTIVE_dict)
-		connection_m0_ahp_APBACTIVE["to"] = connection_to_m0_ahp_APBACTIVE_list
-		connections.append(connection_m0_ahp_APBACTIVE)
-
-
-
-		connection_ahp_m0_PCLKEN = {}
-		connection_ahp_m0_PCLKEN["type"] = "adhoc"
-
-		connection_from_ahp_m0_PCLKEN = {}
-		connection_from_ahp_m0_PCLKEN["instance"] = instance_ahp
-		connection_from_ahp_m0_PCLKEN["port"] = "PCLKEN"
-		connection_ahp_m0_PCLKEN["from"] = connection_from_ahp_m0_PCLKEN
-
-		connection_to_ahp_m0_PCLKEN_list = []
-		connection_to_ahp_m0_PCLKEN_dict = {}
-		connection_to_ahp_m0_PCLKEN_dict["instance"] = instance_m0
-		connection_to_ahp_m0_PCLKEN_dict["port"] = "PCLKEN"
-		connection_to_ahp_m0_PCLKEN_list.append(connection_to_ahp_m0_PCLKEN_dict)
-		connection_ahp_m0_PCLKEN["to"] = connection_to_ahp_m0_PCLKEN_list
-		connections.append(connection_ahp_m0_PCLKEN)
-
-
-
-		connection_ahp_slave_PADDR = {}
-		connection_ahp_slave_PADDR["type"] = "adhoc"
-
-		connection_from_ahp_slave_PADDR = {}
-		connection_from_ahp_slave_PADDR["instance"] = instance_ahp
-		connection_from_ahp_slave_PADDR["port"] = "PADDR"
-		connection_from_ahp_slave_PADDR["range"] = {}
-		connection_from_ahp_slave_PADDR["range"]["max"] = 15
-		connection_from_ahp_slave_PADDR["range"]["min"] = 12
-		connection_ahp_slave_PADDR["from"] = connection_from_ahp_slave_PADDR
-
-		connection_to_ahp_slave_DECODE4BIT_list = []
-		connection_to_ahp_slave_DECODE4BIT_dict = {}
-		connection_to_ahp_slave_DECODE4BIT_dict["instance"] = instance_slave
-		connection_to_ahp_slave_DECODE4BIT_dict["port"] = "DECODE4BIT"
-		connection_to_ahp_slave_DECODE4BIT_dict["range"] = {}
-		connection_to_ahp_slave_DECODE4BIT_dict["range"]["max"] = 3
-		connection_to_ahp_slave_DECODE4BIT_dict["range"]["min"] = 0
-		connection_to_ahp_slave_DECODE4BIT_list.append(connection_to_ahp_slave_DECODE4BIT_dict)
-		connection_ahp_slave_PADDR["to"] = connection_to_ahp_slave_DECODE4BIT_list
-		connections.append(connection_ahp_slave_PADDR)
-
-
-
-		designJson["connections"] = connections
 	if "connections" in designJson:
 		connections = designJson["connections"]
-		tag_top_SYSCLK = False
-		tag_top_SYSRESETN = False
+		tag_top_PCLK = False
+		tag_top_PRESETn = False
 		tag_ahp_PADDR_11_8 = False
 		tag_ahp_PENABLE = False
 		tag_ahp_PWRITE = False
@@ -355,13 +216,13 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 			if "from" in connection:
 				if "port" in connection["from"]:
 
-					if connection["from"]["port"] == "SYSRESETN":
-						tag_top_SYSRESETN = True
-						connection_top_SYSRESETN = connection
+					if connection["from"]["port"] == "PRESETn":
+						tag_top_PRESETn = True
+						connection_top_PRESETn = connection
 
-					elif connection["from"]["port"] == "SYSCLK":
-						tag_top_SYSCLK = True
-						connection_top_SYSCLK = connection
+					elif connection["from"]["port"] == "PCLK":
+						tag_top_PCLK = True
+						connection_top_PCLK = connection
 
 					elif connection["from"]["port"] == "PENABLE":
 						tag_ahp_PENABLE = True
@@ -384,549 +245,128 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 
 		
 		if (generator == 'ldo-gen'):
-			if tag_top_SYSCLK:
-				connection_to_top_ldo_PCLK_list = connection_top_SYSCLK["to"]
-				connection_to_top_ldo_PCLK_dict = {}
-				connection_to_top_ldo_PCLK_dict["instance"] = instance
-				connection_to_top_ldo_PCLK_dict["port"] = "PCLK"
-				connection_to_top_ldo_PCLK_list.append(connection_to_top_ldo_PCLK_dict)
-				connection_top_SYSCLK["to"] = connection_to_top_ldo_PCLK_list
-				connections.append(connection_top_SYSCLK)
+			#addConnection_from_to("apb",False,instance_slave,"APBM" + str(module_number),[0,0],[instance],["LDO_APBS"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_number+2),[0,0],[instance],["PSEL"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_slave,"PRDATA" + str(module_number+2),[31,0],[instance],["PRDATA"],[[31,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_number+2),[0,0],[instance],["PREADY"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_number+2),[0,0],[instance],["PSLVERR"],[[0,0]],[False,0])
 
+			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[11,0],[instance],["PADDR"],[[11,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance],["PWRITE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance],["PENABLE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance],["PWDATA"],[[31,0]],[False,0])
 
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_RESETn",[0,0],[instance],["SRESETn"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_SCLK",[0,0],[instance],["SCLK"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_MOSI",[0,0],[instance],["MOSI"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_SPI_APB_SEL",[0,0],[instance],["SPI_APB_SEL"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_VREF",[0,0],[instance],["VREF"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"LDO_REFCLK",[0,0],[instance],["CLK"],[[0,0]],[False,0])
 
-			if tag_top_SYSRESETN:
-				connection_to_top_ldo_SYSRESETN_list = connection_top_SYSRESETN["to"]
-				connection_to_top_ldo_SYSRESETN_dict = {}
-				connection_to_top_ldo_SYSRESETN_dict["instance"] = instance
-				connection_to_top_ldo_SYSRESETN_dict["port"] = "reset"
-				connection_to_top_ldo_SYSRESETN_list.append(connection_to_top_ldo_SYSRESETN_dict)
-				connection_top_SYSRESETN["to"] = connection_to_top_ldo_SYSRESETN_list
-				connections.append(connection_top_SYSRESETN)
+			if not tag_top_PCLK:
+				addConnection_from_to("clock",False,instance_m0,"PCLK",[0,0],[instance],["PCLK"],[[0,0]],[False,0])
+			else:
+				addConnection_to(connection_top_PCLK,False,[instance],["PCLK"],[[0,0]])
+
+			if not tag_top_PRESETn:
+				addConnection_from_to("reset",False,instance_m0,"PRESETn",[0,0],[instance],["PRESETn"],[[0,0]],[False,0])
+			else:
+				addConnection_to(connection_top_PRESETn,False,[instance],["PRESETn"],[[0,0]])
+
+			addConnection_from_to("adhoc",False,instance_ldo_mux,"LDO_SPI_"+str(ldo_number)+"_MISO",[0,0],[instance],["MISO"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_ldo_mux,"LDO_SPI_"+str(ldo_number)+"_SS",[0,0],[instance],["SS"],[[0,0]],[False,0])
 
 		elif (generator == 'memory-gen'):
-			connection_slave_mem_APBM = {}
-			connection_slave_mem_APBM["type"] = "apb"
+			#addConnection_from_to("apb",False,instance_slave,"APBM" + str(module_number),[0,0],[instance],["MEM_APBS"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_number+2),[0,0],[instance],["psel"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_slave,"PRDATA" + str(module_number+2),[31,0],[instance],["prdata"],[[31,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_number+2),[0,0],[instance],["pready"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_number+2),[0,0],[instance],["pslverr"],[[0,0]],[False,0])
 
-			connection_from_slave_mem_APBM = {}
-			connection_from_slave_mem_APBM["instance"] = instance_slave
-			connection_from_slave_mem_APBM["port"] = "APBM" + str(1 + module_number)
-			connection_slave_mem_APBM["from"] = connection_from_slave_mem_APBM
+			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[13,0],[instance],["paddr"],[[11,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance],["pwrite"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance],["penable"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance],["pwdata"],[[31,0]],[False,0])
 
-			connection_to_slave_mem_MEM_APBS_list = []
-			connection_to_slave_mem_MEM_APBS_dict = {}
-			connection_to_slave_mem_MEM_APBS_dict["instance"] = instance
-			connection_to_slave_mem_MEM_APBS_dict["port"] = "MEM_APBS"
-			connection_to_slave_mem_MEM_APBS_list.append(connection_to_slave_mem_MEM_APBS_dict)
-			connection_slave_mem_APBM["to"] = connection_to_slave_mem_MEM_APBS_list
-			connections.append(connection_slave_mem_APBM)
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_DATA_REQ",[0,0],[instance],["DATA_REQ_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_WE",[0,0],[instance],["WE_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_TEST_MODE",[0,0],[instance],["TEST_MODE_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_CLK_IN",[0,0],[instance],["CLK_IN_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_RESET",[0,0],[instance],["RESET_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_CLOCK",[0,0],[instance],["SPI_CLOCK_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_MOSI",[0,0],[instance],["SPI_MOSI_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_RST",[0,0],[instance],["SPI_RST_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_SCLK",[0,0],[instance],["SPI_SCLK_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_SS",[0,0],[instance],["SPI_SS_pad"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_DOUT32",[0,0],[instance],["DOUT32_PO"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"MEM_SPI_MISO",[0,0],[instance],["SPI_MISO_PO"],[[0,0]],[False,0])
 
-
-
-			if tag_top_SYSCLK:
-				connection_to_top_mem_pclk_list = connection_top_SYSCLK["to"]
-				connection_to_top_mem_pclk_dict = {}
-				connection_to_top_mem_pclk_dict["instance"] = instance
-				connection_to_top_mem_pclk_dict["port"] = "pclk"
-				connection_to_top_mem_pclk_list.append(connection_to_top_mem_pclk_dict)
-				connection_top_SYSCLK["to"] = connection_to_top_mem_pclk_list
-				connections.append(connection_top_SYSCLK)
-
-
-
-			if tag_top_SYSRESETN:
-				connection_to_top_mem_SYSRESETN_list = connection_top_SYSRESETN["to"]
-				connection_to_top_mem_SYSRESETN_dict = {}
-				connection_to_top_mem_SYSRESETN_dict["instance"] = instance
-				connection_to_top_mem_SYSRESETN_dict["port"] = "presetn"
-				connection_to_top_mem_SYSRESETN_list.append(connection_to_top_mem_SYSRESETN_dict)
-				connection_top_SYSRESETN["to"] = connection_to_top_mem_SYSRESETN_list
-				connections.append(connection_top_SYSRESETN)
-
-
-
-			if not tag_ahp_PADDR_11_8:
-				connection_ahp_PADDR_11_8 = {}
-				connection_ahp_PADDR_11_8["type"] = "adhoc"
-
-				connection_from_ahp_PADDR_11_8 = {}
-				connection_from_ahp_PADDR_11_8["instance"] = instance_ahp
-				connection_from_ahp_PADDR_11_8["port"] = "PADDR"
-				connection_from_ahp_PADDR_11_8["range"] = {}
-				connection_from_ahp_PADDR_11_8["range"]["max"] = 11
-				connection_from_ahp_PADDR_11_8["range"]["min"] = 8
-				connection_ahp_PADDR_11_8["from"] = connection_from_ahp_PADDR_11_8
-
-				connection_to_ahp_PADDR_11_8_list = []
-				connection_to_ahp_PADDR_11_8_dict = {}
-				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
-				connection_to_ahp_PADDR_11_8_dict["port"] = "paddr"
-				connection_to_ahp_PADDR_11_8_dict["range"] = {}
-				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
-				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
-				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
-				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
-				connections.append(connection_ahp_PADDR_11_8)
-
+			if not tag_top_PCLK:
+				addConnection_from_to("clock",False,instance_m0,"PCLK",[0,0],[instance],["pclk"],[[0,0]],[False,0])
 			else:
-				connection_to_ahp_PADDR_11_8_list = connection_ahp_PADDR_11_8["to"]
-				connection_to_ahp_PADDR_11_8_dict = {}
-				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
-				connection_to_ahp_PADDR_11_8_dict["port"] = "paddr"
-				connection_to_ahp_PADDR_11_8_dict["range"] = {}
-				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
-				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
-				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
-				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
-				connections.append(connection_ahp_PADDR_11_8)
+				addConnection_to(connection_top_PCLK,False,[instance],["pclk"],[[0,0]])
 
-
-
-			if not tag_ahp_PENABLE:
-				connection_ahp_PENABLE = {}
-				connection_ahp_PENABLE["type"] = "adhoc"
-
-				connection_from_ahp_PENABLE = {}
-				connection_from_ahp_PENABLE["instance"] = instance_ahp
-				connection_from_ahp_PENABLE["port"] = "PENABLE"
-				connection_ahp_PENABLE["from"] = connection_from_ahp_PENABLE
-
-				connection_to_ahp_PENABLE_list = []
-				connection_to_ahp_PENABLE_dict = {}
-				connection_to_ahp_PENABLE_dict["instance"] = instance
-				connection_to_ahp_PENABLE_dict["port"] = "penable"
-				connection_to_ahp_PENABLE_list.append(connection_to_ahp_PENABLE_dict)
-				connection_ahp_PENABLE["to"] = connection_to_ahp_PENABLE_list
-				connections.append(connection_ahp_PENABLE)
-
+			if not tag_top_PRESETn:
+				addConnection_from_to("reset",False,instance_m0,"PRESETn",[0,0],[instance],["presetn"],[[0,0]],[False,0])
 			else:
-				connection_to_ahp_PENABLE_list = connection_ahp_PENABLE["to"]
-				connection_to_ahp_PENABLE_dict = {}
-				connection_to_ahp_PENABLE_dict["instance"] = instance
-				connection_to_ahp_PENABLE_dict["port"] = "penable"
-				connection_to_ahp_PENABLE_list.append(connection_to_ahp_PENABLE_dict)
-				connection_ahp_PENABLE["to"] = connection_to_ahp_PENABLE_list
-				connections.append(connection_ahp_PENABLE)
-
-
-
-			if not tag_ahp_PWRITE:
-				connection_ahp_PWRITE = {}
-				connection_ahp_PWRITE["type"] = "adhoc"
-
-				connection_from_ahp_PWRITE = {}
-				connection_from_ahp_PWRITE["instance"] = instance_ahp
-				connection_from_ahp_PWRITE["port"] = "PWRITE"
-				connection_ahp_PWRITE["from"] = connection_from_ahp_PWRITE
-
-				connection_to_ahp_PWRITE_list = []
-				connection_to_ahp_PWRITE_dict = {}
-				connection_to_ahp_PWRITE_dict["instance"] = instance
-				connection_to_ahp_PWRITE_dict["port"] = "pwrite"
-				connection_to_ahp_PWRITE_list.append(connection_to_ahp_PWRITE_dict)
-				connection_ahp_PWRITE["to"] = connection_to_ahp_PWRITE_list
-				connections.append(connection_ahp_PWRITE)
-
-			else:
-				connection_to_ahp_PWRITE_list = connection_ahp_PWRITE["to"]
-				connection_to_ahp_PWRITE_dict = {}
-				connection_to_ahp_PWRITE_dict["instance"] = instance
-				connection_to_ahp_PWRITE_dict["port"] = "pwrite"
-				connection_to_ahp_PWRITE_list.append(connection_to_ahp_PWRITE_dict)
-				connection_ahp_PWRITE["to"] = connection_to_ahp_PWRITE_list
-				connections.append(connection_ahp_PWRITE)
-
-
-
-			if not tag_ahp_PWDATA:
-				connection_ahp_PWDATA = {}
-				connection_ahp_PWDATA["type"] = "adhoc"
-
-				connection_from_ahp_PWDATA = {}
-				connection_from_ahp_PWDATA["instance"] = instance_ahp
-				connection_from_ahp_PWDATA["port"] = "PWDATA"
-				connection_ahp_PWDATA["from"] = connection_from_ahp_PWDATA
-
-				connection_to_ahp_PWDATA_list = []
-				connection_to_ahp_PWDATA_dict = {}
-				connection_to_ahp_PWDATA_dict["instance"] = instance
-				connection_to_ahp_PWDATA_dict["port"] = "pwdata"
-				connection_to_ahp_PWDATA_list.append(connection_to_ahp_PWDATA_dict)
-				connection_ahp_PWDATA["to"] = connection_to_ahp_PWDATA_list
-				connections.append(connection_ahp_PWDATA)
-
-			else:
-				connection_to_ahp_PWDATA_list = connection_ahp_PWDATA["to"]
-				connection_to_ahp_PWDATA_dict = {}
-				connection_to_ahp_PWDATA_dict["instance"] = instance
-				connection_to_ahp_PWDATA_dict["port"] = "pwdata"
-				connection_to_ahp_PWDATA_list.append(connection_to_ahp_PWDATA_dict)
-				connection_ahp_PWDATA["to"] = connection_to_ahp_PWDATA_list
-				connections.append(connection_ahp_PWDATA)
-
-
+				addConnection_to(connection_top_PRESETn,False,[instance],["presetn"],[[0,0]])
 
 		elif (generator == 'pll-gen'):
-			connection_slave_pll_APBM = {}
-			connection_slave_pll_APBM["type"] = "apb"
+			#addConnection_from_to("apb",False,instance_slave,"APBM" + str(module_number),[0,0],[instance],["PLL_APBS"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_number+2),[0,0],[instance],["PSEL"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_slave,"PRDATA" + str(module_number+2),[31,0],[instance],["PRDATA"],[[31,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_number+2),[0,0],[instance],["PREADY"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_number+2),[0,0],[instance],["PSLVERR"],[[0,0]],[False,0])
 
-			connection_from_slave_pll_APBM = {}
-			connection_from_slave_pll_APBM["instance"] = instance_slave
-			connection_from_slave_pll_APBM["port"] = "APBM" + str(1 + module_number)
-			connection_slave_pll_APBM["from"] = connection_from_slave_pll_APBM
+			addConnection_from_to("clock",False,"toplevel","SYSCLKOUT" + str(module_number),[0,0],[instance],["CLKOUT"],[[0,0]],[False,0])
 
-			connection_to_slave_pll_PLL_APBS_list = []
-			connection_to_slave_pll_PLL_APBS_dict = {}
-			connection_to_slave_pll_PLL_APBS_dict["instance"] = instance
-			connection_to_slave_pll_PLL_APBS_dict["port"] = "PLL_APBS"
-			connection_to_slave_pll_PLL_APBS_list.append(connection_to_slave_pll_PLL_APBS_dict)
-			connection_slave_pll_APBM["to"] = connection_to_slave_pll_PLL_APBS_list
-			connections.append(connection_slave_pll_APBM)
+			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[11,0],[instance],["PADDR"],[[11,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance],["PWRITE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance],["PENABLE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance],["PWDATA"],[[31,0]],[False,0])
 
-
-
-			connection_top_pll_SYSCLKOUT = {}
-			connection_top_pll_SYSCLKOUT["type"] = "clock"
-
-			connection_from_top_pll_SYSCLKOUT = {}
-			connection_from_top_pll_SYSCLKOUT["instance"] = "toplevel"
-			connection_from_top_pll_SYSCLKOUT["port"] = "SYSCLKOUT" + str(module_number)
-			connection_top_pll_SYSCLKOUT["from"] = connection_from_top_pll_SYSCLKOUT
-
-			connection_to_top_pll_CLKOUT_list = []
-			connection_to_top_pll_CLKOUT_dict = {}
-			connection_to_top_pll_CLKOUT_dict["instance"] = instance
-			connection_to_top_pll_CLKOUT_dict["port"] = "CLKOUT"
-			connection_to_top_pll_CLKOUT_list.append(connection_to_top_pll_CLKOUT_dict)
-			connection_top_pll_SYSCLKOUT["to"] = connection_to_top_pll_CLKOUT_list
-			connections.append(connection_top_pll_SYSCLKOUT)
-
-
-
-			if tag_top_SYSCLK:
-				connection_to_top_pll_PCLK_list = connection_top_SYSCLK["to"]
-				connection_to_top_pll_PCLK_dict = {}
-				connection_to_top_pll_PCLK_dict["instance"] = instance
-				connection_to_top_pll_PCLK_dict["port"] = "PCLK"
-				connection_to_top_pll_PCLK_list.append(connection_to_top_pll_PCLK_dict)
-				connection_top_SYSCLK["to"] = connection_to_top_pll_PCLK_list
-				connections.append(connection_top_SYSCLK)
-
-
-
-			if tag_top_SYSRESETN:
-				connection_to_top_pll_SYSRESETN_list = connection_top_SYSRESETN["to"]
-				connection_to_top_pll_SYSRESETN_dict = {}
-				connection_to_top_pll_SYSRESETN_dict["instance"] = instance
-				connection_to_top_pll_SYSRESETN_dict["port"] = "PRESETn"
-				connection_to_top_pll_SYSRESETN_list.append(connection_to_top_pll_SYSRESETN_dict)
-				connection_top_SYSRESETN["to"] = connection_to_top_pll_SYSRESETN_list
-				connections.append(connection_top_SYSRESETN)
-
-
-
-			if not tag_ahp_PADDR_11_8:
-				connection_ahp_PADDR_11_8 = {}
-				connection_ahp_PADDR_11_8["type"] = "adhoc"
-
-				connection_from_ahp_PADDR_11_8 = {}
-				connection_from_ahp_PADDR_11_8["instance"] = instance_ahp
-				connection_from_ahp_PADDR_11_8["port"] = "PADDR"
-				connection_from_ahp_PADDR_11_8["range"] = {}
-				connection_from_ahp_PADDR_11_8["range"]["max"] = 11
-				connection_from_ahp_PADDR_11_8["range"]["min"] = 8
-				connection_ahp_PADDR_11_8["from"] = connection_from_ahp_PADDR_11_8
-
-				connection_to_ahp_PADDR_11_8_list = []
-				connection_to_ahp_PADDR_11_8_dict = {}
-				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
-				connection_to_ahp_PADDR_11_8_dict["port"] = "PADDR"
-				connection_to_ahp_PADDR_11_8_dict["range"] = {}
-				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
-				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
-				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
-				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
-				connections.append(connection_ahp_PADDR_11_8)
-
+			if not tag_top_PCLK:
+				addConnection_from_to("clock",False,instance_m0,"PCLK",[0,0],[instance],["PCLK"],[[0,0]],[False,0])
 			else:
-				connection_to_ahp_PADDR_11_8_list = connection_ahp_PADDR_11_8["to"]
-				connection_to_ahp_PADDR_11_8_dict = {}
-				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
-				connection_to_ahp_PADDR_11_8_dict["port"] = "PADDR"
-				connection_to_ahp_PADDR_11_8_dict["range"] = {}
-				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
-				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
-				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
-				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
-				connections.append(connection_ahp_PADDR_11_8)
+				addConnection_to(connection_top_PCLK,False,[instance],["PCLK"],[[0,0]])
 
-
-
-			if not tag_ahp_PENABLE:
-				connection_ahp_PENABLE = {}
-				connection_ahp_PENABLE["type"] = "adhoc"
-
-				connection_from_ahp_PENABLE = {}
-				connection_from_ahp_PENABLE["instance"] = instance_ahp
-				connection_from_ahp_PENABLE["port"] = "PENABLE"
-				connection_ahp_PENABLE["from"] = connection_from_ahp_PENABLE
-
-				connection_to_ahp_PENABLE_list = []
-				connection_to_ahp_PENABLE_dict = {}
-				connection_to_ahp_PENABLE_dict["instance"] = instance
-				connection_to_ahp_PENABLE_dict["port"] = "PENABLE"
-				connection_to_ahp_PENABLE_list.append(connection_to_ahp_PENABLE_dict)
-				connection_ahp_PENABLE["to"] = connection_to_ahp_PENABLE_list
-				connections.append(connection_ahp_PENABLE)
-
+			if not tag_top_PRESETn:
+				addConnection_from_to("reset",False,instance_m0,"PRESETn",[0,0],[instance],["PRESETn"],[[0,0]],[False,0])
 			else:
-				connection_to_ahp_PENABLE_list = connection_ahp_PENABLE["to"]
-				connection_to_ahp_PENABLE_dict = {}
-				connection_to_ahp_PENABLE_dict["instance"] = instance
-				connection_to_ahp_PENABLE_dict["port"] = "PENABLE"
-				connection_to_ahp_PENABLE_list.append(connection_to_ahp_PENABLE_dict)
-				connection_ahp_PENABLE["to"] = connection_to_ahp_PENABLE_list
-				connections.append(connection_ahp_PENABLE)
+				addConnection_to(connection_top_PRESETn,False,[instance],["PRESETn"],[[0,0]])
 
-
-
-			if not tag_ahp_PWRITE:
-				connection_ahp_PWRITE = {}
-				connection_ahp_PWRITE["type"] = "adhoc"
-
-				connection_from_ahp_PWRITE = {}
-				connection_from_ahp_PWRITE["instance"] = instance_ahp
-				connection_from_ahp_PWRITE["port"] = "PWRITE"
-				connection_ahp_PWRITE["from"] = connection_from_ahp_PWRITE
-
-				connection_to_ahp_PWRITE_list = []
-				connection_to_ahp_PWRITE_dict = {}
-				connection_to_ahp_PWRITE_dict["instance"] = instance
-				connection_to_ahp_PWRITE_dict["port"] = "PWRITE"
-				connection_to_ahp_PWRITE_list.append(connection_to_ahp_PWRITE_dict)
-				connection_ahp_PWRITE["to"] = connection_to_ahp_PWRITE_list
-				connections.append(connection_ahp_PWRITE)
-
-			else:
-				connection_to_ahp_PWRITE_list = connection_ahp_PWRITE["to"]
-				connection_to_ahp_PWRITE_dict = {}
-				connection_to_ahp_PWRITE_dict["instance"] = instance
-				connection_to_ahp_PWRITE_dict["port"] = "PWRITE"
-				connection_to_ahp_PWRITE_list.append(connection_to_ahp_PWRITE_dict)
-				connection_ahp_PWRITE["to"] = connection_to_ahp_PWRITE_list
-				connections.append(connection_ahp_PWRITE)
-
-
-
-			if not tag_ahp_PWDATA:
-				connection_ahp_PWDATA = {}
-				connection_ahp_PWDATA["type"] = "adhoc"
-
-				connection_from_ahp_PWDATA = {}
-				connection_from_ahp_PWDATA["instance"] = instance_ahp
-				connection_from_ahp_PWDATA["port"] = "PWDATA"
-				connection_ahp_PWDATA["from"] = connection_from_ahp_PWDATA
-
-				connection_to_ahp_PWDATA_list = []
-				connection_to_ahp_PWDATA_dict = {}
-				connection_to_ahp_PWDATA_dict["instance"] = instance
-				connection_to_ahp_PWDATA_dict["port"] = "PWDATA"
-				connection_to_ahp_PWDATA_list.append(connection_to_ahp_PWDATA_dict)
-				connection_ahp_PWDATA["to"] = connection_to_ahp_PWDATA_list
-				connections.append(connection_ahp_PWDATA)
-
-			else:
-				connection_to_ahp_PWDATA_list = connection_ahp_PWDATA["to"]
-				connection_to_ahp_PWDATA_dict = {}
-				connection_to_ahp_PWDATA_dict["instance"] = instance
-				connection_to_ahp_PWDATA_dict["port"] = "PWDATA"
-				connection_to_ahp_PWDATA_list.append(connection_to_ahp_PWDATA_dict)
-				connection_ahp_PWDATA["to"] = connection_to_ahp_PWDATA_list
-				connections.append(connection_ahp_PWDATA)
+			addConnection_from_to("adhoc",False,instance_m0,"PLL_CLKREF"+str(pll_number),[0,0],[instance],["CLKREF"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"PLL_CLKOUT"+str(pll_number),[0,0],[instance],["CLK_OUT"],[[0,0]],[False,0])
 
 		elif (generator == 'temp-sense-gen'):
-			connection_slave_temp_APBM = {}
-			connection_slave_temp_APBM["type"] = "apb"
+			#addConnection_from_to("apb",False,instance_slave,"APBM" + str(module_number),[0,0],[instance],["TEMP_APBS"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSEL" + str(module_number+2),[0,0],[instance],["PSEL"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_slave,"PRDATA" + str(module_number+2),[31,0],[instance],["PRDATA"],[[31,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_number+2),[0,0],[instance],["PREADY"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_number+2),[0,0],[instance],["PSLVERR"],[[0,0]],[False,0])
 
-			connection_from_slave_temp_APBM = {}
-			connection_from_slave_temp_APBM["instance"] = instance_slave
-			connection_from_slave_temp_APBM["port"] = "APBM" + str(1 + module_number)
-			connection_slave_temp_APBM["from"] = connection_from_slave_temp_APBM
+			addConnection_from_to("clock",False,"toplevel","SYSCLKOUT" + str(module_number),[0,0],[instance],["CLKOUT"],[[0,0]],[False,0])
 
-			connection_to_slave_temp_TEMP_APBS_list = []
-			connection_to_slave_temp_TEMP_APBS_dict = {}
-			connection_to_slave_temp_TEMP_APBS_dict["instance"] = instance
-			connection_to_slave_temp_TEMP_APBS_dict["port"] = "TEMP_APBS"
-			connection_to_slave_temp_TEMP_APBS_list.append(connection_to_slave_temp_TEMP_APBS_dict)
-			connection_slave_temp_APBM["to"] = connection_to_slave_temp_TEMP_APBS_list
-			connections.append(connection_slave_temp_APBM)
+			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[11,0],[instance],["PADDR"],[[11,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance],["PWRITE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance],["PENABLE"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance],["PWDATA"],[[31,0]],[False,0])
 
-
-
-			connection_top_temp_SYSCLKOUT = {}
-			connection_top_temp_SYSCLKOUT["type"] = "clock"
-
-			connection_from_top_temp_SYSCLKOUT = {}
-			connection_from_top_temp_SYSCLKOUT["instance"] = "toplevel"
-			connection_from_top_temp_SYSCLKOUT["port"] = "SYSCLKOUT" + str(module_number)
-			connection_top_temp_SYSCLKOUT["from"] = connection_from_top_temp_SYSCLKOUT
-
-			connection_to_top_temp_CLKOUT_list = []
-			connection_to_top_temp_CLKOUT_dict = {}
-			connection_to_top_temp_CLKOUT_dict["instance"] = instance
-			connection_to_top_temp_CLKOUT_dict["port"] = "CLKOUT"
-			connection_to_top_temp_CLKOUT_list.append(connection_to_top_temp_CLKOUT_dict)
-			connection_top_temp_SYSCLKOUT["to"] = connection_to_top_temp_CLKOUT_list
-			connections.append(connection_top_temp_SYSCLKOUT)
-
-
-
-			if tag_top_SYSCLK:
-				connection_to_top_temp_PCLK_list = connection_top_SYSCLK["to"]
-				connection_to_top_temp_PCLK_dict = {}
-				connection_to_top_temp_PCLK_dict["instance"] = instance
-				connection_to_top_temp_PCLK_dict["port"] = "PCLK"
-				connection_to_top_temp_PCLK_list.append(connection_to_top_temp_PCLK_dict)
-				connection_top_SYSCLK["to"] = connection_to_top_temp_PCLK_list
-				connections.append(connection_top_SYSCLK)
-
-
-
-			if tag_top_SYSRESETN:
-				connection_to_top_temp_SYSRESETN_list = connection_top_SYSRESETN["to"]
-				connection_to_top_temp_SYSRESETN_dict = {}
-				connection_to_top_temp_SYSRESETN_dict["instance"] = instance
-				connection_to_top_temp_SYSRESETN_dict["port"] = "PRESETn"
-				connection_to_top_temp_SYSRESETN_list.append(connection_to_top_temp_SYSRESETN_dict)
-				connection_top_SYSRESETN["to"] = connection_to_top_temp_SYSRESETN_list
-				connections.append(connection_top_SYSRESETN)
-
-
-
-			if not tag_ahp_PADDR_11_8:
-				connection_ahp_PADDR_11_8 = {}
-				connection_ahp_PADDR_11_8["type"] = "adhoc"
-
-				connection_from_ahp_PADDR_11_8 = {}
-				connection_from_ahp_PADDR_11_8["instance"] = instance_ahp
-				connection_from_ahp_PADDR_11_8["port"] = "PADDR"
-				connection_from_ahp_PADDR_11_8["range"] = {}
-				connection_from_ahp_PADDR_11_8["range"]["max"] = 11
-				connection_from_ahp_PADDR_11_8["range"]["min"] = 8
-				connection_ahp_PADDR_11_8["from"] = connection_from_ahp_PADDR_11_8
-
-				connection_to_ahp_PADDR_11_8_list = []
-				connection_to_ahp_PADDR_11_8_dict = {}
-				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
-				connection_to_ahp_PADDR_11_8_dict["port"] = "PADDR"
-				connection_to_ahp_PADDR_11_8_dict["range"] = {}
-				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
-				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
-				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
-				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
-				connections.append(connection_ahp_PADDR_11_8)
-
+			if not tag_top_PCLK:
+				addConnection_from_to("clock",False,instance_m0,"PCLK",[0,0],[instance],["PCLK"],[[0,0]],[False,0])
 			else:
-				connection_to_ahp_PADDR_11_8_list = connection_ahp_PADDR_11_8["to"]
-				connection_to_ahp_PADDR_11_8_dict = {}
-				connection_to_ahp_PADDR_11_8_dict["instance"] = instance
-				connection_to_ahp_PADDR_11_8_dict["port"] = "PADDR"
-				connection_to_ahp_PADDR_11_8_dict["range"] = {}
-				connection_to_ahp_PADDR_11_8_dict["range"]["max"] = 3
-				connection_to_ahp_PADDR_11_8_dict["range"]["min"] = 0
-				connection_to_ahp_PADDR_11_8_list.append(connection_to_ahp_PADDR_11_8_dict)
-				connection_ahp_PADDR_11_8["to"] = connection_to_ahp_PADDR_11_8_list
-				connections.append(connection_ahp_PADDR_11_8)
+				addConnection_to(connection_top_PCLK,False,[instance],["PCLK"],[[0,0]])
 
-
-
-			if not tag_ahp_PENABLE:
-				connection_ahp_PENABLE = {}
-				connection_ahp_PENABLE["type"] = "adhoc"
-
-				connection_from_ahp_PENABLE = {}
-				connection_from_ahp_PENABLE["instance"] = instance_ahp
-				connection_from_ahp_PENABLE["port"] = "PENABLE"
-				connection_ahp_PENABLE["from"] = connection_from_ahp_PENABLE
-
-				connection_to_ahp_PENABLE_list = []
-				connection_to_ahp_PENABLE_dict = {}
-				connection_to_ahp_PENABLE_dict["instance"] = instance
-				connection_to_ahp_PENABLE_dict["port"] = "PENABLE"
-				connection_to_ahp_PENABLE_list.append(connection_to_ahp_PENABLE_dict)
-				connection_ahp_PENABLE["to"] = connection_to_ahp_PENABLE_list
-				connections.append(connection_ahp_PENABLE)
-
+			if not tag_top_PRESETn:
+				addConnection_from_to("reset",False,instance_m0,"PRESETn",[0,0],[instance],["PRESETn"],[[0,0]],[False,0])
 			else:
-				connection_to_ahp_PENABLE_list = connection_ahp_PENABLE["to"]
-				connection_to_ahp_PENABLE_dict = {}
-				connection_to_ahp_PENABLE_dict["instance"] = instance
-				connection_to_ahp_PENABLE_dict["port"] = "PENABLE"
-				connection_to_ahp_PENABLE_list.append(connection_to_ahp_PENABLE_dict)
-				connection_ahp_PENABLE["to"] = connection_to_ahp_PENABLE_list
-				connections.append(connection_ahp_PENABLE)
-
-
-
-			if not tag_ahp_PWRITE:
-				connection_ahp_PWRITE = {}
-				connection_ahp_PWRITE["type"] = "adhoc"
-
-				connection_from_ahp_PWRITE = {}
-				connection_from_ahp_PWRITE["instance"] = instance_ahp
-				connection_from_ahp_PWRITE["port"] = "PWRITE"
-				connection_ahp_PWRITE["from"] = connection_from_ahp_PWRITE
-
-				connection_to_ahp_PWRITE_list = []
-				connection_to_ahp_PWRITE_dict = {}
-				connection_to_ahp_PWRITE_dict["instance"] = instance
-				connection_to_ahp_PWRITE_dict["port"] = "PWRITE"
-				connection_to_ahp_PWRITE_list.append(connection_to_ahp_PWRITE_dict)
-				connection_ahp_PWRITE["to"] = connection_to_ahp_PWRITE_list
-				connections.append(connection_ahp_PWRITE)
-
-			else:
-				connection_to_ahp_PWRITE_list = connection_ahp_PWRITE["to"]
-				connection_to_ahp_PWRITE_dict = {}
-				connection_to_ahp_PWRITE_dict["instance"] = instance
-				connection_to_ahp_PWRITE_dict["port"] = "PWRITE"
-				connection_to_ahp_PWRITE_list.append(connection_to_ahp_PWRITE_dict)
-				connection_ahp_PWRITE["to"] = connection_to_ahp_PWRITE_list
-				connections.append(connection_ahp_PWRITE)
-
-
-
-			if not tag_ahp_PWDATA:
-				connection_ahp_PWDATA = {}
-				connection_ahp_PWDATA["type"] = "adhoc"
-
-				connection_from_ahp_PWDATA = {}
-				connection_from_ahp_PWDATA["instance"] = instance_ahp
-				connection_from_ahp_PWDATA["port"] = "PWDATA"
-				connection_ahp_PWDATA["from"] = connection_from_ahp_PWDATA
-
-				connection_to_ahp_PWDATA_list = []
-				connection_to_ahp_PWDATA_dict = {}
-				connection_to_ahp_PWDATA_dict["instance"] = instance
-				connection_to_ahp_PWDATA_dict["port"] = "PWDATA"
-				connection_to_ahp_PWDATA_list.append(connection_to_ahp_PWDATA_dict)
-				connection_ahp_PWDATA["to"] = connection_to_ahp_PWDATA_list
-				connections.append(connection_ahp_PWDATA)
-
-			else:
-				connection_to_ahp_PWDATA_list = connection_ahp_PWDATA["to"]
-				connection_to_ahp_PWDATA_dict = {}
-				connection_to_ahp_PWDATA_dict["instance"] = instance
-				connection_to_ahp_PWDATA_dict["port"] = "PWDATA"
-				connection_to_ahp_PWDATA_list.append(connection_to_ahp_PWDATA_dict)
-				connection_ahp_PWDATA["to"] = connection_to_ahp_PWDATA_list
-				connections.append(connection_ahp_PWDATA)
+				addConnection_to(connection_top_PRESETn,False,[instance],["PRESETn"],[[0,0]])
 
 	else:
 		return
 
-	last_SYSRESETN = -1
-	last_SYSCLK = -1
+	last_PRESETn = -1
+	last_PCLK = -1
 	last_PADDR = -1
 	last_PENABLE = -1
 	last_PWRITE = -1
@@ -935,19 +375,15 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 	index = []
 	counter = 0
 
-
-
-
-
 	for connection in connections:
 		if "from" in connection:
 			if "port" in connection["from"]:
-				if connection["from"]["port"] == "SYSRESETN":
+				if connection["from"]["port"] == "PRESETn":
 					index.append(counter)
-					last_SYSRESETN = counter
-				elif connection["from"]["port"] == "SYSCLK":
+					last_PRESETn = counter
+				elif connection["from"]["port"] == "PCLK":
 					index.append(counter)
-					last_SYSCLK = counter
+					last_PCLK = counter
 				elif connection["from"]["port"] == "PADDR" and connection["from"]["range"]["max"] == 11 and connection["from"]["range"]["min"] == 8:
 					index.append(counter)
 					last_PADDR = counter
@@ -963,7 +399,7 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 		counter += 1
 
 	counter = 0
-	last = [last_SYSRESETN,last_SYSCLK,last_PADDR,last_PENABLE,last_PWRITE,last_PWDATA]
+	last = [last_PRESETn,last_PCLK,last_PADDR,last_PENABLE,last_PWRITE,last_PWDATA]
 
 	for i in index:
 		if i not in last:
@@ -973,209 +409,29 @@ def connectionGen(generator,instance,module_number,designJson,designDir):
 
 
 	if module_number == total_gen_numbers:
-		connection_tie_ahp_HSEL = {}
-		connection_tie_ahp_HSEL["type"] = "tieoff"
+		# addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_ahp],["HSEL"],[[0,0]],[True,1])
 
-		connection_from_tie_ahp_HSEL = {}
-		connection_from_tie_ahp_HSEL["value"] = 1
-		connection_tie_ahp_HSEL["from"] = connection_from_tie_ahp_HSEL
+		# addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_ahp],["HREADY"],[[0,0]],[True,1])
 
-		connection_to_tie_ahp_HSEL_list = []
-		connection_to_tie_ahp_HSEL_dict = {}
-		connection_to_tie_ahp_HSEL_dict["instance"] = instance_ahp
-		connection_to_tie_ahp_HSEL_dict["port"] = "HSEL"
-		connection_to_tie_ahp_HSEL_list.append(connection_to_tie_ahp_HSEL_dict)
-		connection_tie_ahp_HSEL["to"] = connection_to_tie_ahp_HSEL_list
-		connections.append(connection_tie_ahp_HSEL)
+		addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_m0],["ext_HREADY"],[[0,0]],[True,1])
 
+		addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_m0],["NRST"],[[0,0]],[True,1])
 
+		addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_m0],["TDI"],[[0,0]],[True,1])
 
-		connection_tie_ahp_HREADY = {}
-		connection_tie_ahp_HREADY["type"] = "tieoff"
+		addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_m0],["TDO"],[[0,0]],[True,"open"])
 
-		connection_from_tie_ahp_HREADY = {}
-		connection_from_tie_ahp_HREADY["value"] = 1
-		connection_tie_ahp_HREADY["from"] = connection_from_tie_ahp_HREADY
+		addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_m0],["PCLKG"],[[0,0]],[True,"open"])
 
-		connection_to_tie_ahp_HREADY_list = []
-		connection_to_tie_ahp_HREADY_dict = {}
-		connection_to_tie_ahp_HREADY_dict["instance"] = instance_ahp
-		connection_to_tie_ahp_HREADY_dict["port"] = "HREADY"
-		connection_to_tie_ahp_HREADY_list.append(connection_to_tie_ahp_HREADY_dict)
-		connection_tie_ahp_HREADY["to"] = connection_to_tie_ahp_HREADY_list
-		connections.append(connection_tie_ahp_HREADY)
+		# addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_ahp],["HREADYOUT"],[[0,0]],[True,"open"])
 
+		# addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_ahp],["PSTRB"],[[0,0]],[True,"open"])
 
+		# addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_ahp],["PPROT"],[[0,0]],[True,"open"])
 
-		connection_tie_m0_ext_HREADY = {}
-		connection_tie_m0_ext_HREADY["type"] = "tieoff"
+		addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_slave],["PSLVERR.*|PRDATA.*"],[[0,0]],[True,0])
 
-		connection_from_tie_m0_ext_HREADY = {}
-		connection_from_tie_m0_ext_HREADY["value"] = 1
-		connection_tie_m0_ext_HREADY["from"] = connection_from_tie_m0_ext_HREADY
-
-		connection_to_tie_m0_ext_HREADY_list = []
-		connection_to_tie_m0_ext_HREADY_dict = {}
-		connection_to_tie_m0_ext_HREADY_dict["instance"] = instance_m0
-		connection_to_tie_m0_ext_HREADY_dict["port"] = "ext_HREADY"
-		connection_to_tie_m0_ext_HREADY_list.append(connection_to_tie_m0_ext_HREADY_dict)
-		connection_tie_m0_ext_HREADY["to"] = connection_to_tie_m0_ext_HREADY_list
-		connections.append(connection_tie_m0_ext_HREADY)
-
-
-
-		connection_tie_m0_NRST = {}
-		connection_tie_m0_NRST["type"] = "tieoff"
-
-		connection_from_tie_m0_NRST = {}
-		connection_from_tie_m0_NRST["value"] = 1
-		connection_tie_m0_NRST["from"] = connection_from_tie_m0_NRST
-
-		connection_to_tie_m0_NRST_list = []
-		connection_to_tie_m0_NRST_dict = {}
-		connection_to_tie_m0_NRST_dict["instance"] = instance_m0
-		connection_to_tie_m0_NRST_dict["port"] = "NRST"
-		connection_to_tie_m0_NRST_list.append(connection_to_tie_m0_NRST_dict)
-		connection_tie_m0_NRST["to"] = connection_to_tie_m0_NRST_list
-		connections.append(connection_tie_m0_NRST)
-
-
-
-		connection_tie_m0_TDI = {}
-		connection_tie_m0_TDI["type"] = "tieoff"
-
-		connection_from_tie_m0_TDI = {}
-		connection_from_tie_m0_TDI["value"] = 1
-		connection_tie_m0_TDI["from"] = connection_from_tie_m0_TDI
-
-		connection_to_tie_m0_TDI_list = []
-		connection_to_tie_m0_TDI_dict = {}
-		connection_to_tie_m0_TDI_dict["instance"] = instance_m0
-		connection_to_tie_m0_TDI_dict["port"] = "TDI"
-		connection_to_tie_m0_TDI_list.append(connection_to_tie_m0_TDI_dict)
-		connection_tie_m0_TDI["to"] = connection_to_tie_m0_TDI_list
-		connections.append(connection_tie_m0_TDI)
-
-
-
-		connection_tie_m0_TDO = {}
-		connection_tie_m0_TDO["type"] = "tieoff"
-
-		connection_from_tie_m0_TDO = {}
-		connection_from_tie_m0_TDO["value"] = "open"
-		connection_tie_m0_TDO["from"] = connection_from_tie_m0_TDO
-
-		connection_to_tie_m0_TDO_list = []
-		connection_to_tie_m0_TDO_dict = {}
-		connection_to_tie_m0_TDO_dict["instance"] = instance_m0
-		connection_to_tie_m0_TDO_dict["port"] = "TDO"
-		connection_to_tie_m0_TDO_list.append(connection_to_tie_m0_TDO_dict)
-		connection_tie_m0_TDO["to"] = connection_to_tie_m0_TDO_list
-		connections.append(connection_tie_m0_TDO)
-
-
-
-		connection_tie_m0_PCLKG = {}
-		connection_tie_m0_PCLKG["type"] = "tieoff"
-
-		connection_from_tie_m0_PCLKG = {}
-		connection_from_tie_m0_PCLKG["value"] = "open"
-		connection_tie_m0_PCLKG["from"] = connection_from_tie_m0_PCLKG
-
-		connection_to_tie_m0_PCLKG_list = []
-		connection_to_tie_m0_PCLKG_dict = {}
-		connection_to_tie_m0_PCLKG_dict["instance"] = instance_m0
-		connection_to_tie_m0_PCLKG_dict["port"] = "PCLKG"
-		connection_to_tie_m0_PCLKG_list.append(connection_to_tie_m0_PCLKG_dict)
-		connection_tie_m0_PCLKG["to"] = connection_to_tie_m0_PCLKG_list
-		connections.append(connection_tie_m0_PCLKG)
-
-
-
-		connection_tie_ahp_HREADYOUT = {}
-		connection_tie_ahp_HREADYOUT["type"] = "tieoff"
-
-		connection_from_tie_ahp_HREADYOUT = {}
-		connection_from_tie_ahp_HREADYOUT["value"] = "open"
-		connection_tie_ahp_HREADYOUT["from"] = connection_from_tie_ahp_HREADYOUT
-
-		connection_to_tie_ahp_HREADYOUT_list = []
-		connection_to_tie_ahp_HREADYOUT_dict = {}
-		connection_to_tie_ahp_HREADYOUT_dict["instance"] = instance_ahp
-		connection_to_tie_ahp_HREADYOUT_dict["port"] = "HREADYOUT"
-		connection_to_tie_ahp_HREADYOUT_list.append(connection_to_tie_ahp_HREADYOUT_dict)
-		connection_tie_ahp_HREADYOUT["to"] = connection_to_tie_ahp_HREADYOUT_list
-		connections.append(connection_tie_ahp_HREADYOUT)
-
-
-
-		connection_tie_ahp_PSTRB = {}
-		connection_tie_ahp_PSTRB["type"] = "tieoff"
-
-		connection_from_tie_ahp_PSTRB = {}
-		connection_from_tie_ahp_PSTRB["value"] = "open"
-		connection_tie_ahp_PSTRB["from"] = connection_from_tie_ahp_PSTRB
-
-		connection_to_tie_ahp_PSTRB_list = []
-		connection_to_tie_ahp_PSTRB_dict = {}
-		connection_to_tie_ahp_PSTRB_dict["instance"] = instance_ahp
-		connection_to_tie_ahp_PSTRB_dict["port"] = "PSTRB"
-		connection_to_tie_ahp_PSTRB_list.append(connection_to_tie_ahp_PSTRB_dict)
-		connection_tie_ahp_PSTRB["to"] = connection_to_tie_ahp_PSTRB_list
-		connections.append(connection_tie_ahp_PSTRB)
-
-
-
-		connection_tie_ahp_PPROT = {}
-		connection_tie_ahp_PPROT["type"] = "tieoff"
-
-		connection_from_tie_ahp_PPROT = {}
-		connection_from_tie_ahp_PPROT["value"] = "open"
-		connection_tie_ahp_PPROT["from"] = connection_from_tie_ahp_PPROT
-
-		connection_to_tie_ahp_PPROT_list = []
-		connection_to_tie_ahp_PPROT_dict = {}
-		connection_to_tie_ahp_PPROT_dict["instance"] = instance_ahp
-		connection_to_tie_ahp_PPROT_dict["port"] = "PPROT"
-		connection_to_tie_ahp_PPROT_list.append(connection_to_tie_ahp_PPROT_dict)
-		connection_tie_ahp_PPROT["to"] = connection_to_tie_ahp_PPROT_list
-		connections.append(connection_tie_ahp_PPROT)
-
-
-
-		connection_tie_slave_PSLVERR = {}
-		connection_tie_slave_PSLVERR["type"] = "tieoff"
-
-		connection_from_tie_slave_PSLVERR = {}
-		connection_from_tie_slave_PSLVERR["value"] = 0
-		connection_tie_slave_PSLVERR["from"] = connection_from_tie_slave_PSLVERR
-
-		connection_to_tie_slave_PSLVERR_list = []
-		connection_to_tie_slave_PSLVERR_dict = {}
-		connection_to_tie_slave_PSLVERR_dict["instance"] = instance_slave
-		connection_to_tie_slave_PSLVERR_dict["port"] = "PSLVERR.*|PRDATA.*"
-		connection_to_tie_slave_PSLVERR_list.append(connection_to_tie_slave_PSLVERR_dict)
-		connection_tie_slave_PSLVERR["to"] = connection_to_tie_slave_PSLVERR_list
-		connections.append(connection_tie_slave_PSLVERR)
-
-
-
-		connection_tie_slave_PSEL = {}
-		connection_tie_slave_PSEL["type"] = "tieoff"
-
-		connection_from_tie_slave_PSEL = {}
-		connection_from_tie_slave_PSEL["value"] = "open"
-		connection_tie_slave_PSEL["from"] = connection_from_tie_slave_PSEL
-
-		connection_to_tie_slave_PSEL_list = []
-		connection_to_tie_slave_PSEL_dict = {}
-		connection_to_tie_slave_PSEL_dict["instance"] = instance_slave
-		connection_to_tie_slave_PSEL_dict["port"] = "PSEL.*"
-		connection_to_tie_slave_PSEL_list.append(connection_to_tie_slave_PSEL_dict)
-		connection_tie_slave_PSEL["to"] = connection_to_tie_slave_PSEL_list
-		connections.append(connection_tie_slave_PSEL)
-
-
+		addConnection_from_to("tieoff",False,"None","None",[0,0],[instance_slave],["PSEL.*"],[[0,0]],[True,"open"])
 
 		connection_tie_slave_PREADY = {}
 		connection_tie_slave_PREADY["type"] = "tieoff"

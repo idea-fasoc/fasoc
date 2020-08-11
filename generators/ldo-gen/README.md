@@ -5,8 +5,8 @@ See more at https://fasoc.engin.umich.edu/digital-ldo/
 
 # Version Details
 ```
-Version : Alpha-1.0                                                             
-Date    : May 12, 2019 
+Version : Beta-1.0                                                             
+Date    : June 7, 2020
 ```
 
 # What's in the release
@@ -24,7 +24,7 @@ Ensure that your machine has all of the required tools setup and have access to 
 
 
 # Tool Setup
-1. Add the Auxiliary library and Model directory paths to the [`fasoc/config/platform_config.json`](https://github.com/idea-fasoc/fasoc/blob/master/config/platform_config.json) file under the corresponding technology node. `ldo-gen` currently supports tsmc65lp and gfbicmos8hp nodes. An example of the platform config with the variable descriptions is provided below.
+1. Add the Auxiliary library and Model directory paths to the [`fasoc/config/platform_config.json`](https://github.com/idea-fasoc/fasoc/blob/master/config/platform_config.json) file under the corresponding technology node. `ldo-gen` currently supports tsmc65lp, gfbicmos8hp and gf12lp nodes. An example of the platform config with the variable descriptions is provided below.
     ```bash
     "tsmc65lp": {
       "nominal_voltage": 1.2,
@@ -61,13 +61,33 @@ Ensure that your machine has all of the required tools setup and have access to 
     __hspiceModels__
     - Folder path containing the spice models of the technology node.
    
-1. Run the test script from `ldo-gen` folder to ensure the generator tool and the model tool are correctly setup
+1. There are three modes of LDO-GEN tool, and the function of each mode is described in "Running the tools" section. Run the following commands as a validation for the LDO-GEN tool setup.
+  
+    __To ensure the "verilog" mode is correctly setup, run the below test command from `ldo-gen` folder.__
+    - The ldo gen "verilog" mode is successfully setup if the the build generates `generators/ldo-gen/work/*.v` files at the end of the run.
     ```bash
     make gen_65lp (for TSMC65lp) or
-    make gen_8hp  (for GFBICMOS8HP)
+    make gen_8hp  (for GFBICMOS8HP) or
+    make gen_12lp (for GF12LP)
     ``` 
-    The ldo gen tool is successfully setup if the the builds generates `generators/ldo-gen/work/*.v` at the end of the run. 
-
+     
+    __To ensure the "macro" mode is correctly setup, run the below test command from `ldo-gen` folder.__
+    - The ldo gen "macro" mode is successfully setup if the the build generates `generators/ldo-gen/work/*.gds.gz` files at the end of the run. 
+    ```bash
+    make gen_65lp_macro (for TSMC65lp) or
+    make gen_8hp_macro  (for GFBICMOS8HP) or
+    make gen_12lp_macro (for GF12LP)
+    ``` 
+    
+    
+    __To ensure the "full" mode is correctly setup, run the below test command from `ldo-gen` folder.__
+    - The ldo gen "full" mode is successfully setup if the the build generate `generators/ldo-gen/work/*.gds.gz` files and completes the run without any errors. 
+    ```bash
+    make gen_65lp_full (for TSMC65lp) or
+    make gen_8hp_full  (for GFBICMOS8HP) or
+    make gen_12lp_full (for GF12LP)
+    ``` 
+    
 
 # Running the tools
 1. Prepare an input spec "Input_Spec_File.json" file similar to `fasoc/generators/ldo-gen/test.json`. An example of the input spec file with variable descriptions is provided below.
@@ -76,7 +96,7 @@ Ensure that your machine has all of the required tools setup and have access to 
       "module_name": "ldoInst",
       "generator": "ldo-gen",
       "specifications": {
-        "vin": 0.7,
+        "vin": 0.8,
         "imax": "1e-03"
       }
     }
@@ -92,12 +112,12 @@ Ensure that your machine has all of the required tools setup and have access to 
     __specifications__
     - _vin_
       - Input Voltage of the LDO. 
-      - `vin` values from the set [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3] are supported for TSMC65lp PDK 
-      - `vin` values from the set [0.6, 0.7, 0.8, 0.9, 1.0] are supported for GFBiCMOS8HP PDK (Using old auxiliary cells).
+      - `vin` values from the set [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3] are supported for TSMC65lp & GFBiCMOS8HP PDKs.
+      - `vin` values from the set [0.6, 0.7, 0.8, 0.9] are supported for GF12LP PDK.
     - _imax_
       - Maximum Output Load Current. 
-      - `imax` values in the range [0.5e-03, 25e-03] are supported for TSMC65lp PDK.
-      - `imax` values in the range [0.5e-03, 1.5e-03] are supported for GFBiCMOS8HP PDK (Using old auxiliary cells).
+      - `imax` values in the range [0.5e-03, 25e-03] are supported for TSMC65lp & GFBiCMOS8HP PDKs.
+      - `imax` values in the range [0.5e-03, 19.5e-03] are supported for GF12LP PDK.
 
 1. Running the LDO generator. 
    To run the LDO generator, execute the below command from any location.

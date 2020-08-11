@@ -1,0 +1,2 @@
+SOFTINCLUDE /usr/caen/incisive-15.20.005/tools/inca/files/cds.lib
+define worklib ../worklib

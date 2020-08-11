@@ -1,0 +1,27 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
++delay_mode_unit
+-INPUT
+dump_irun.tcl
+-MESSAGES
++EMGRLOG
+irun_run.log
+-XLSTIME
+1578606843
+-XLKEEP
+-XLMODE
+./INCA_libs/irun.lnx8664.15.20.nc
+-RUNMODE
+-CDSLIB
+./INCA_libs/irun.lnx8664.15.20.nc/cds.lib
+-HDLVAR
+./INCA_libs/irun.lnx8664.15.20.nc/hdl.var
+-XLNAME
+irun
+-XLVERSION
+"TOOL:	irun(64)	15.20-s005"
+-CMDPSIM
+-XLNAME
+./INCA_libs/irun.lnx8664.15.20.nc/grandtraverse.eecs.umich.edu_27473

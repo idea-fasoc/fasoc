@@ -1,0 +1,16 @@
+{
+ "pll_model_constants": {
+  "CF": 2.965883e-13,
+  "Cc": 4.36437e-11,
+  "Cf": 9.941385e-13,
+  "Iavg_const": 10082590.0,
+  "1M_PN_const": 1.4e-11,
+  "A_CC": 16.92,
+  "A_FC": 6.84 
+ },
+ "pex coefficients": {
+  "mult_Con": 2.53,
+  "mult_Coff": 2.53,
+  "pex_Iavg_const": 10082590.0
+ }
+}

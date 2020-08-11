@@ -499,7 +499,7 @@ class MemGen():
  
                elif p_options['Mode'] == 'macro':
                        fileName= self.digitalflowdir +'/export/'+self.sram_name
-                 #Verilog files
+	               #Verilog files
                        try:
                              vf = fileName+'.lvs.v'
                              shutil.copy(vf, p_options['Opdir'])
@@ -509,7 +509,7 @@ class MemGen():
                                         log.error("%s verilog is not created. Check if the APR is successful and the verilog file is generated. Check the run log"%vf)
                                         log.error("SRAM Macro Generation Failed. Check the log file for more information.")
                                         sys.exit(1)
-           #GDS file
+		       #GDS file
                        try:
                              gds = fileName+'.gds.gz'
                              shutil.copy(gds, p_options['Opdir'])

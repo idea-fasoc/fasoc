@@ -1,0 +1,17 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
+-64bit
+-R
+-sv
+-sem2009
+-access
++rwc
+-input
+dump_irun.tcl
++delay_mode_unit
+-timescale
+1ns/1ps
+-l
+irun_run.log

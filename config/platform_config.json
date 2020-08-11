@@ -20,8 +20,15 @@
       "nominal_voltage": 1.2,
       "aux_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/aux_lib_8hp",
       "model_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/model_8hp",
-      "calibreRules": "/net/gaylord/l/yaswanth/forTutu/ruleFiles_8hp",
+      "calibreRules": "/net/gaylord/l/yaswanth/Research/forTutu/ruleFiles_8hp",
       "hspiceModels": "/afs/eecs.umich.edu/kits/GF/130HPSIGE-8HP/V1.8_0.1HP/Models/HSPICE/models"
+    },
+    "gf12lp": {
+      "nominal_voltage": 0.8,
+      "aux_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/aux_lib_gf12lp_10p5_track",
+      "model_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/model_12lp",
+      "calibreRules": "/net/gaylord/l/yaswanth/Research/forTutu/ruleFiles_12lp",
+      "hspiceModels": "/afs/eecs.umich.edu/kits/GF/12LP/V1.0_2.1/Models/HSPICE/models"
     }
   }
 }

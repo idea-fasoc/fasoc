@@ -1,0 +1,16 @@
+{
+ "instance_name": "sar",
+ "generator": "adc-gen",
+ "specifications": {
+  "fsampling": 1000000,
+  "target enob": 7.4,
+  "optimization": "area",
+  "model": "modelfile.csv"
+ },
+ "results": {
+  "platform": "gf12lp",
+  "area": 1000,
+  "enob": 7.652437,
+  "power": 1.7095e-06
+ }
+}

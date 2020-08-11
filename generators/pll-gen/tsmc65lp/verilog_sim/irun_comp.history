@@ -1,1 +1,0 @@
-s1(24May2019:13:00:28):  irun -64bit -elaborate -sv -sem2009 -sysv_ext +.vh -access +rwc -timescale 1ns/1ps -f ./flist.f -l irun_comp.log 

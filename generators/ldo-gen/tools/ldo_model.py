@@ -47,8 +47,10 @@ parser.add_argument('--clean', action='store_true',
                     help='To clean the workspace.')
 args = parser.parse_args()
 
-if args.platform != 'tsmc65lp' and args.platform != 'gfbicmos8hp':
-   print('Error: Only supports TSMC65lp and GFBiCmos8hp kits as of now.')
+if args.platform != 'tsmc65lp' and args.platform != 'gfbicmos8hp' and \
+   args.platform != 'gf12lp':
+   print('Error: Only supports TSMC65lp, GFBiCmos8hp and GF12LP kits ' + \
+         'as of now.')
    sys.exit(1)
 
 if not os.path.isdir(pvtGenDir):   
@@ -162,7 +164,8 @@ except OSError:
 print('#---------------------------------------------------------------------')
 print('# Configuring Synth and APR scripts...')
 print('#---------------------------------------------------------------------')
-cfg.ldo_model_dg_flow_cfg(args.platform, platformConfig['aux_lib'], flowDir)
+cfg.ldo_model_dg_flow_cfg(args.platform, platformConfig['nominal_voltage'], \
+                          platformConfig['aux_lib'], flowDir)
 
 #------------------------------------------------------------------------------
 # Initialize the local variables
@@ -173,7 +176,7 @@ numIter = 0
 startDT = datetime.datetime.now()
 for arrSize in [2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, \
                 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, \
-                220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 500]:
+                220]:
    print('#---------------------------------------------------------------' + \
          '------')
    print('# Running the sim loop for array size = %s...' % arrSize)

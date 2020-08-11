@@ -1,1 +1,1 @@
-python ./tools/auto_netgen.py 7 1 1 1
+python tools/../tools/auto_netgen.py 8 1 1 1

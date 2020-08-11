@@ -1,0 +1,109 @@
+
+#
+# Preferences
+#
+preferences set plugin-enable-svdatabrowser-new 1
+preferences set toolbar-Standard-Console {
+  usual
+  position -pos 1
+}
+preferences set toolbar-Search-Console {
+  usual
+  position -pos 2
+}
+preferences set toolbar-Standard-WaveWindow {
+  usual
+  position -pos 1
+}
+preferences set plugin-enable-groupscope 0
+preferences set plugin-enable-interleaveandcompare 0
+preferences set plugin-enable-waveformfrequencyplot 0
+preferences set toolbar-WaveZoom-WaveWindow {
+  usual
+  position -pos 1
+}
+
+#
+# Databases
+#
+database require tb_pll_controller_tdc_counter -search {
+	./tb_pll_controller_tdc_counter.shm/tb_pll_controller_tdc_counter.trn
+	/afs/eecs.umich.edu/wics/users/kmkwon/IDEA/fasoc/fasoc/generators/pll-gen/verilog_sim/single_ended_dco/tb_pll_controller_tdc_counter.shm/tb_pll_controller_tdc_counter.trn
+}
+
+#
+# Mnemonic Maps
+#
+mmap new -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+#
+# Waveform windows
+#
+if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1748x675+49+47}] != ""} {
+    window geometry "Waveform 1" 1748x675+49+47
+}
+window target "Waveform 1" on
+waveform using {Waveform 1}
+waveform sidebar select designbrowser
+waveform set \
+    -primarycursor TimeA \
+    -signalnames name \
+    -signalwidth 175 \
+    -units ns \
+    -valuewidth 75
+waveform baseline set -time 0
+
+set id [waveform add -signals  {
+	{tb_pll_controller_tdc_counter::tb_pll_controller_tdc_counter.capture_mux_out[24:0]}
+	} ]
+set id [waveform add -signals  {
+	{tb_pll_controller_tdc_counter::tb_pll_controller_tdc_counter.capture_mux_sel[3:0]}
+	} ]
+set id [waveform add -signals  {
+	tb_pll_controller_tdc_counter::tb_pll_controller_tdc_counter.clk_dither
+	} ]
+set id [waveform add -signals  {
+	{tb_pll_controller_tdc_counter::tb_pll_controller_tdc_counter.u_pll_controller_tdc_counter.u_pll_controller.CAPTURE_MUX_OUT[24:0]}
+	} ]
+set id [waveform add -signals  {
+	{tb_pll_controller_tdc_counter::tb_pll_controller_tdc_counter.u_pll_controller_tdc_counter.u_pll_controller.CAPTURE_MUX_OUT[24:0]}
+	} ]
+set id [waveform add -signals  {
+	tb_pll_controller_tdc_counter::tb_pll_controller_tdc_counter.u_analog_core.u_dco_model.frequency
+	} ]
+waveform format $id -trace analogSampleAndHold
+waveform axis range $id -for default -min 0 -max 6739815096.3261089 -scale linear
+set id [waveform add -signals  {
+	tb_pll_controller_tdc_counter::tb_pll_controller_tdc_counter.u_analog_core.u_dco_model.frequency
+	} ]
+waveform format $id -trace analogSampleAndHold
+waveform axis range $id -for default -min 0 -max 6739815096.3261089 -scale linear
+set id [waveform add -signals  {
+	tb_pll_controller_tdc_counter::tb_pll_controller_tdc_counter.u_analog_core.u_dco_model.freq_noise
+	} ]
+waveform format $id -trace analogSampleAndHold
+waveform axis range $id -for default -min -582467.15035526862 -max 915140.82901540934 -scale linear
+set id [waveform add -signals  {
+	tb_pll_controller_tdc_counter::tb_pll_controller_tdc_counter.u_analog_core.u_dco_model.dco_clk
+	} ]
+
+waveform xview limits 5356.386357ns 5570ns
+
+#
+# Waveform Window Links
+#
+
+#
+# Console windows
+#
+console set -windowname Console
+window geometry Console 600x250+0+0
+
+#
+# Layout selection
+#

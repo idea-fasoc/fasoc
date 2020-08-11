@@ -58,8 +58,6 @@ if os.path.isdir(simDir + '/run'):
    shutil.rmtree(simDir + '/run', ignore_errors=True)
 if os.path.isdir(extDir + '/run'):
    shutil.rmtree(extDir + '/run', ignore_errors=True)
-if os.path.isdir(extDir + '/run/'):
-   shutil.rmtree(extDir + '/run/*', ignore_errors=True)
 
 try:
    os.mkdir(extDir + '/run')
@@ -100,18 +98,37 @@ time.sleep(2)
 # Define the internal variables used
 #ptCell = 'PT_UNIT_CELL'
 
-aux1 = 'INVXRVT_ISOVDD'
-aux2 = 'BUFX4RVT_ISOVDD'
-aux3 = 'INV_X1M_A9TR'
-aux4 = 'BUF_X4M_A9TR'
-aux5 = 'NAND2_X1M_A9TR'
-aux6 = 'INV_X2M_A9TR'
-aux7 = 'NOR2_X1M_A9TR'
-aux8 = 'NAND3_X1M_A9TR'
-aux9 = 'XNOR2_X1M_A9TR'
-aux10 = 'PRECHARGEX1'
-aux11 = 'LC1P2TO3P6X1RVT_VDDX4'
-aux12 = 'DFFRPQ_X1M_A9TR'
+
+
+if args.platform == 'tsmc65lp' :
+  print("Selecting Aux Cells from platform: " + args.platform)
+  aux1 = 'INVXRVT_ISOVDD'
+  aux2 = 'BUFX4RVT_ISOVDD'
+  aux3 = 'INV_X1M_A9TR'
+  aux4 = 'BUF_X4M_A9TR'
+  aux5 = 'NAND2_X1M_A9TR'
+  aux6 = 'INV_X2M_A9TR'
+  aux7 = 'NOR2_X1M_A9TR'
+  aux8 = 'NAND3_X1M_A9TR'
+  aux9 = 'XNOR2_X1M_A9TR'
+  aux10 = 'PRECHARGEX1'
+  aux11 = 'LC1P2TO3P6X1RVT_VDDX4'
+  aux12 = 'DFFRPQ_X1M_A9TR'
+if args.platform == 'gf12lp' :
+  print("Selecting Aux Cells from platform: " + args.platform)
+  aux1 = 'INVP_X0P4N_A10P5PP84TR_C14'
+  aux2 = 'BUF_X0P4N_A10P5PP84TR_C14'
+  aux3 = 'INVP_X0P4N_A10P5PP84TR_C14'
+  aux4 = 'BUF_X0P4N_A10P5PP84TR_C14'
+  aux5 = 'NAND2_X0P4N_A10P5PP84TR_C14'
+  aux6 = 'INVP_X0P4N_A10P5PP84TR_C14'
+  aux7 = 'NOR2_X0P4N_A10P5PP84TR_C14'
+  aux8 = 'NAND3_X0P4N_A10P5PP84TR_C14'
+  aux9 = 'XNOR2_X0P6N_A10P5PP84TR_C14'
+  aux10 = 'PRECHARGEX1'
+  aux11 = 'SLC_cell'
+  aux12 = 'DFFRPQ_X1N_A10P5PP84TR_C14'
+
 
 ##change
 # #aLib1 = platformConfig['aux_lib'] + '/libs/' + aux1
@@ -153,7 +170,14 @@ CDC_netlist.gen_cdc_analog(npre,aux10,aux11,srcDir)
 CDC_netlist.gen_cdc_cnt(aux12,aux3,aux5,aux4,srcDir)
 CDC_netlist.gen_cdc_top(aux6,aux4,srcDir)
 
-shutil.copyfile(flowDir + '/src/cdcInst.v',   flowDir + '/src/' + designName + '.v')
+shutil.copyfile(srcDir + '/cdcInst.v',   flowDir + '/src/' + designName + '.v')
+shutil.copyfile(srcDir + '/CDCW_CNT.v',   flowDir + '/src/' + 'CDCW_CNT' + '.v')
+shutil.copyfile(srcDir + '/CDC_ANALOG.nl.v',   flowDir + '/src/' + 'CDC_ANALOG.nl' + '.v')
+shutil.copyfile(srcDir + '/DLY_COMP.nl.v',   flowDir + '/src/' + 'DLY_COMP.nl' + '.v')
+shutil.copyfile(srcDir + '/NEXT_EDGE_GEN.nl.v',   flowDir + '/src/' + 'NEXT_EDGE_GEN.nl' + '.v')
+shutil.copyfile(srcDir + '/CDC_ANALOG2.nl.v',   flowDir + '/src/' + 'CDC_ANALOG2.nl' + '.v')
+shutil.copyfile(srcDir + '/INVCHAIN_ISOVDD.nl.v',   flowDir + '/src/' + 'INVCHAIN_ISOVDD.nl' + '.v')
+
 with open(flowDir + '/src/' + designName  + '.v', 'r') as file:
    filedata = file.read()
 filedata = re.sub(r'cdcInst*', r' ' + \
@@ -165,11 +189,19 @@ print('#----------------------------------------------------------------------')
 print('# Verilog Generated')
 print('#----------------------------------------------------------------------')
 
+# designAreaVerilog= 2621.44 + 2621.4*0.001*nhead
+# jsonSpec['results'] = {'platform': args.platform}
+# jsonSpec['results'].update({'area': designAreaVerilog})
+# jsonSpec['results'].update({'error': error})
+# jsonSpec['results'].update({'power': power})
+
+# with open(args.outputDir + '/' + designName + '.json', 'w') as resultSpecfile:
+#    json.dump(jsonSpec, resultSpecfile, indent=True)
+
 time.sleep(2)
 if args.mode == 'verilog':
   print("Exiting tool....")
-  sys.exit(1)
-  #exit()
+  exit()
 #------------------------------------------------------------------------------
 # Configure Synth and APR scripts
 #------------------------------------------------------------------------------
@@ -210,32 +242,43 @@ if not os.path.exists(flowPtExportDir):
   os.makedirs(flowPtExportDir)
 
 
+if args.platform == 'tsmc65lp' :   
+  shutil.copyfile(aLib + '/'  + aux1 + '/latest/' + aux1 + '_tt.db',   flowPtExportDir + "/" + aux1 + '_tt.db')
+  shutil.copyfile(aLib + '/'  + aux2 + '/latest/' + aux2 + '_tt.db',   flowPtExportDir + "/" + aux2 + '_tt.db')
+  shutil.copyfile(aLib + '/'  + aux10 + '/latest/' + aux10 + '_tt.db',   flowPtExportDir + "/" + aux10 + '_tt.db')
+  shutil.copyfile(aLib + '/'  + aux11 + '/latest/' + aux11 + '_tt.db',   flowPtExportDir + "/" + aux11 + '_tt.db')
 
-shutil.copyfile(aLib + '/'  + aux1 + '/latest/' + aux1 + '_tt.db',   flowPtExportDir + "/" + aux1 + '_tt.db')
-shutil.copyfile(aLib + '/'  + aux2 + '/latest/' + aux2 + '_tt.db',   flowPtExportDir + "/" + aux2 + '_tt.db')
-shutil.copyfile(aLib + '/'  + aux10 + '/latest/' + aux10 + '_tt.db',   flowPtExportDir + "/" + aux10 + '_tt.db')
-shutil.copyfile(aLib + '/'  + aux11 + '/latest/' + aux11 + '_tt.db',   flowPtExportDir + "/" + aux11 + '_tt.db')
+  shutil.copyfile(aLib + '/'  + aux1 + '/latest/' + aux1 + '_tt.lib',   flowPtExportDir + "/" + aux1 + '_tt.lib')
+  shutil.copyfile(aLib + '/'  + aux2 + '/latest/' + aux2 + '_tt.lib',   flowPtExportDir + "/" + aux2 + '_tt.lib')
+  shutil.copyfile(aLib + '/'  + aux10 + '/latest/' + aux10 + '_tt.lib',   flowPtExportDir + "/" + aux10 + '_tt.lib')
+  shutil.copyfile(aLib + '/'  + aux11 + '/latest/' + aux11 + '_tt.lib',   flowPtExportDir + "/" + aux11 + '_tt.lib')
 
-shutil.copyfile(aLib + '/'  + aux1 + '/latest/' + aux1 + '_tt.lib',   flowPtExportDir + "/" + aux1 + '_tt.lib')
-shutil.copyfile(aLib + '/'  + aux2 + '/latest/' + aux2 + '_tt.lib',   flowPtExportDir + "/" + aux2 + '_tt.lib')
-shutil.copyfile(aLib + '/'  + aux10 + '/latest/' + aux10 + '_tt.lib',   flowPtExportDir + "/" + aux10 + '_tt.lib')
-shutil.copyfile(aLib + '/'  + aux11 + '/latest/' + aux11 + '_tt.lib',   flowPtExportDir + "/" + aux11 + '_tt.lib')
+  shutil.copyfile(aLib + '/'  + aux1 + '/latest/' + aux1 + '_tt.lef',   flowPtExportDir + "/" + aux1 + '_tt.lef')
+  shutil.copyfile(aLib + '/'  + aux2 + '/latest/' + aux2 + '_tt.lef',   flowPtExportDir + "/" + aux2 + '_tt.lef')
+  shutil.copyfile(aLib + '/'  + aux10 + '/latest/' + aux10 + '_tt.lef',   flowPtExportDir + "/" + aux10 + '_tt.lef')
+  shutil.copyfile(aLib + '/'  + aux11 + '/latest/' + aux11 + '_tt.lef',   flowPtExportDir + "/" + aux11 + '_tt.lef')
 
-shutil.copyfile(aLib + '/'  + aux1 + '/latest/' + aux1 + '_tt.lef',   flowPtExportDir + "/" + aux1 + '_tt.lef')
-shutil.copyfile(aLib + '/'  + aux2 + '/latest/' + aux2 + '_tt.lef',   flowPtExportDir + "/" + aux2 + '_tt.lef')
-shutil.copyfile(aLib + '/'  + aux10 + '/latest/' + aux10 + '_tt.lef',   flowPtExportDir + "/" + aux10 + '_tt.lef')
-shutil.copyfile(aLib + '/'  + aux11 + '/latest/' + aux11 + '_tt.lef',   flowPtExportDir + "/" + aux11 + '_tt.lef')
+  shutil.copyfile(aLib + '/'  + aux1 + '/latest/' + aux1 + '_tt.cdl',   flowPtExportDir + "/" + aux1 + '_tt.cdl')
+  shutil.copyfile(aLib + '/'  + aux2 + '/latest/' + aux2 + '_tt.cdl',   flowPtExportDir + "/" + aux2 + '_tt.cdl')
+  shutil.copyfile(aLib + '/'  + aux10 + '/latest/' + aux10 + '_tt.cdl',   flowPtExportDir + "/" + aux10 + '_tt.cdl')
+  shutil.copyfile(aLib + '/'  + aux11 + '/latest/' + aux11 + '_tt.cdl',   flowPtExportDir + "/" + aux11 + '_tt.cdl')
 
-shutil.copyfile(aLib + '/'  + aux1 + '/latest/' + aux1 + '_tt.cdl',   flowPtExportDir + "/" + aux1 + '_tt.cdl')
-shutil.copyfile(aLib + '/'  + aux2 + '/latest/' + aux2 + '_tt.cdl',   flowPtExportDir + "/" + aux2 + '_tt.cdl')
-shutil.copyfile(aLib + '/'  + aux10 + '/latest/' + aux10 + '_tt.cdl',   flowPtExportDir + "/" + aux10 + '_tt.cdl')
-shutil.copyfile(aLib + '/'  + aux11 + '/latest/' + aux11 + '_tt.cdl',   flowPtExportDir + "/" + aux11 + '_tt.cdl')
+  shutil.copyfile(aLib + '/'  + aux1 + '/latest/' + aux1 + '_tt.gds',   flowPtExportDir + "/" + aux1 + '_tt.gds')
+  shutil.copyfile(aLib + '/'  + aux2 + '/latest/' + aux2 + '_tt.gds',   flowPtExportDir + "/" + aux2 + '_tt.gds')
+  shutil.copyfile(aLib + '/'  + aux10 + '/latest/' + aux10 + '_tt.gds',   flowPtExportDir + "/" + aux10 + '_tt.gds')
+  shutil.copyfile(aLib + '/'  + aux11 + '/latest/' + aux11 + '_tt.gds',   flowPtExportDir + "/" + aux11 + '_tt.gds')
 
-shutil.copyfile(aLib + '/'  + aux1 + '/latest/' + aux1 + '_tt.gds',   flowPtExportDir + "/" + aux1 + '_tt.gds')
-shutil.copyfile(aLib + '/'  + aux2 + '/latest/' + aux2 + '_tt.gds',   flowPtExportDir + "/" + aux2 + '_tt.gds')
-shutil.copyfile(aLib + '/'  + aux10 + '/latest/' + aux10 + '_tt.gds',   flowPtExportDir + "/" + aux10 + '_tt.gds')
-shutil.copyfile(aLib + '/'  + aux11 + '/latest/' + aux11 + '_tt.gds',   flowPtExportDir + "/" + aux11 + '_tt.gds')
-
+if args.platform == 'gf12lp' :
+  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.db',   flowPtExportDir + "/" + aux10 + '.db')
+  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.db',   flowPtExportDir + "/" + aux11 + '.db')
+  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.db',   flowPtExportDir + "/" + aux10 + '.lib')
+  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.db',   flowPtExportDir + "/" + aux11 + '.lib')
+  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.db',   flowPtExportDir + "/" + aux10 + '.lef')
+  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.db',   flowPtExportDir + "/" + aux11 + '.lef')
+  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.db',   flowPtExportDir + "/" + aux10 + '.cdl')
+  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.db',   flowPtExportDir + "/" + aux11 + '.cdl')
+  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.db',   flowPtExportDir + "/" + aux10 + '.gds')
+  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.db',   flowPtExportDir + "/" + aux11 + '.gds')
 
 
 time.sleep(1)
@@ -253,7 +296,7 @@ time.sleep(1)
 #------------------------------------------------------------------------------
 # Run Synthesis and APR
 #------------------------------------------------------------------------------
-
+exit()
 p = sp.Popen(['make','synth'], cwd=flowDir)
 p.wait()
 

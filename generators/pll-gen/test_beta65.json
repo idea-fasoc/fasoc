@@ -1,0 +1,18 @@
+{
+"generator": "pll-gen",
+"module_name": "pll6",
+"specifications": 
+   {
+"frequency":
+	{
+"nom_min":2.80e8,
+"nom_max":3.00e8,
+"max":480e6,
+"min":100e6,
+"res":30e3
+	},
+"FCR_min":1,
+"inband_PN":-80,
+"dco_PWR":34
+   }
+}

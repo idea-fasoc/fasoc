@@ -13,7 +13,7 @@
       "model_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/model_tsmc65",
       "calibreRules": "/net/gaylord/l/yaswanth/Research/LDO_Automation/extraction/ruleFiles",
       "hspiceModels": "/afs/eecs.umich.edu/kits/TSMC/CRN65LP/2013.03/rf1p9m6x2z0u2ff2p5v/models/hspice",
-      "database": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database1",
+      "database": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database_65lp",
       "socModel": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool_model"
     },
     "gfbicmos8hp": {
@@ -28,7 +28,8 @@
       "aux_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/aux_lib_gf12lp_10p5_track",
       "model_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/model_12lp",
       "calibreRules": "/net/gaylord/l/yaswanth/Research/forTutu/ruleFiles_12lp",
-      "hspiceModels": "/afs/eecs.umich.edu/kits/GF/12LP/V1.0_2.1/Models/HSPICE/models"
+      "hspiceModels": "/afs/eecs.umich.edu/kits/GF/12LP/V1.0_2.1/Models/HSPICE/models",
+      "database": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database_12lp"
     }
   }
 }

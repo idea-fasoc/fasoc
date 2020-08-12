@@ -57,8 +57,8 @@ parser.add_argument('--database', default="add",
 args = parser.parse_args()
 
 
-if not (args.platform == "tsmc65lp" or args.platform == "gf12lp"):
-	print("Error: tsmc65lp and gf12lp are the only platforms supported")
+if args.platform != "tsmc65lp":
+	print("Error: tsmc65lp is the only platform supported")
 	sys.exit(1)
 
 
@@ -94,7 +94,7 @@ except ValueError as e:
 	sys.exit(1)
 
 design_dir = os.path.dirname(args.design)
-databaseDir = platformJson["platforms"][args.platform]["database"]
+databaseDir = platformJson["platforms"]["tsmc65lp"]["database"]
 designName = designJson['design_name']
 socrates_installDir = platformJson["socratesInstall"]
 ipXactDir = os.path.join(design_dir,'ipxact')

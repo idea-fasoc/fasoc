@@ -50,6 +50,8 @@ Date    : May 27, 2020
     ```
    
 # Running the tools
+1. First, you need to setup the CADRE flow for certain technology (this only applies for macro or full mode). Go to /fasoc/private/cad/ and type: (1) git checkout master (for TSMC65), (2) git checkout gf14 (for GF12).
+
 1. Prepare an input spec "Input_Spec_File.json" file similar to below. Alpha version supports only nominal frequency range as an input spec. More specs (Phase noise, Jitter, power, area, frequency range) will be added in the future release. 
     ```bash
 	{
@@ -110,11 +112,9 @@ Date    : May 27, 2020
     ```bash
    # for tsmc65lp
    make modeling65 
-   make pex_modeling65 
 
    # for gf12lp
    make modeling12 
-   make pex_modeling12 
     ```
 
 1. Remove the generated files for new run. 

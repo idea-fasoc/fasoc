@@ -27,6 +27,7 @@ The macro generation mode will generate hard macros in addition to the verilog. 
 1. Additional tool requirements:
     - Cadre Flow:
       - Synopsys Design Compiler (2016.03-SP2)
+      - Quantus QRC extraction (15.23.000) (For nodes <20nm and it should be loaded before Innovus)
       - Cadence Innovus (v15.21-s080_1)
       - Synopsys Primetime (2016.06)
       - Mentor Graphics Calibre (2016.1_23.16)

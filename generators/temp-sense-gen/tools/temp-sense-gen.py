@@ -36,10 +36,10 @@ print(head_tail_0)
 print(head_tail_1)
 print(privateGenDir)
 flowDir = os.path.join(privateGenDir , './flow')
+print("flowDir: " + flowDir)
 extDir = genDir + '../../private/generators/temp-sense-gen/extraction'
 simDir = genDir + '../../private/generators/temp-sense-gen/hspice'
 srcDir = genDir + './src'
-
 
 
 #------------------------------------------------------------------------------
@@ -129,10 +129,14 @@ if args.platform == 'gf12lp' :
   aux4 = 'BUF_X0P4N_A10P5PP84TR_C14'
   aux5 = 'HEAD14'
   aux6 = 'SLC_cell'
-
-
-
-
+if args.platform == 'sky130':
+  print("Selecting Aux Cells from platform: " + args.platform)
+  aux1 = 'scs8hs_nand2_1'
+  aux2 = 'scs8hs_inv_1'
+  aux3 = 'scs8hs_buf_1'
+  aux4 = 'scs8hs_buf_1'
+  aux5 = 'HEADER'
+  aux6 = 'SLC'
 
 
 ##change
@@ -151,10 +155,14 @@ ninv=ninv+1
 TEMP_netlist.gen_temp_netlist(ninv,nhead,aux1,aux2,aux3,aux4,aux5, srcDir)
 
 print(designName)
-shutil.copyfile(srcDir + '/TEMP_ANALOG.nl.v',   flowDir + '/src/' + 'TEMP_ANALOG.nl' + '.v')
+
+shutil.copyfile(srcDir + '/TEMP_ANALOG_lv.nl.v',   flowDir + '/src/' + 'TEMP_ANALOG_lv.nl' + '.v')
+shutil.copyfile(srcDir + '/TEMP_ANALOG_hv.nl.v',   flowDir + '/src/' + 'TEMP_ANALOG_hv.nl' + '.v')
+shutil.copyfile(srcDir + '/TEMP_AUTO_def.v',   flowDir + '/src/' + 'TEMP_AUTO_def' + '.v')
+shutil.copyfile(srcDir + '/tempsenseInst.v',   flowDir + '/src/' + designName  + '.v')
+
 shutil.copyfile(srcDir + '/counter.v',   flowDir + '/src/' + 'counter' + '.v')
 
-shutil.copyfile(srcDir + '/tempsenseInst.v',   flowDir + '/src/' + designName + '.v')
 with open(flowDir + '/src/' + designName  + '.v', 'r') as file:
    filedata = file.read()
 filedata = re.sub(r'tempsenseInst*', r' ' + \
@@ -178,9 +186,6 @@ jsonSpec['results'].update({'power': power})
 with open(args.outputDir + '/' + designName + '.json', 'w') as resultSpecfile:
    json.dump(jsonSpec, resultSpecfile, indent=True)
 
-
-
-
 time.sleep(2)
 print()
 if args.mode == 'verilog':
@@ -200,7 +205,6 @@ filedata = re.sub(r'export PLATFORM *:=.*', r'export PLATFORM    := ' + \
                   args.platform, filedata)
 with open(flowDir + '/include.mk', 'w') as file:
    file.write(filedata)
-
 
 
 # Update the verilog file list for Synthesis
@@ -299,6 +303,41 @@ if args.platform == 'gf12lp' :
   shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.gds',   flowPtExportDir + "/" + aux6 + '.gds')
   
 
+if args.platform == 'sky130':
+  #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.db',   flowPtExportDir + "/" + aux1 + '.db')
+  #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.db',   flowPtExportDir + "/" + aux2 + '.db')
+  #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.db',   flowPtExportDir + "/" + aux3 + '.db')
+  #shutil.copyfile(aLib + '/' + aux4 + '/latest/'  + aux4 + '.db',   flowPtExportDir + "/" + aux4 + '.db')
+  shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.db',   flowPtExportDir + "/" + aux5 + '.db')
+  shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.db',   flowPtExportDir + "/" + aux6 + '.db')
+
+  #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.lib',   flowPtExportDir + "/" + aux1 + '.lib')
+  #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.lib',   flowPtExportDir + "/" + aux2 + '.lib')
+  #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.lib',   flowPtExportDir + "/" + aux3 + '.lib')
+  #shutil.copyfile(aLib + '/' + aux4 + '/latest/'  + aux4 + '.lib',   flowPtExportDir + "/" + aux4 + '.lib')
+  shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.lib',   flowPtExportDir + "/" + aux5 + '.lib')
+  shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.lib',   flowPtExportDir + "/" + aux6 + '.lib')
+
+  #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.lef',   flowPtExportDir + "/" + aux1 + '.lef')
+  #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.lef',   flowPtExportDir + "/" + aux2 + '.lef')
+  #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.lef',   flowPtExportDir + "/" + aux3 + '.lef')
+  #shutil.copyfile(aLib + '/' + aux4 + '/latest/'  + aux4 + '.lef',   flowPtExportDir + "/" + aux4 + '.lef')
+  shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.lef',   flowPtExportDir + "/" + aux5 + '.lef')
+  shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.lef',   flowPtExportDir + "/" + aux6 + '.lef')
+
+  #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.cdl',   flowPtExportDir + "/" + aux1 + '.cdl')
+  #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.cdl',   flowPtExportDir + "/" + aux2 + '.cdl')
+  #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.cdl',   flowPtExportDir + "/" + aux3 + '.cdl')
+  #shutil.copyfile(aLib + '/' + aux4 + '/latest/'  + aux4 + '.cdl',   flowPtExportDir + "/" + aux4 + '.cdl')
+  shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.cdl',   flowPtExportDir + "/" + aux5 + '.cdl')
+  shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.cdl',   flowPtExportDir + "/" + aux6 + '.cdl')
+
+  #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.gds',   flowPtExportDir + "/" + aux1 + '.gds')
+  #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.gds',   flowPtExportDir + "/" + aux2 + '.gds')
+  #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.gds',   flowPtExportDir + "/" + aux3 + '.gds')
+  #shutil.copyfile(aLib + '/' + aux4 + '/latest/'  + aux4 + '.gds',   flowPtExportDir + "/" + aux4 + '.gds')
+  shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.gds',   flowPtExportDir + "/" + aux5 + '.gds')
+  shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.gds',   flowPtExportDir + "/" + aux6 + '.gds')
 
 
 #shutil.copyfile(aLib + '/gds/' + ptCell + '.gds2', flowPtExportDir + "/" + ptCell + '.gds2')
@@ -323,10 +362,10 @@ time.sleep(1)
 #------------------------------------------------------------------------------
 
 # Run the Synthesis flow
+print("flowDir: " + flowDir)
 
 p = sp.Popen(['make','synth'], cwd=flowDir)
 p.wait()
-
 
 # Get the cell area estimate from synthesis report
 with open(flowDir + '/reports/dc/' + designName + '.mapped.area.rpt', \
@@ -341,7 +380,7 @@ else:
 
 
 # Calculate and update the core cell area dimensions
-coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*5
+coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*6
 with open(flowDir + '/scripts/innovus/always_source.tcl', 'r') as file:
    filedata = file.read()
 filedata = re.sub(r'set core_width.*', r'set core_width    ' + \
@@ -359,7 +398,6 @@ p.wait()
 print('#----------------------------------------------------------------------')
 print('# Place and Route finished')
 print('#----------------------------------------------------------------------')
-
 
 time.sleep(2)
 
@@ -382,6 +420,29 @@ p.wait()
 print('#----------------------------------------------------------------------')
 print('# DRC finished')
 print('#----------------------------------------------------------------------')
+
+
+
+#shutil.copytree(flow + '/export', args.outputDir)
+p = sp.Popen(['cp', './results/calibre/'+designName+'.merged.gds.gz', \
+        '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.merged.gds.gz'], cwd=flowDir)
+p.wait()
+p = sp.Popen(['cp', './export/'+designName+'.lef', \
+        '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lef'], cwd=flowDir)
+p.wait()
+p = sp.Popen(['cp', './export/'+designName+'_typ.lib', \
+         '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lib'], cwd=flowDir)
+p.wait()
+p = sp.Popen(['cp', './export/'+designName+'_typ.db', \
+          '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.db'], cwd=flowDir)
+p.wait()
+p = sp.Popen(['cp', './export/'+designName+'.lvs.v', \
+          '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.v'], cwd=flowDir)
+p.wait()
+p = sp.Popen(['cp', '../extraction/sch/'+designName+'.spi', \
+          '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.spi'], cwd=flowDir)
+p.wait()
+
 
 time.sleep(2)
 print()
@@ -468,31 +529,65 @@ if os.path.isdir(extDir + '/run/svdb/' + 'template'):
    shutil.rmtree(extDir + '/run/svdb/' + 'template',
                  ignore_errors=True)
 
+# # Configure the PEX rule files
+# for file in os.listdir(calibreRulesDir + '/'):
+#    if not os.path.isdir(simDir + '/' + file):
+#       shutil.copy2(calibreRulesDir+'/'+file, extDir+'/run/')
+# 
+# with open(extDir+'/ruleFiles/_calibre.rcx_'+args.platform, 'r') as file:
+#    filedata = file.read()
+# filedata = filedata.replace('design', designName)
+# with open(extDir+'/run/_calibre.rcx_', 'w') as file:
+#    file.write(filedata)
+# 
+# # Run Calibre RCX
+# p = sp.Popen(['calibre','-xrc','-phdb','-nowait','-turbo','1',
+#              '_calibre.rcx_'],cwd=extDir+'/run')
+# p.wait()
+# p = sp.Popen(['calibre','-xrc','-pdb','-rcc','-turbo','1','-nowait',
+#              '_calibre.rcx_'],cwd=extDir+'/run')
+# p.wait()
+# p = sp.Popen(['calibre','-xrc','-fmt','-all','-nowait','_calibre.rcx_'],
+#              cwd=extDir+'/run')
+# p.wait()
+# print('# Temperature Sensor - Post PEX netlist Generated')
+
+if args.platform == 'gf12lp':
+   with open(flowDir + '/scripts/innovus/generated/' + designName + \
+          '.beolStack', 'r') as file:
+      filedata = file.read()
+   os.environ['BEOL_STACK'] = filedata.rstrip()
+   with open(flowDir + '/scripts/innovus/generated/' + designName + \
+          '.techLvsDir', 'r') as file:
+      filedata = file.read()
+   os.environ['TECHDIR_LVS'] = filedata.rstrip()
+   with open(flowDir + '/scripts/innovus/generated/' + designName + \
+          '.techPexDir', 'r') as file:
+      filedata = file.read()
+   os.environ['TECHDIR_XACT'] = filedata.rstrip()
+   os.environ['PEX_RUN'] = 'TRUE'
 
 # Configure the PEX rule files
 for file in os.listdir(calibreRulesDir + '/'):
-   if not os.path.isdir(simDir + '/' + file):
+   if not os.path.isdir(calibreRulesDir + '/' + file):
       shutil.copy2(calibreRulesDir+'/'+file, extDir+'/run/')
 
-with open(extDir+'/ruleFiles/_calibre.rcx_'+args.platform, 'r') as file:
+with open(extDir+'/runsets/pex.runset.'+ args.platform, 'r') as file:
    filedata = file.read()
 filedata = filedata.replace('design', designName)
-with open(extDir+'/run/_calibre.rcx_', 'w') as file:
+with open(extDir+'/run/pex.runset', 'w') as file:
    file.write(filedata)
 
-
-
 # Run Calibre RCX
-p = sp.Popen(['calibre','-xrc','-phdb','-nowait','-turbo','1',
-             '_calibre.rcx_'],cwd=extDir+'/run')
-p.wait()
-p = sp.Popen(['calibre','-xrc','-pdb','-rcc','-turbo','1','-nowait',
-             '_calibre.rcx_'],cwd=extDir+'/run')
-p.wait()
-p = sp.Popen(['calibre','-xrc','-fmt','-all','-nowait','_calibre.rcx_'],
-             cwd=extDir+'/run')
-p.wait()
-print('# Temperature Sensor - Post PEX netlist Generated')
+if args.platform == 'gf12lp':
+   p = sp.Popen(['calibre','-gui','-xact','-batch','-runset',
+                'pex.runset'],cwd=extDir+'/run')
+   p.wait()
+else:
+   p = sp.Popen(['calibre','-gui','-pex','-batch','-runset',
+                'pex.runset'],cwd=extDir+'/run')
+   p.wait()
+
 
 
 

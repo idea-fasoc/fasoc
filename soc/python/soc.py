@@ -140,6 +140,7 @@ module_list = []
 module_number = 0
 ldo_number = 0
 pll_number = 0
+temp_sense_number = 0
 connection_done_flag = False
 
 for module in designJson["modules"]:
@@ -171,13 +172,15 @@ for module in designJson["modules"]:
 				for file in os.listdir(inputDir):
 					os.remove(os.path.join(inputDir,file))
 
-		moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args.platform,args.mode,args.database,units,module_number,designJson,args.design,connection_done_flag,ldo_number,pll_number)
+		moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args.platform,args.mode,args.database,units,module_number,designJson,args.design,connection_done_flag,ldo_number,pll_number,temp_sense_number)
 
 		module_number += 1
 		if module["generator"] == "ldo-gen":
 			ldo_number += 1
 		elif module["generator"] == "pll-gen":
 			pll_number += 1
+		elif module["generator"] == "temp-sense-gen":
+			temp_sense_number += 1
 #---------------------------------------------------------------------------------------			
 
 #---------------------------------------------------------------------------------------		 
@@ -258,3 +261,4 @@ wb.open_new(os.path.join(projectDir,'arm.com-'+projectName+'-'+designName+'-'+de
 
 # STEP 8: Run chip level Cadre Flow
 # ==============================================================================
+	

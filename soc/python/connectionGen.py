@@ -24,7 +24,7 @@
 
 import json
 
-def connectionGen(generator,instance,module_number,designJson,designDir,ldo_number,pll_number):
+def connectionGen(generator,instance,module_number,designJson,designDir,ldo_number,pll_number,temp_sense_number):
 
 #------------------------------------------------------------------------------------
 
@@ -345,7 +345,7 @@ def connectionGen(generator,instance,module_number,designJson,designDir,ldo_numb
 			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_number+2),[0,0],[instance],["PREADY"],[[0,0]],[False,0])
 			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_number+2),[0,0],[instance],["PSLVERR"],[[0,0]],[False,0])
 
-			addConnection_from_to("clock",False,"toplevel","SYSCLKOUT" + str(module_number),[0,0],[instance],["CLKOUT"],[[0,0]],[False,0])
+			addConnection_from_to("clock",False,instance_m0,"TEMP_" + str(temp_sense_number) + "_CLKOUT",[0,0],[instance],["CLKOUT"],[[0,0]],[False,0])
 
 			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[11,0],[instance],["PADDR"],[[11,0]],[False,0])
 			addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance],["PWRITE"],[[0,0]],[False,0])

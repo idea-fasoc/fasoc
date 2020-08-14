@@ -1,4 +1,4 @@
-module TEMP_ANALOG (EN, OUT, OUTB);
+module TEMP_ANALOG_lv (EN, OUT, OUTB);
  input  EN;
 // inout in_vin;
  output OUT, OUTB;
@@ -25,12 +25,5 @@ BUF_X0P4N_A10P5PP84TR_C14 a_buf_3 ( .A(nx3), .Y(nb2));
 BUF_X0P4N_A10P5PP84TR_C14 a_buf_0 ( .A(nx1), .Y(nb1));
 BUF_X0P4N_A10P5PP84TR_C14 a_buf_1 ( .A(nb1), .Y(OUT));
 BUF_X0P4N_A10P5PP84TR_C14 a_buf_2 ( .A(nb2), .Y(OUTB));
-HEAD14 a_header_0(.VIN(VVDD));
-HEAD14 a_header_1(.VIN(VVDD));
-HEAD14 a_header_2(.VIN(VVDD));
-HEAD14 a_header_3(.VIN(VVDD));
-HEAD14 a_header_4(.VIN(VVDD));
-HEAD14 a_header_5(.VIN(VVDD));
-HEAD14 a_header_6(.VIN(VVDD));
 
 endmodule

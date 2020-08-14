@@ -33,8 +33,6 @@ print( sys.argv)
 
 genDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../")
 
-
-
 head_tail_0 = os.path.split(os.path.abspath(genDir))
 head_tail_1 = os.path.split(head_tail_0[0])
 privateGenDir = os.path.relpath(os.path.join(genDir, '../../', 'private', head_tail_1[1], head_tail_0[1]))
@@ -63,8 +61,8 @@ if not os.path.isfile(args.specfile):
    sys.exit(1)
 
 
-if args.platform != 'tsmc65lp' and args.platform != 'gf12lp':
-  print("Error: tsmc65lp and gf12lp are the only platform supported as of now")
+if args.platform != 'tsmc65lp' and args.platform != 'gf12lp' and args.platform != 'sky130':
+  print("Error: tsmc65lp, gf12lp, sky130 are the only platform supported as of now")
   sys.exit(1)
 
 if args.mode != 'verilog':

@@ -1,4 +1,4 @@
-module TEMP_ANALOG (EN, OUT, OUTB);
+module TEMP_ANALOG_lv (EN, OUT, OUTB);
  input  EN;
 // inout in_vin;
  output OUT, OUTB;
@@ -14,6 +14,5 @@ wire nx1, nx2, nx3, nb1, nb2;
 @@ @nc a_buf_0 ( .A(nx1), .Y(nb1));
 @@ @nd a_buf_1 ( .A(nb1), .Y(OUT));
 @@ @ne a_buf_2 ( .A(nb2), .Y(OUTB));
-@@ @nf a_header_@nh(.VIN(VVDD));
 
 endmodule

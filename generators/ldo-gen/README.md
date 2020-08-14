@@ -117,7 +117,7 @@ Ensure that your machine has all of the required tools setup and have access to 
     - _imax_
       - Maximum Output Load Current. 
       - `imax` values in the range [0.5e-03, 25e-03] are supported for TSMC65lp & GFBiCMOS8HP PDKs.
-      - `imax` values in the range [0.5e-03, 19.5e-03] are supported for GF12LP PDK.
+      - `imax` values in the range [0.5e-03, 16e-03] are supported for GF12LP PDK.
 
 1. Running the LDO generator. 
    To run the LDO generator, execute the below command from any location.

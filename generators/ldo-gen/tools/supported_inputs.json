@@ -1,0 +1,35 @@
+
+{
+  "platforms": {
+    "tsmc65lp": {
+      "vin": {
+        "max": 1.3,
+        "min": 0.6
+      },
+      "maxLoad": {
+        "max": "25e-03",
+        "min": "0.5e-03"
+      }
+    },
+    "gfbicmos8hp": {
+      "vin": {
+        "max": 1.3,
+        "min": 0.6
+      },
+      "maxLoad": {
+        "max": "25e-03",
+        "min": "0.5e-03"
+      }
+    },
+    "gf12lp": {
+      "vin": {
+        "max": 0.9,
+        "min": 0.6
+      },
+      "maxLoad": {
+        "max": "16e-03",
+        "min": "0.5e-03"
+      }
+    }
+  }
+}

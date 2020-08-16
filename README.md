@@ -30,7 +30,7 @@ The macro generation mode will generate hard macros in addition to the verilog. 
       - Quantus QRC extraction (15.23.000) (For nodes <20nm and it should be loaded before Innovus)
       - Cadence Innovus (v15.21-s080_1)
       - Synopsys Primetime (2016.06)
-      - Mentor Graphics Calibre (2016.1_23.16)
+      - Mentor Graphics Calibre (2019.3_25)
     - Synopsys HSPICE (2017.03-SP1)
     - Cadence Liberate (16.1.1.132)
     - Cadence Spectre (15.1.0)

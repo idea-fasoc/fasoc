@@ -57,9 +57,14 @@ modeling65:
 modeling12:
 	cd $(HOME_PATH); python $(PY_DIR)/MDL_GEN_Beta.py --platform gf12lp --mode full
 
+dcoto12:
+	cd $(HOME_PATH); python $(PY_DIR)/DCO_TO_PREP.py --platform gf12lp --mode full
+
 pll_gen_beta65:
 	$(PY_DIR)/PLL_GEN_Beta.py --specfile test_beta65.json --output ./work --platform tsmc65lp --mode macro 
 
 pll_gen_beta12:
 	$(PY_DIR)/PLL_GEN_Beta.py --specfile test_alpha12.json --output ./work --platform gf12lp --mode macro 
 
+dltdc12:
+	cd $(HOME_PATH); python $(PY_DIR)/ignore_dltdc_gen.py --platform gf12lp --mode full

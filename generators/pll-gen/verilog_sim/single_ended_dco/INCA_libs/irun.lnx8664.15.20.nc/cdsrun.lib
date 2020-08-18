@@ -1,2 +1,2 @@
-SOFTINCLUDE /usr/caen/incisive-15.20.005/tools/inca/files/cds.lib
+SOFTINCLUDE /usr/caen/incisiv-15.20.084/tools/inca/files/cds.lib
 define worklib ../worklib

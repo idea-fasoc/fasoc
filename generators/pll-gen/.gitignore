@@ -4,4 +4,11 @@ tsmc40gp/
 *.swo
 *.shm
 *.vcd
+*.svwf
+*INCA_libs/
+*simvision/
+*xcelium*
+*.diag
+*.log
+*.history
 *ignore*

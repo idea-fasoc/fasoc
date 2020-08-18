@@ -26,6 +26,7 @@ module analog_core(
 	// Parameters
 
 		// DCO Base operating frequency
+		parameter DCO_CENTER_FREQ = 2.4e9;
 		parameter DCO_FBASE = 450e6;
 		parameter DCO_OFFSET = 0;
 		parameter DCO_VT_VARIATION = 150e6;
@@ -75,6 +76,7 @@ module analog_core(
 	// Structural
 		//dco_model #(
 		dco_model_noise #(
+				.DCO_CENTER_FREQ(DCO_CENTER_FREQ), 
 				.DCO_FBASE(DCO_FBASE), 
 				.DCO_OFFSET(DCO_OFFSET),
 				.DCO_VT_VARIATION(DCO_VT_VARIATION),

@@ -84,3 +84,5 @@ define VIEW_MAP ( $VIEW_MAP \
 , .SVMS => SVMS \
 , .vh => vh \
 )
+define ELAB_SNAPSHOT
+define SNAPSHOT worklib.tb_pll_controller_tdc_counter:sv

@@ -102,6 +102,10 @@ if platform=='tsmc65lp':
 	FC_half=0
 	pex_spectre=0
 	vdd=[1.2]
+	dead_CC=0
+	cp_version=0 # custom_place version
+	welltap_dim=[0,0]
+	welltap_xc=[0,0]
 elif platform=='gf12lp':
 	fc_en_type = 2 # dco_FC en => decrease frequency
 	modelVersion='Alpha_pex' 
@@ -133,6 +137,10 @@ elif platform=='gf12lp':
 	CC_stack=2
 	pex_spectre=0
 	vdd=[0.8]
+	dead_CC=0
+	cp_version=2 # custom_place version
+	welltap_dim=[0.924, 0.672]
+	welltap_xc=[50,95]
 if single_ended==0:
 	dco_CC_lib=aLib+'/dco_CC/latest/'
 	dco_FC_lib=aLib+'/dco_FC/latest/'
@@ -267,9 +275,10 @@ Ndrv_range=[2,42,2]
 Nfc_range=[10,40,2]
 Ncc_range=[10,40,2]
 Nstg_range=[4,32,2]
+ND=0
 temp=[25]
 
-pass_flag,passed_designs,passed_specs,specRangeDic=modeling.design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN,dco_PWR,CF,Cf,Cc,mult_Con,mult_Coff,Iavg_const,PN_const,vdd,Ndrv_range,Nfc_range,Ncc_range,Nstg_range,A_CC,A_FC,modelVersion)
+pass_flag,passed_designs,passed_specs,specRangeDic=modeling.design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN,dco_PWR,CF,Cf,Cc,mult_Con,mult_Coff,Iavg_const,PN_const,vdd,Ndrv_range,Nfc_range,Ncc_range,Nstg_range,A_CC,A_FC,modelVersion, FC_half, dead_CC, ND)
 
 #--------------------------------------------------------
 # select the design with least area
@@ -364,10 +373,10 @@ if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	# generate Feed Forward DCO 
 	#--------------------------------------------------------
-	dco_bleach=0 # test switch
+	dco_bleach=1 # test switch
 	dco_synth=1
 	dco_apr=1
-	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name)
+	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name,cp_version,welltap_dim,welltap_xc,ND)
 	#--------------------------------------------------------
 	# generate output buffer, divider 
 	#--------------------------------------------------------
@@ -381,7 +390,7 @@ if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	# generate PDpll 
 	#--------------------------------------------------------
-	pdpll_bleach=0
+	pdpll_bleach=1
 	pdpll_synth=1 # test switch
 	pdpll_apr=1
 	W_dco,H_dco,W_pll,H_pll=run_digital_flow.pdpll_flow(pvtFormatDir,pll_flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,pdpll_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,pdpll_synth,pdpll_apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,pll_max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc)

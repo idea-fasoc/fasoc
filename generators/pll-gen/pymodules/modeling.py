@@ -1,5 +1,6 @@
 import math
 import run_pre_sim
+import run_pex_sim
 import txt_mds
 
 #===============================================================================================
@@ -10,7 +11,7 @@ import txt_mds
 #			Fnom includes Fnom_*
 #===============================================================================================
 
-def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN,dco_PWR,CF,Cf,Cc,mult_Con,mult_Coff,Iavg_const,PN_const,vdd,Ndrv_range,Nfc_range,Ncc_range,Nstg_range,A_CC,A_FC,modelVersion):
+def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN,dco_PWR,CF,Cf,Cc,mult_Con,mult_Coff,Iavg_const,PN_const,vdd,Ndrv_range,Nfc_range,Ncc_range,Nstg_range,A_CC,A_FC,modelVersion, FC_half, dead_CC, ND):
 	pass_flag=0
 	passed_designs=[]
 	passed_specs=[]
@@ -70,12 +71,15 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 					#===============================================================
 					# calculate the model expected spec vals 
 					#===============================================================
-					Fmax_mdl,Fmin_mdl,Fres_mdl,Fnom_mdl,freqCoverRatio,Ctotal,Pwr_mdl,IB_PN_mdl,Area_mdl=spec_cal(Nd,Nc,Nf,M,Cc,Cf,CF,Iavg_const,PN_const,Fref,A_CC,A_FC,vdd)
+					Fmax_mdl,Fmin_mdl,Fres_mdl,Fnom_mdl,freqCoverRatio,Ctotal,Pwr_mdl,IB_PN_mdl,Area_mdl=spec_cal(Nd,Nc,Nf,M,Cc,Cf,CF,Iavg_const,PN_const,Fref,A_CC,A_FC,vdd, FC_half, ND)
 					#===============================================================
 					# generate dictionary list for specs
 					# and filter the ones that satisfy input spec in the order in 
 					# spec_priority
 					#===============================================================
+					print ("#=================================================================================")
+					print ('INFO: model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, pwr_mdl=%.2e, FCR=%.2f'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl,freqCoverRatio))
+					print ('INFO: model design: ndrv=%d, ncrs=%d, nfine=%d, nstg=%d'%(Nd,Nc,Nf,M))
 					if modelVersion=='Beta':
 						specDic={"Fnom":Fnom_mdl,"Fmax":Fmax_mdl,"Fmin":Fmin_mdl,"Fres":Fres_mdl,"FCR":freqCoverRatio,"dco_PWR":Pwr_mdl,"IB_PN":IB_PN_mdl}
 					elif modelVersion=='Alpha' or modelVersion=='Alpha_pex':
@@ -122,10 +126,12 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 						#passed_specs.append([Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl,Area_mdl])
 						if modelVersion=='Beta':
 							passed_specs.append([Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,freqCoverRatio,Pwr_mdl,Area_mdl,IB_PN_mdl])
-							print ('INFO: passed model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, IB_PN=%.2f, pwr_mdl=%.2e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,IB_PN_mdl,Pwr_mdl))
+							print ('INFO: passed model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, IB_PN=%.2f, pwr_mdl=%.2e, FCR=%.2e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,IB_PN_mdl,Pwr_mdl,freqCoverRatio))
 						elif modelVersion=='Alpha' or  modelVersion=='Alpha_pex':
 							passed_specs.append([Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,freqCoverRatio,Pwr_mdl,Area_mdl])
-							print ('INFO: passed model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, pwr_mdl=%.2e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl))
+							print ("#=================================================================================")
+							print ('INFO: passed model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, pwr_mdl=%.2e, FCR=%.2e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl,freqCoverRatio))
+							print ('INFO: passed model design: ndrv=%d, ncrs=%d, nfine=%d, nstg=%d'%(Nd,Nc,Nf,M))
 						pass_flag=1
 					#print('%e'%(Fnom_mdl))	
 					#print(freqCoverRatio)
@@ -153,6 +159,21 @@ def depth_check (spec_depth,max_spec_depth,specDic,specRangeDic,empty_specRangeD
 		specRangeDic[spec].append(specDic[spec])
 	return max_spec_depth, specRangeDic 			
 
+def spec_cal_freq(Nd,Nc,Nf,M,Cc,Cf,CF):
+	Np=Nd+Nc
+	CB=(Np)*Cc+Nf*Cf
+	Fnom_fcmax=(Nd+Nc/2)/(CB*M)
+	Fnom_fcmin=(Nd+Nc/2)/((CB+Nf*CF)*M)
+	dFf_mdl=Fnom_fcmax-Fnom_fcmin
+	#dFc_mdl=1/CB/M/Nc    # is this right?
+	dFc_mdl=((Nd+Nc/2+1/M)/((CB+Nf*CF)*M))-Fnom_fcmin    # is this right?
+	freqCoverRatio=dFf_mdl/dFc_mdl
+	Fres_mdl=(Fnom_fcmax-Fnom_fcmin)/Nf/M
+	Fmin_mdl=1/(CB+Nf*CF)*(Nd)/M
+	Fmax_mdl=1/(CB)*(Nd+Nc)/M
+	Fnom_mdl=(Nd+Nc/2)/(CB*M)
+	Ctotal=Cc*(Nd+Nc/2)+Cf*Nf+CF*Nf/2
+	return Fmax_mdl,Fmin_mdl,Fres_mdl,Fnom_mdl,freqCoverRatio,Ctotal
 #===========================================================
 # prints out the error rate of math model
 #===========================================================
@@ -167,7 +188,7 @@ def math_model_verify(formatDir,write_model_file,CF,Cc,Cf,dm,result_exist,freq,F
 		N_cc=dm[nd][1]	
 		N_drv=dm[nd][0]
 		N_stg=dm[nd][2]
-		Fmax_mdl,Fmin_mdl,Fres_mdl,Fnom_mdl,freqCoverRatio,Ctotal,Pwr_mdl=spec_cal(N_drv,N_cc,N_fc,N_stg,Cc,Cf,CF)
+		Fmax_mdl,Fmin_mdl,Fres_mdl,Fnom_mdl,freqCoverRatio,Ctotal=spec_cal_freq(N_drv,N_cc,N_fc,N_stg,Cc,Cf,CF)
 		Fnom_err.append(abs(Fnom_mdl-freq[nd][0][0])/freq[nd][0][0]*100)
 		Fmax_err.append(abs(Fmax_mdl-Fmax[nd][0][0])/Fmax[nd][0][0]*100)
 		Fmin_err.append(abs(Fmin_mdl-Fmin[nd][0][0])/Fmin[nd][0][0]*100)
@@ -199,7 +220,7 @@ def math_model_verify(formatDir,write_model_file,CF,Cc,Cf,dm,result_exist,freq,F
 	Iavg_err_mean=sum(Iavg_err)/len(Iavg_err)
 	Iavg_err_max=max(Iavg_err)
 	if print_error==1:	
-		print ('Fnom_err_mean,max=%f,%f, Fmax=%f,%f, Fmin=%f,%f, Fres=%f,%f, Iavg=%f,%f'%(Fnom_err_mean,Fnom_err_max,Fmax_err_mean,Fmax_err_max,Fmin_err_mean,Fmin_err_max,Fres_err_mean,Fres_err_max,Iavg_err_mean,Iavg_err_max)) 
+		print ('*Model accuracy result(in percentage): Fnom_err_mean,max=%f,%f, Fmax=%f,%f, Fmin=%f,%f, Fres=%f,%f, Iavg=%f,%f'%(Fnom_err_mean,Fnom_err_max,Fmax_err_mean,Fmax_err_max,Fmin_err_mean,Fmin_err_max,Fres_err_mean,Fres_err_max,Iavg_err_mean,Iavg_err_max)) 
 
 	#--- write the model.json ---
 	r_model=open(formatDir+'form_model.json','r')
@@ -254,19 +275,57 @@ def math_model_gen(vm1,netlist_dir,format_dir,vdd,temp,platform,resultrf_dir,num
 	return CF_avg,Cc_avg,Cf_avg,CF_max_err,Cc_max_err,Cf_max_err	
 
 
+def pex_math_model_gen(vm1,netlist_dir,format_dir,vdd,temp,platform,num_core,result_dir,index,show,num_meas,fc_en_type):
+	idK,Kg,freq,Fmax,Fmin,Fres,FCR,Iavg,result_exist,dm=run_pex_sim.gen_result(result_dir,vm1.comblist[0],vm1.comblist[1],vm1.comblist[2],vm1.comblist[3],num_meas,index,show,vdd,temp, fc_en_type)
+	CF=[]	
+	Cc=[]	
+	Cf=[]
+	for i in result_exist:
+		for j in result_exist:
+			if i<j:
+				Ncell_1=dm[i][1]+dm[i][0]  #Nc+Nd
+				Nfc_1=dm[i][3]
+				Ncell_2=dm[j][1]+dm[j][0]  #Nc+Nd
+				Nfc_2=dm[j][3]
+				cf1=[Ncell_1,Nfc_1,Nfc_1//2]
+				cf2=[Ncell_2,Nfc_2,Nfc_2//2]
+				#cf1=[16,16,16//2]
+				#cf2=[16,32,32//2]
+				if (Ncell_1==Ncell_2 and Nfc_1!=Nfc_2) or (Ncell_1!=Ncell_2 and Nfc_1==Nfc_2):
+					CF1_temp,Cc1_temp,Cf1_temp=C_solve(Kg[i],Kg[j],idK[i],idK[j],cf1,cf2)
+					CF.append(CF1_temp)				
+					Cc.append(Cc1_temp)				
+					Cf.append(Cf1_temp)
+					#print ("Ncell= %d, %d, Nfc= %d, %d, Kg[i]=%e,Kg[j]=%e, idK=%e, %e"%(Ncell_1,Ncell_2,Nfc_1,Nfc_2,Kg[i][0][0],Kg[j][0][0],idK[i][0][0],idK[j][0][0]))
+	CF_avg=sum(CF)/len(CF)
+	CF_max_err=max(abs(CF_avg-min(CF)),abs(CF_avg-max(CF)))/CF_avg*100
+	Cc_avg=sum(Cc)/len(Cc)
+	Cc_max_err=max(abs(Cc_avg-min(Cc)),abs(Cc_avg-max(Cc)))/Cc_avg*100
+	Cf_avg=sum(Cf)/len(Cf)
+	Cf_max_err=max(abs(Cf_avg-min(Cf)),abs(Cf_avg-max(Cf)))/Cf_avg*100
+	print ('CF_avg=%e'%(CF_avg))
+	print ('Cc_avg=%e'%(Cc_avg))
+	print ('Cf_avg=%e'%(Cf_avg))
+	print ('CF_max_err=%f (in percentage)'%(CF_max_err))
+	print ('Cc_max_err=%f (in percentage)'%(Cc_max_err))
+	print ('Cf_max_err=%f (in percentage)'%(Cf_max_err))
+	return CF_avg,Cc_avg,Cf_avg,CF_max_err,Cc_max_err,Cf_max_err	
 
 #=====================================================================
 # calculate math mdl specs according to design params 
 #=====================================================================
-def spec_cal(Nd,Nc,Nf,M,Cc,Cf,CF,Iavg_const,PN_const,Fref,A_CC,A_FC,vdd):
+def spec_cal(Nd,Nc,Nf,M,Cc,Cf,CF,Iavg_const,PN_const,Fref,A_CC,A_FC,vdd,FC_half, ND):
 	Np=Nd+Nc
-	CB=(Np)*Cc+Nf*Cf
+	CB=(Np+ND)*Cc+Nf*Cf
 	Fnom_fcmax=(Nd+Nc/2)/(CB*M)
 	Fnom_fcmin=(Nd+Nc/2)/((CB+Nf*CF)*M)
 	dFf_mdl=Fnom_fcmax-Fnom_fcmin
-	dFc_mdl=1/CB/M/Nc    # is this right?
+	#dFc_mdl=1/CB/M/Nc    # is this right?
+	dFc_mdl=((Nd+Nc/2+1/M)/((CB+Nf*CF)*M))-Fnom_fcmin    # is this right?
 	freqCoverRatio=dFf_mdl/dFc_mdl
 	Fres_mdl=(Fnom_fcmax-Fnom_fcmin)/Nf/M
+	if FC_half==1:
+		Fres_mdl=Fres_mdl/2
 	Fmin_mdl=1/(CB+Nf*CF)*(Nd)/M
 	Fmax_mdl=1/(CB)*(Nd+Nc)/M
 	Fnom_mdl=(Nd+Nc/2)/(CB*M)

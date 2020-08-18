@@ -49,7 +49,12 @@ pvtFormatDir=absPvtDir + '/formats/'
 
 absPvtDir_plat=absPvtDir+platform+'/'
 #hspiceDir=absPvtDir_plat +  '/HSPICE/'
-hspiceDir='/tmp/kmkwon_sim/HSPICE_3st/'
+#hspiceDir='/tmp/kmkwon_sim/HSPICE_3st/'
+#hspiceDir='/tmp/kmkwon_sim/HSPICE_mod/' # modeling
+#hspiceDir='/tmp/kmkwon_sim/HSPICE_mod2/' # modeling
+#hspiceDir='/tmp/kmkwon_sim/HSPICE_mod2_2st/' # modeling
+#hspiceDir='/tmp/kmkwon_sim/HSPICE_mod3/' # modeling
+hspiceDir='/tmp/kmkwon_sim/HSPICE_mod3_halfFC/' # modeling
 verilogSrcDir=absGenDir + 'verilogs/'
 netlistDir=hspiceDir+'NETLIST/'
 pex_netlistDir=hspiceDir+'pex_NETLIST/'
@@ -93,6 +98,11 @@ if platform=='tsmc65lp':
 	FC_half=0
 	pex_spectre=0
 	vdd=[1.2]   #vdd[0] is the nominal val
+	welltap_dim=[0,0]
+	welltap_xc=[0,0]
+	cp_version=0 # custom_place version
+	FC_version=0 # dco_FC single ended version
+	ND=0 # always-off NCCs
 elif platform=='gf12lp':
 	fc_en_type = 2 # dco_FC en => decrease frequency
 	modelVersion='Alpha' 
@@ -112,18 +122,23 @@ elif platform=='gf12lp':
 	p_rng_s= 0.8
 	p2_rng_w= 1.2
 	p2_rng_s= 0.8
-	max_r_l=5
-	pll_max_r_l=8
+	max_r_l=13
+	pll_max_r_l=13
 	outbuff_div=0
 	tdc_dff='DFFRPQL_X1N_A10P5PP84TR_C14'
 	H_stdc=0.672
 	custom_lvs=0
 	cust_place=1
 	single_ended=1
-	FC_half=0
+	FC_half=1
 	CC_stack=3
 	pex_spectre=0
 	vdd=[0.8]   #vdd[0] is the nominal val
+	welltap_dim=[0.924, 0.672]
+	welltap_xc=[50,95]
+	cp_version=2 # custom_place version
+	FC_version=2 # dco_FC single ended version
+	ND=6 # always-off NCCs
 
 if pex_spectre==1:
 	pex_netlistDir=hspiceDir+'pex_NETLIST_scs/'
@@ -138,9 +153,15 @@ else:
 	elif CC_stack==3:
 		dco_CC_lib=aLib+'/dco_CC_se_3st/latest/'
 	if FC_half==0:
-		dco_FC_lib=aLib+'/dco_FC_se/latest/'
+		if FC_version==1:
+			dco_FC_lib=aLib+'/dco_FC_se/latest/'
+		elif FC_version==2:
+			dco_FC_lib=aLib+'/dco_FC_se2/latest/'
 	elif FC_half==1:
-		dco_FC_lib=aLib+'/dco_FC_se_half/latest/'
+		if FC_version==1:
+			dco_FC_lib=aLib+'/dco_FC_se_half/latest/'
+		elif FC_version==2:
+			dco_FC_lib=aLib+'/dco_FC_se2_half/latest/'
 W_CC,H_CC,W_FC,H_FC=preparations.aux_parse_size(dco_CC_lib,dco_FC_lib)
 
 aLib = ''
@@ -161,15 +182,30 @@ dco_CC_name,dco_FC_name=preparations.aux_copy_export(dco_flowDir,dco_CC_lib,dco_
 #------------------------------------------------------------------------------
 sys.setrecursionlimit(10000)  #expand the recursion limit if exceeded
 vm1=txt_mds.varmap()
-vm1.get_var('n_cc',30,30,1)   #[0]=n_cc
+#vm1.get_var('n_cc',24,28,4)   #[0]=n_cc
+#vm1.get_var('n_drv',5,5,1)  #[1]=n_drv
+#vm1.get_var('n_fc',40,48,8)  #[2]=n_fc
+#vm1.get_var('n_stg',3,5,2)  #[3]=n_stg
+
+# 5stg only
+vm1.get_var('n_cc',24,28,4)   #[0]=n_cc
 vm1.get_var('n_drv',5,5,1)  #[1]=n_drv
-vm1.get_var('n_fc',40,40,1)  #[2]=n_fc
+vm1.get_var('n_fc',40,48,8)  #[2]=n_fc
 vm1.get_var('n_stg',5,5,1)  #[3]=n_stg
+
+# design solution
+##vm1.get_var('n_cc',70,70,1)   #[0]=n_cc
+#vm1.get_var('n_cc',24,24,1)   #[0]=n_cc: debug purpose
+#vm1.get_var('n_drv',28,28,1)  #[1]=n_drv
+#vm1.get_var('n_fc',16,16,1)  #[2]=n_fc
+#vm1.get_var('n_stg',5,5,1)  #[3]=n_stg
+
 vm1.cal_nbigcy()
 vm1.combinate()
 
 temp=[25] #tmep[0] is the nominal val
 
+# search design solution
 #------------------------------------------------------------------------------
 #  result definition
 #------------------------------------------------------------------------------
@@ -247,34 +283,61 @@ mkfile=run_pre_sim.gen_mkfile_v2(formatDir,hspiceDir,vm1.comblist[0],vm1.comblis
 # post-pex modeling 
 #==============================================================================
 
-tapeout_mode=1
-bleach=0
+run_flow=1
+run_dig_flow=1
+gen_model=1
+
+tapeout_mode=0
+bleach=1
 synth=1
 apr=1
 pex=1
+tb_netlist=1
 lvs=0
 ninterp=2
 num_core=4
-pex_sim_time=20e-9
+if tapeout_mode==0:
+	pex_sim_time=8e-9
+else:
+	pex_sim_time=8e-9
+
 dcoNames=[]
 finesim=1
-for i in range(1,len(vm1.comblist[0])):
-	Ncc=vm1.comblist[0][i]
-	Ndrv=vm1.comblist[1][i]
-	Nfc=vm1.comblist[2][i]
-	Nstg=vm1.comblist[3][i]
-	dcoName='dco_%dndrv_%dncc_%dnstg_%dnfc'%(Ndrv,Ncc,Nstg,Nfc)
-	dcoNames.append(dcoName)
-	print(dcoName)
-	print(dcoNames)
-#	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name)
-	if lvs==1:
-		run_digital_flow.buf_custom_lvs(calibreRulesDir,dco_flowDir,extDir,dcoName,pvtFormatDir,platform)
-	if pex==1:
-#		run_pex_flow.gen_post_pex_netlist(platform, dcoName, pvtFormatDir, dco_flowDir, extDir, calibreRulesDir, wellpin, pex_spectre)
-		run_pex_sim.gen_dco_pex_wrapper(extDir,pex_netlistDir,pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,ninterp,dcoName,fc_en_type,FC_half,pex_spectre)
-		if pex_spectre==0:
-			run_pex_sim.gen_tb_wrapped(hspiceModel,pex_tbDir,pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,vdd,temp,fc_en_type,pex_sim_time,corner_lib,dcoName,pex_netlistDir,finesim,single_ended,FC_half,pex_spectre,tapeout_mode)
 
-run_pex_sim.gen_mkfile_pex(pvtFormatDir,hspiceDir,pex_resDir,pex_tbDir,num_core,dcoNames,tech_node,finesim)
-sys.exit(1)
+if run_flow==1:
+	for i in range(1,len(vm1.comblist[0])):
+		Ncc=vm1.comblist[0][i]
+		Ndrv=vm1.comblist[1][i]
+		Nfc=vm1.comblist[2][i]
+		Nstg=vm1.comblist[3][i]
+		dcoName='dco_%dndrv_%dncc_%dnstg_%dnfc'%(Ndrv,Ncc,Nstg,Nfc)
+		dcoNames.append(dcoName)
+		print(dcoName)
+		print(dcoNames)
+		if run_dig_flow==1:
+			W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name,cp_version,welltap_dim,welltap_xc,ND)
+		if lvs==1:
+			run_digital_flow.buf_custom_lvs(calibreRulesDir,dco_flowDir,extDir,dcoName,pvtFormatDir,platform)
+		if pex==1:
+			run_pex_flow.gen_post_pex_netlist(platform, dcoName, pvtFormatDir, dco_flowDir, extDir, calibreRulesDir, wellpin, pex_spectre)
+		if tb_netlist==1:
+			run_pex_sim.gen_dco_pex_wrapper(extDir,pex_netlistDir,pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,ninterp,dcoName,fc_en_type,FC_half,pex_spectre)
+			if pex_spectre==0:
+				run_pex_sim.gen_tb_wrapped(hspiceModel,pex_tbDir,pvtFormatDir,Ncc,Ndrv,Nfc,Nstg,vdd,temp,fc_en_type,pex_sim_time,corner_lib,dcoName,pex_netlistDir,finesim,single_ended,FC_half,pex_spectre,tapeout_mode)
+	
+	run_pex_sim.gen_mkfile_pex(pvtFormatDir,hspiceDir,pex_resDir,pex_tbDir,num_core,dcoNames,tech_node,finesim)
+
+# Run spice sim manually
+
+if gen_model==1:
+	#------------------------------------------------------------------------------
+	# Read transient sim result, receive nominal frequencies
+	#------------------------------------------------------------------------------
+	idK,Kg,freq,Fmax,Fmin,Fres,FCR,Iavg,result_exist,dm=run_pex_sim.gen_result(pex_resDir,vm1.comblist[0],vm1.comblist[1],vm1.comblist[2],vm1.comblist[3],num_meas,index,show,vdd,temp,fc_en_type)
+	
+	#-------------------------------------
+	# generate & verify math model
+	#-------------------------------------
+	CF,Cc,Cf,CF_err,Cc_err,Cf_err=modeling.pex_math_model_gen(vm1,netlistDir,formatDir,vdd,temp,platform,num_core,pex_resDir,index,show,num_meas,fc_en_type)
+	Iavg_const=modeling.math_model_verify(formatDir,'./pll_pex_model_gf12lp_FCv2.json',CF,Cc,Cf,dm,result_exist,freq,Fmax,Fmin,Fres,Iavg,print_error)
+	

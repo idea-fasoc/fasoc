@@ -82,7 +82,7 @@ def pll_verilog_gen(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,
 #------------------------------------------------------------------------------
 # generates ff_dco
 #------------------------------------------------------------------------------
-def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name):
+def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name, dcocp_version, welltap_dim, welltap_xc,ND):
 	print ('#======================================================================')
 	print('# setting up flow directory for dco')
 	print ('#======================================================================')
@@ -101,6 +101,7 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 	shutil.copyfile(formatDir+'dco_dc_setup.tcl',flowDir+'/scripts/dc/dc_setup.tcl')	
 	shutil.copyfile(formatDir+'dco_report_timing.tcl',flowDir+'/scripts/dc/report_timing.tcl')	
 	shutil.copyfile(formatDir+'dco_floorplan.tcl',flowDir+'/scripts/innovus/floorplan.tcl')	
+	shutil.copyfile(formatDir+'pdpll_pre_init.tcl',flowDir+'/scripts/innovus/pre_init.tcl')	
 	shutil.copyfile(formatDir+'dco_power_intent.cpf',flowDir+'/scripts/innovus/power_intent.cpf')	
 	shutil.copyfile(formatDir+platform+'_dco_post_init.tcl',flowDir+'/scripts/innovus/post_init.tcl')	
 	shutil.copyfile(formatDir+'dco_pre_route.tcl',flowDir+'/scripts/innovus/pre_route.tcl')	
@@ -117,11 +118,6 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 		lines_const=list(rmkfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wmkfile)
-	#--- bleach ---
-	if bleach==1:
-		p = sp.Popen(['make','bleach_all'], cwd=flowDir)
-		p.wait()
-	
 	#--- generate verilog file ---
 	nm1=txt_mds.netmap()
 	if single_ended==0:
@@ -147,22 +143,35 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 		nm1.get_net('Cn',dco_CC_name,None,None,None)
 	else:
 		if FC_half==0:
-			rvfile=open(formatDir+'/form_dco_se.v','r')
+			if ND==0:
+				rvfile=open(formatDir+'/form_dco_se.v','r')
+			else:
+				rvfile=open(formatDir+'/form_dco_se_dCC.v','r')
 		elif FC_half==1:
-			rvfile=open(formatDir+'/form_dco_se_halfFC.v','r')
+			if ND==0:
+				rvfile=open(formatDir+'/form_dco_se_halfFC.v','r')
+			else:
+				rvfile=open(formatDir+'/form_dco_se_halfFC_dCC.v','r')
 		nm1.get_net('iN',dcoName,None,None,None)
 		nm1.get_net('nM',None,nstg,nstg,1)
 		nm1.get_net('nD',None,ndrv,ndrv,1)
 		nm1.get_net('nF',None,nfc,nfc,1)
 		nm1.get_net('nC',None,ncc,ncc,1)
+		if ND>0:
+			nm1.get_net('ND',None,ND,ND,1)
+			nm1.get_net('CC',dco_CC_name,None,None,None)
 		nm1.get_net('NC',dco_CC_name,None,None,None)
 		nm1.get_net('Nc',dco_CC_name,None,None,None)
+		nm1.get_net('Nf',dco_FC_name,None,None,None)
 		for bcnt in range (1,3):
 			nm1.get_net('b%d'%(bcnt),buf_small,None,None,None)
 		nm1.get_net('B1',buf_big,None,None,None)
+		if ND>0:
+			nm1.get_net('DL',dco_CC_name,None,None,None)
 		nm1.get_net('CN',dco_CC_name,None,None,None)
 		nm1.get_net('cN',dco_CC_name,None,None,None)
 		nm1.get_net('Cn',dco_CC_name,None,None,None)
+		nm1.get_net('NF',dco_FC_name,None,None,None)
 	with open(flowDir+'src/'+dcoName+'.v','w') as wvfile:
 		lines_const=list(rvfile.readlines())
 		for line in lines_const:
@@ -191,15 +200,32 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 	NFtotal=nstg*(nfc)
 	A_dco=NCtotal*W_CC*H_CC+NFtotal*W_FC*H_FC
 	if cust_place==0:
-		W_dco=math.ceil(math.sqrt(A_dco)*3.0/5)*5
-		H_dco=math.ceil(math.sqrt(A_dco)*3.0/5)*5
+		W_dco=math.ceil(math.sqrt(A_dco)*2.2/2)*2
+		H_dco=math.ceil(math.sqrt(A_dco)*2.2/2)*2
 	else:
-		W_dco=math.ceil((W_CC*ncc+W_FC*nfc)*3.0/5)*5
-		H_dco=math.ceil(H_CC*nstg*3.0/5)*5
 		nspace=1
-		nxoff=4
+		#nxoff=4
+		nxoff=14
 		nyoff=6
-		dco_custom_place(formatDir,flowDir+'scripts/innovus/',[W_CC, H_CC],[W_FC, H_FC],ncc,int(nfc/2),nstg,ndrv,nspace,nxoff,nyoff)
+		#W_dco=math.ceil((W_CC*ncc+W_FC*nfc)*2.2/5)*5
+		#H_dco=math.ceil(H_CC*nstg*2.2/5)*5
+
+		#W_dco=math.ceil((W_CC*ncc+W_FC*nfc+nxoff*W_FC*2.5)/2)*2
+		#H_dco=math.ceil((H_CC*nstg+H_CC*nyoff*2)/2)*2
+		if FC_half==0:
+			W_dco=math.ceil((W_CC*ncc+W_FC*nfc+nxoff*W_FC)/2)*2
+			H_dco=math.ceil((H_CC*nstg+H_CC*nyoff*4)/2)*2
+		elif FC_half==1:
+			if ND==0:
+				W_dco=math.ceil((W_CC*ncc+W_FC*nfc+nxoff*W_FC*2)/2)*2
+			elif ND>0:
+				W_dco=math.ceil((W_CC*ncc+W_FC*nfc+nxoff*W_FC*2+W_CC*ND)/2)*2
+			H_dco=math.ceil((H_CC*nstg+H_CC*nyoff*8)/2)*2
+		if dcocp_version==1:
+			dco_custom_place(formatDir,flowDir+'scripts/innovus/',[W_CC, H_CC],[W_FC, H_FC],ncc,int(nfc/2),nstg,ndrv,nspace,nxoff,nyoff)
+		elif dcocp_version==2:
+		#	dco_custom_place_v2(formatDir,flowDir+'scripts/innovus/',[W_CC, H_CC],[W_FC, H_FC],ncc,int(nfc/2),nstg,ndrv,nspace,nxoff,nyoff,welltap_dim,welltap_xc)
+			dco_custom_place_v2p5(formatDir,flowDir+'scripts/innovus/',[W_CC, H_CC],[W_FC, H_FC],ncc,int(nfc/2),nstg,ndrv,nspace,nxoff,nyoff,welltap_dim,welltap_xc,ND)
 	#--- generate setup.tcl
 	rsufile=open(formatDir+'/form_setup.tcl','r')
 	nm1=txt_mds.netmap()
@@ -230,10 +256,18 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 	#--- generate pre_place.tcl with editPin_gen ---	
 	version=2
 	wfile_name=flowDir+'scripts/innovus/pre_place.tcl'
-	editPin_gen(ndrv,ncc,nfc,nstg,formatDir,wfile_name)
+	if single_ended==0: 
+		editPin_gen(ndrv,ncc,nfc,nstg,formatDir,wfile_name)
+	elif single_ended==1: 
+		editPin_gen_se(ndrv,ncc,nfc,nstg,formatDir,wfile_name)
 	print ('#======================================================================')
 	print('# ready for synth & apr')
 	print ('#======================================================================')
+	#--- bleach ---
+	if bleach==1:
+		p = sp.Popen(['make','bleach_all'], cwd=flowDir)
+		p.wait()
+	
 	if synth==1:
 		#-------------------------------------------
 		# run CADRE flow 
@@ -772,6 +806,635 @@ def dco_custom_place(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfine_h,n
 			netmap1.get_net('nc',None,cntc,cntc,1) # coarse cell 
 			netmap1.get_net('Lx',None, xd_end+cntc*crs_w, xd_end+cntc*crs_w, 1) # X coordinate 
 			netmap1.get_net('Ly',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate 
+
+	with open(outputDir+"custom_place.tcl","w") as w_tcl:
+		for line in lines:
+			netmap1.printline(line,w_tcl)
+
+def dltdc_custom_place(formatDir,outputDir,crscell_dim,finecell_dim,dff_dim,ncrs,nfine_h,nstg,ndrv,nspace,nxoff,nyoff, version, ndrv_ref, ncrs_ref):
+	if nfine_h!=0 and version<3:
+		r_c = open(formatDir+"form_dltdc_custom_place.tcl","r")
+	elif version==1:
+		r_c = open(formatDir+"form_dltdc_custom_place_noFC.tcl","r")
+	elif version==2:
+		r_c = open(formatDir+"form_dltdc_custom_place_noFC_v2.tcl","r")
+	elif version==3 and nfine_h==0:
+		r_c = open(formatDir+"form_dltdc_custom_place_noFC_v3.tcl","r")
+	elif version==3 and nfine_h!=0:
+		r_c = open(formatDir+"form_dltdc_custom_place_v3.tcl","r")
+	lines=list(r_c.readlines())
+
+	crs_w=crscell_dim[0]
+	crs_h=crscell_dim[1]
+	fine_w=finecell_dim[0]
+	fine_h=finecell_dim[1]
+	dff_w=dff_dim[0]
+	dff_h=dff_dim[1]
+	xoff=nxoff*fine_w	
+	yoff=nyoff*fine_h
+
+	if version==1 or version==2:
+		xfl_end=xoff+nfine_h*fine_w
+		xd_start=xfl_end + nspace*fine_w	
+		xd_end=xd_start + ndrv*crs_w
+		xc_end=xd_end + ncrs*crs_w
+		xfr_start=xc_end + nspace*fine_w
+		xfr_end=xfr_start+fine_w*nfine_h
+		xdff_start=xfr_end+nspace*fine_w
+		xdff_end=xdff_start+dff_w
+		xdr_start=xdff_end+nspace*fine_w
+		xdr_end=xdr_start+ndrv*crs_w
+	elif version==3:
+		xfl_end=xoff+nfine_h*2*fine_w
+		xd_start=xfl_end + nspace*fine_w	
+		xd_end=xd_start + ndrv*crs_w*2
+		xc_end=xd_end + ncrs*crs_w*2
+		xdff_start=xc_end+nspace*fine_w
+		xdff_end=xdff_start+dff_w
+		xdr_start=xdff_end+nspace*fine_w
+		xdr_end=xdr_start+ndrv_ref*crs_w*2
+		xcr_start=xdr_end
+		xcr_end=xcr_start+ncrs_ref*crs_w*2
+		xfr_start=xcr_end + nspace*fine_w # ref
+		xfr_end=xfr_start+fine_w*2*nfine_h
+	netmap1=txt_mds.netmap()
+	for ig in range(nstg): # for each stage
+		if version==1 or version==2:
+			#---------------------------------------------
+			# place fine cells
+			#---------------------------------------------
+			for cntf in range(nfine_h*2):
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+				netmap1.get_net('nf',None,cntf,cntf,1) # fine cell
+				if cntf < nfine_h:
+					netmap1.get_net('LX', None, xoff+cntf*fine_w, xoff+cntf*fine_w, 1) # X coordinate 
+				else:
+					netmap1.get_net('LX',None, xfr_start+(cntf-nfine_h)*fine_w, xfr_start+(cntf-nfine_h)*fine_w, 1) # X coordinate 
+				netmap1.get_net('LY',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate 
+			#---------------------------------------------
+			# place driver cells
+			#---------------------------------------------
+			for cntd in range(ndrv):
+				netmap1.get_net('ns',None,ig,ig,1) # stg
+				netmap1.get_net('nd',None,cntd,cntd,1) # driver cell 
+				netmap1.get_net('lx',None, xd_start+cntd*crs_w, xd_start+cntd*crs_w, 1) # X coordinate 
+				netmap1.get_net('ly',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+				if version==2: 
+					netmap1.get_net('rs',None,ig,ig,1) # stg
+					netmap1.get_net('rd',None,cntd,cntd,1) # driver cell 
+					netmap1.get_net('rx',None, xdr_start+cntd*crs_w, xdr_start+cntd*crs_w, 1) # X coordinate 
+					netmap1.get_net('ry',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+			#---------------------------------------------
+			# place coarse cells
+			#---------------------------------------------
+			for cntc in range(ncrs):
+				netmap1.get_net('Ns',None,ig,ig,1) # stg
+				netmap1.get_net('nc',None,cntc,cntc,1) # coarse cell 
+				netmap1.get_net('Lx',None, xd_end+cntc*crs_w, xd_end+cntc*crs_w, 1) # X coordinate 
+				netmap1.get_net('Ly',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate 
+				if version==2:
+					netmap1.get_net('Rs',None,ig,ig,1) # stg
+					netmap1.get_net('Rc',None,cntc,cntc,1) # coarse cell 
+					netmap1.get_net('Rx',None, xdr_end+cntc*crs_w, xdr_end+cntc*crs_w, 1) # X coordinate 
+					netmap1.get_net('Ry',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+		elif version==3:
+			for cntf in range(nfine_h*2):
+				# for fb path
+				netmap1.get_net('fs',None,ig,ig,1) # stg
+				netmap1.get_net('nf',None,cntf,cntf,1) # fine cell
+				netmap1.get_net('fx', None, xoff+cntf*fine_w, xoff+cntf*fine_w, 1) # X coordinate 
+				netmap1.get_net('fy',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+				# for ref path 
+				netmap1.get_net('FS',None,ig,ig,1) # stg
+				netmap1.get_net('NF',None,cntf,cntf,1) # fine cell
+				netmap1.get_net('FX', None, xfr_start+cntf*fine_w, xfr_start+cntf*fine_w, 1) # X coordinate 
+				netmap1.get_net('FY',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate 
+			for cntd in range(ndrv):
+				netmap1.get_net('ns',None,ig,ig,1) # stg
+				netmap1.get_net('nd',None,cntd,cntd,1) # driver cell 
+				netmap1.get_net('lx',None, xd_start+cntd*crs_w*2, xd_start+cntd*crs_w*2, 1) # X coordinate 
+				netmap1.get_net('ly',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+				netmap1.get_net('ND',None,cntd,cntd,1) # driver cell 
+				netmap1.get_net('LX',None, xd_start+cntd*crs_w*2+crs_w, xd_start+cntd*crs_w*2+crs_w, 1) # X coordinate 
+				netmap1.get_net('LY',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+			for cntd in range(ndrv_ref):
+				netmap1.get_net('rs',None,ig,ig,1) # stg
+				netmap1.get_net('rd',None,cntd,cntd,1) # driver cell 
+				netmap1.get_net('rx',None, xdr_start+cntd*crs_w*2, xdr_start+cntd*crs_w*2, 1) # X coordinate 
+				netmap1.get_net('ry',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+				netmap1.get_net('RS',None,ig,ig,1) # stg
+				netmap1.get_net('RD',None,cntd,cntd,1) # driver cell 
+				netmap1.get_net('RX',None, xdr_start+cntd*crs_w*2+crs_w, xdr_start+cntd*crs_w*2+crs_w, 1) # X coordinate 
+				netmap1.get_net('RY',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+			for cntc in range(ncrs):
+				netmap1.get_net('Ns',None,ig,ig,1) # stg
+				netmap1.get_net('nc',None,cntc,cntc,1) # coarse cell 
+				netmap1.get_net('Lx',None, xd_end+cntc*crs_w*2, xd_end+cntc*crs_w*2, 1) # X coordinate 
+				netmap1.get_net('Ly',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate 
+				netmap1.get_net('cS',None,ig,ig,1) # stg
+				netmap1.get_net('nC',None,cntc,cntc,1) # coarse cell 
+				netmap1.get_net('cX',None, xd_end+cntc*crs_w*2+crs_w, xd_end+cntc*crs_w*2+crs_w, 1) # X coordinate 
+				netmap1.get_net('cY',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+			for cntc in range(ncrs_ref):
+				netmap1.get_net('Rs',None,ig,ig,1) # stg
+				netmap1.get_net('Rc',None,cntc,cntc,1) # coarse cell 
+				netmap1.get_net('Rx',None, xdr_end+cntc*crs_w*2, xdr_end+cntc*crs_w*2, 1) # X coordinate 
+				netmap1.get_net('Ry',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+				netmap1.get_net('rS',None,ig,ig,1) # stg
+				netmap1.get_net('rC',None,cntc,cntc,1) # coarse cell 
+				netmap1.get_net('rX',None, xdr_end+cntc*crs_w*2+crs_w, xdr_end+cntc*crs_w*2+crs_w, 1) # X coordinate 
+				netmap1.get_net('rY',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+		#---------------------------------------------
+		# place dffs 
+		#---------------------------------------------
+		netmap1.get_net('nS',None,ig,ig,1) # stg
+	#	netmap1.get_net('lX',None, xfr_end+nspace*fine_w, xfr_end+nspace*fine_w, 1) # X coordinate 
+		netmap1.get_net('lX',None, xdff_start, xdff_start, 1) # X coordinate 
+		netmap1.get_net('lY',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate 
+
+	with open(outputDir+"custom_place.tcl","w") as w_tcl:
+		for line in lines:
+			netmap1.printline(line,w_tcl)
+
+# v2 considers welltap placements and skips the cell placements near them
+# welltap_xc is a list of x-coordinates where the welltaps are placed
+def dco_custom_place_v2(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfine_h,nstg,ndrv,nspace,nxoff,nyoff, welltap_dim, welltap_xc):
+	r_c = open(formatDir+"form_dco_custom_place.tcl","r")
+	lines=list(r_c.readlines())
+
+	welltap_w=welltap_dim[0]
+	crs_w=crscell_dim[0]
+	crs_h=crscell_dim[1]
+	fine_w=finecell_dim[0]
+	fine_h=finecell_dim[1]
+	xoff=nxoff*fine_w	
+	yoff=nyoff*fine_h
+
+#	xfl_end=xoff+nfine_h*fine_w
+#	xd_start=xfl_end + nspace*fine_w	
+#	xd_end=xd_start + ndrv*crs_w
+#	xc_end=xd_end + ncrs*crs_w
+#	xfr_start=xc_end + nspace*fine_w
+	netmap1=txt_mds.netmap()
+	skip=0
+	for ig in range(nstg): # for each stage
+		#---------------------------------------------
+		# place left fine cells
+		#---------------------------------------------
+		for cntf in range(nfine_h):
+			if ig!=nstg-1:	
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('NS',None,None,'last',1) # stg
+			netmap1.get_net('nf',None,cntf,cntf,1) # fine cell
+			if cntf==0:
+				xtry=xoff
+			else:
+				xtry=xcor+fine_w
+			xcor,skip=xcorCal_skipwt(xtry, fine_w, welltap_w, welltap_xc, fine_w)
+			netmap1.get_net('LX', None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('LY',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+			if cntf==nfine_h-1:
+				xfl_end=xcor+fine_w
+				print("xfl_end=%.3e"%(xfl_end))
+			print("%.2e, %d"%(xcor,skip))
+			
+		#---------------------------------------------
+		# place driver cells
+		#---------------------------------------------
+		xd_start=xfl_end+nspace*fine_w
+		for cntd in range(ndrv):
+			if ig!=nstg-1:	
+				netmap1.get_net('ns',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('ns',None,None,'last',1) # stg
+			if cntd==0:
+				xtry=xd_start
+			else:
+				xtry=xcor+crs_w
+			netmap1.get_net('nd',None,cntd,cntd,1) # driver cell 
+			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+			print("%.2e, %d"%(xcor,skip))
+			netmap1.get_net('lx',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('ly',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+			if cntd==ndrv-1:
+				xd_end=xcor+crs_w 
+				print("xd_end=%.3e"%(xd_end))
+		#---------------------------------------------
+		# place coarse cells
+		#---------------------------------------------
+		for cntc in range(ncrs):
+			if ig!=nstg-1:	
+				netmap1.get_net('Ns',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('Ns',None,None,'last',1) # stg
+			if cntc==0:
+				xtry=xd_end
+			else:
+				xtry=xcor+crs_w
+			netmap1.get_net('nc',None,cntc,cntc,1) # coarse cell 
+			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+			print("%.2e, %d"%(xcor,skip))
+			netmap1.get_net('Lx',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('Ly',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
+			if cntc==ncrs-1:
+				xc_end=xcor+crs_w 
+				print("xc_end=%.3e"%(xc_end))
+		#---------------------------------------------
+		# place right fine cells
+		#---------------------------------------------
+		xfr_start=xc_end+nspace*fine_w
+		for cntf in range(nfine_h):
+			if ig!=nstg-1:	
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('NS',None,None,'last',1) # stg
+			if cntf==0:
+				xtry=xfr_start
+			else:
+				xtry=xcor+fine_w
+			netmap1.get_net('nf',None,cntf+nfine_h,cntf+nfine_h,1) # fine cell
+			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+			netmap1.get_net('LX',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('LY',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate 
+
+	with open(outputDir+"custom_place.tcl","w") as w_tcl:
+		for line in lines:
+			netmap1.printline(line,w_tcl)
+
+# 2 stack per stage. the number of cells per xtage have to be even!!!
+def dco_custom_place_v2p5(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfine_h,nstg,ndrv,nspace,nxoff,nyoff, welltap_dim, welltap_xc, ND):
+	if ND==0:
+		r_c = open(formatDir+"form_dco_custom_place.tcl","r")
+	else:
+		r_c = open(formatDir+"form_dco_custom_place_dCC.tcl","r") # dead CC
+	lines=list(r_c.readlines())
+
+	welltap_w=welltap_dim[0]
+	crs_w=crscell_dim[0]
+	crs_h=crscell_dim[1]
+	fine_w=finecell_dim[0]
+	fine_h=finecell_dim[1]
+	xoff=nxoff*fine_w	
+	yoff=nyoff*fine_h
+
+	nfine_h_h=int(nfine_h/2)
+	ndrv_h=int(ndrv/2)
+	ncrs_h=int(ncrs/2)
+
+#	xfl_end=xoff+nfine_h*fine_w
+#	xd_start=xfl_end + nspace*fine_w	
+#	xd_end=xd_start + ndrv*crs_w
+#	xc_end=xd_end + ncrs*crs_w
+#	xfr_start=xc_end + nspace*fine_w
+	netmap1=txt_mds.netmap()
+	skip=0
+	for ig in range(nstg): # for each stage
+		if ND>0:
+			#---------------------------------------------
+			# place left off-coarse cells
+			#---------------------------------------------
+			for cntd in range(int(ND/4)):
+				if ig!=nstg-1:	
+					netmap1.get_net('nS',None,ig,ig,1) # stg
+					netmap1.get_net('nS',None,ig,ig,1) # stg
+				else:
+					netmap1.get_net('nS',None,None,'last',1) # stg
+					netmap1.get_net('nS',None,None,'last',1) # stg
+				netmap1.get_net('nD',None,2*cntd,2*cntd,1) # fine cell idx
+				netmap1.get_net('nD',None,2*cntd+1,2*cntd+1,1) # fine cell idx2
+				if cntd==0:
+					xtry=xoff
+				else:
+					xtry=xcor+crs_w
+				xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+				netmap1.get_net('DX', None, xcor, xcor, 1) # X coordinate 
+				netmap1.get_net('DX', None, xcor, xcor, 1) # X coordinate 
+				netmap1.get_net('DY',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
+				netmap1.get_net('DY',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+				if cntd==int(ND/4)-1:
+					xdc_end=xcor+crs_w
+					print("xdc_end=%.3e"%(xdc_end))
+#				print("%.2e, %d"%(xcor,skip))
+		#---------------------------------------------
+		# place left fine cells
+		#---------------------------------------------
+		for cntf in range(nfine_h_h):
+			if ig!=nstg-1:	
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('NS',None,None,'last',1) # stg
+				netmap1.get_net('NS',None,None,'last',1) # stg
+			netmap1.get_net('nf',None,2*cntf,2*cntf,1) # fine cell idx
+			netmap1.get_net('nf',None,2*cntf+1,2*cntf+1,1) # fine cell idx2
+			if cntf==0:
+				if ND==0:
+					xtry=xoff
+				elif ND>0:
+					xtry=xdc_end+fine_w*nspace
+					print("ND is greater than 0. fine cells starting from %.3e"%(xtry))
+			else:
+				xtry=xcor+fine_w
+			xcor,skip=xcorCal_skipwt(xtry, fine_w, welltap_w, welltap_xc, fine_w)
+			netmap1.get_net('LX', None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('LX', None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('LY',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
+			netmap1.get_net('LY',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+			if cntf==nfine_h_h-1:
+				xfl_end=xcor+fine_w
+				print("xfl_end=%.3e"%(xfl_end))
+			print("%.2e, %d"%(xcor,skip))
+			
+		#---------------------------------------------
+		# place driver cells
+		#---------------------------------------------
+		xd_start=xfl_end+nspace*fine_w
+		for cntd in range(ndrv_h):
+			if ig!=nstg-1:	
+				netmap1.get_net('ns',None,ig,ig,1) # stg
+				netmap1.get_net('ns',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('ns',None,None,'last',1) # stg
+				netmap1.get_net('ns',None,None,'last',1) # stg
+			if cntd==0:
+				xtry=xd_start
+			else:
+				xtry=xcor+crs_w
+			netmap1.get_net('nd',None,2*cntd,2*cntd,1) # driver cell 
+			netmap1.get_net('nd',None,2*cntd+1,2*cntd+1,1) # driver cell 
+			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+			print("%.2e, %d"%(xcor,skip))
+			netmap1.get_net('lx',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('lx',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('ly',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
+			netmap1.get_net('ly',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+			if cntd==ndrv_h-1:
+				xd_end=xcor+crs_w 
+				print("xd_end=%.3e"%(xd_end))
+		#---------------------------------------------
+		# place coarse cells
+		#---------------------------------------------
+		for cntc in range(ncrs_h):
+			if ig!=nstg-1:	
+				netmap1.get_net('Ns',None,ig,ig,1) # stg
+				netmap1.get_net('Ns',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('Ns',None,None,'last',1) # stg
+				netmap1.get_net('Ns',None,None,'last',1) # stg
+			if cntc==0:
+				xtry=xd_end
+			else:
+				xtry=xcor+crs_w
+			netmap1.get_net('nc',None,2*cntc,2*cntc,1) # coarse cell 
+			netmap1.get_net('nc',None,2*cntc+1,2*cntc+1,1) # coarse cell 
+			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+			print("%.2e, %d"%(xcor,skip))
+			netmap1.get_net('Lx',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('Lx',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('Ly',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
+			netmap1.get_net('Ly',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+			if cntc==ncrs_h-1:
+				xc_end=xcor+crs_w 
+				print("xc_end=%.3e"%(xc_end))
+		#---------------------------------------------
+		# place right fine cells
+		#---------------------------------------------
+		xfr_start=xc_end+nspace*fine_w
+		for cntf in range(nfine_h_h):
+			if ig!=nstg-1:	
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('NS',None,None,'last',1) # stg
+				netmap1.get_net('NS',None,None,'last',1) # stg
+			if cntf==0:
+				xtry=xfr_start
+			else:
+				xtry=xcor+fine_w
+			netmap1.get_net('nf',None,2*cntf+nfine_h,2*cntf+nfine_h,1) # fine cell
+			netmap1.get_net('nf',None,2*cntf+nfine_h+1,2*cntf+nfine_h+1,1) # fine cell
+			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+			netmap1.get_net('LX',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('LX',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('LY',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate 
+			netmap1.get_net('LY',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate 
+			if cntf==nfine_h_h-1:
+				xfr_end=xcor+fine_w
+		if ND>0:
+			#---------------------------------------------
+			# place left off-coarse cells
+			#---------------------------------------------
+			for cntd in range(int(ND/4),int(ND/2)):
+				if ig!=nstg-1:	
+					netmap1.get_net('nS',None,ig,ig,1) # stg
+					netmap1.get_net('nS',None,ig,ig,1) # stg
+				else:
+					netmap1.get_net('nS',None,None,'last',1) # stg
+					netmap1.get_net('nS',None,None,'last',1) # stg
+				netmap1.get_net('nD',None,2*cntd,2*cntd,1) # fine cell idx
+				netmap1.get_net('nD',None,2*cntd+1,2*cntd+1,1) # fine cell idx2
+				if cntd==0:
+					xtry=xfr_end
+				else:
+					xtry=xcor+crs_w
+				xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+				netmap1.get_net('DX', None, xcor, xcor, 1) # X coordinate 
+				netmap1.get_net('DX', None, xcor, xcor, 1) # X coordinate 
+				netmap1.get_net('DY',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
+				netmap1.get_net('DY',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+				if cntd==int(ND/2)-1:
+					xdc_end=xcor+crs_w
+
+	with open(outputDir+"custom_place.tcl","w") as w_tcl:
+		for line in lines:
+			netmap1.printline(line,w_tcl)
+
+# calculates and returns the x-coordinate considering the welltap placements
+def xcorCal_skipwt ( cell_xc, cell_w, welltap_w, welltap_xc, xoff):
+	c_start=cell_xc
+	c_end=c_start+cell_w
+	skip=0
+	for iwt in range(len(welltap_xc)):
+		wt_start=welltap_xc[iwt]
+		wt_end=welltap_xc[iwt]+welltap_w
+		if (c_start <= wt_start and c_end >=wt_start) or (c_start <= wt_end and c_end >= wt_end): # skip when overlap
+			xcor= wt_end+xoff
+#			print("INFO: welltap overlap with cell. xcor moved from %.3e to %.3e"%(c_start,xcor))
+			skip=1
+	if skip==0: # no overlap with any welltaps
+		xcor=c_start
+#		print("INFO: no overlap with welltaps")
+	return xcor,skip 
+
+
+
+def editPin_gen_se(Ndrv,Ncc,Nfc,Nstg,formatDir,wfile_name):
+	nCC=Ncc*Nstg
+	nFC=Nfc*Nstg
+	nPout=Nstg*2
+	
+	#rfile=open(formatDir+'/form_floorplan_test.tcl','r')
+	#rfile=open('ignore_form_floorplan.tcl','r')
+	rfile=open(formatDir+'/form_dco_pre_place_se.tcl','r')
+	wfile=open(wfile_name,'w')
+	
+	#========================================================================
+	# Version 2
+	#	for floor plan.tcl: spreading out the pin
+	# 	this is the 2nd version, with all the edge selection spread out,
+	#	PH_P/N_out*, CLK_OUT are only concentrated in the bottom,
+	#	all other pins are spread 4-side to reduce the delay mismatch between cells
+	#========================================================================
+	Nedge_start=Nstg*2
+	eps=int(Nstg/2) # edge_per_side per either N or P
+	nm2=txt_mds.netmap()
+	
+	#--- distribute PH_P_OUT, PH_N_OUT ---
+	nm2.get_net('po',None,0,Nstg//2,1)
+	nm2.get_net('Po',None,Nstg//2+1,Nstg-1,1)
+	
+	lines=list(rfile.readlines())
+	istg=0
+	for line in lines:
+		if line[0:2]=='@E': 
+			nm1=txt_mds.netmap()
+			nm1.get_net('f1','FC[',istg,istg+Nstg*(Nfc-1),Nstg)
+			nm1.get_net('fb','FCB[',istg,istg+Nstg*(Nfc-1),Nstg)
+			nm1.get_net('c1','CC[',istg,istg+Nstg*(Ncc-1),Nstg)
+			nm1.printline(line,wfile)
+			istg=istg+1
+		else:
+			nm2.printline(line,wfile)
+
+def pre_dltdc_custom_place(formatDir,outputDir,dltdc_dim,cccell_dim,finecell_dim,dff_dim,ncc_fb,nfc_h,nstg_fb,ndrv_fb,nspace,nxoff,nyoff, version, ndrv_ref, ncc_ref, pre_ncc_fb, pre_ndrv_fb, pre_nstg_fb, pre_ncc_ref, pre_ndrv_ref, pre_nstg_ref, np_nstg, npb_ncc, np_ncc,np_ndrv,pp_nstg, pp_ncc, pp_drv, fm_ncc):
+	r_c = open(formatDir+"form_pre_dltdc_custom_place.tcl","r")
+	lines=list(r_c.readlines())
+
+	dltdc_w=dltdc_dim[0]
+	dltdc_h=dltdc_dim[1]
+	cc_w=cccell_dim[0]
+	cc_h=cccell_dim[1]
+	fine_w=finecell_dim[0]
+	fine_h=finecell_dim[1]
+	dff_w=dff_dim[0]
+	dff_h=dff_dim[1]
+	xoff=nxoff*fine_w	
+	yoff=nyoff*fine_h
+
+	netmap1=txt_mds.netmap()
+	#=====================================================
+	# pre-dltdc: place from right => left
+	# design params: pre-dltdc 
+	pre_ndrv_fb = 1;
+	pre_ndrv_ref = 2;
+	pre_ncc_fb = 4;
+	pre_ncc_ref = 2;
+	
+	np_ndrv = 4;
+	pp_ndrv = 2;
+	
+	np_ncc = 4;
+	np_nstg = 3; 
+	pp_nstg = 4; 
+	pp_ncc = 6;
+
+	pre_nstg_ref_ls = 1;
+	pre_nstg_ref = 10; 
+	pre_nstg_fb = 4;
+	# DPs: dltdc delay line	
+	nstg = 10; 
+	nfc_fb = 6;
+	nfc_ref = 6;
+	ndrv_fb = 1;
+	ndrv_ref = 2;
+	ncc_fb = 4;
+	ncc_ref = 2;
+	dco_num_ph = 5;
+
+	# x-positions
+	embtdc_start = dltdc_w - xoff - dff_w
+	smpl_edge_sel_start = embtdc_start - xoff - dff_w
+	pre_dco_path_start = smpl_edge_sel_start - xoff -cc_w		
+	pre_dco_path_end = pre_dco_path_start - cc_w*(pre_ncc_fb + pre_ndrv_fb)*pre_nstg_fb*cc_w +cc_w
+	pp_start = pre_dco_path_end - xoff - cc_w
+	np_start = pp_start - cc_w 
+#	pp_end = pp_start - pp_nstg*cc_w 
+
+	# embtdc
+#	for ig in range(
+
+
+	#=====================================================
+	# dltdc
+	xfl_end=xoff+nfc_h*2*fine_w
+	xd_start=xfl_end + nspace*fine_w	
+	xd_end=xd_start + ndrv_fb*cc_w*2
+	xc_end=xd_end + ncc_fb*cc_w*2
+	xdff_start=xc_end+nspace*fine_w
+	xdff_end=xdff_start+dff_w
+	xdr_start=xdff_end+nspace*fine_w
+	xdr_end=xdr_start+ndrv_ref*cc_w*2
+	xcr_start=xdr_end
+	xcr_end=xcr_start+ncc_ref*cc_w*2
+	xfr_start=xcr_end + nspace*fine_w # ref
+	xfr_end=xfr_start+fine_w*2*nfc_h
+	for ig in range(nstg): # for each stage
+		for cntf in range(nfc_h*2):
+			# for fb path
+			netmap1.get_net('fs',None,ig,ig,1) # stg
+			netmap1.get_net('nf',None,cntf,cntf,1) # fine cell
+			netmap1.get_net('fx', None, xoff+cntf*fine_w, xoff+cntf*fine_w, 1) # X coordinate 
+			netmap1.get_net('fy',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate
+			# for ref path 
+			netmap1.get_net('FS',None,ig,ig,1) # stg
+			netmap1.get_net('NF',None,cntf,cntf,1) # fine cell
+			netmap1.get_net('FX', None, xfr_start+cntf*fine_w, xfr_start+cntf*fine_w, 1) # X coordinate 
+			netmap1.get_net('FY',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate 
+		for cntd in range(ndrv_fb):
+			netmap1.get_net('ns',None,ig,ig,1) # stg
+			netmap1.get_net('nd',None,cntd,cntd,1) # driver cell 
+			netmap1.get_net('lx',None, xd_start+cntd*cc_w*2, xd_start+cntd*cc_w*2, 1) # X coordinate 
+			netmap1.get_net('ly',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate
+			netmap1.get_net('NS',None,ig,ig,1) # stg
+			netmap1.get_net('ND',None,cntd,cntd,1) # driver cell 
+			netmap1.get_net('LX',None, xd_start+cntd*cc_w*2+cc_w, xd_start+cntd*cc_w*2+cc_w, 1) # X coordinate 
+			netmap1.get_net('LY',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate
+		for cntd in range(ndrv_ref):
+			netmap1.get_net('rs',None,ig,ig,1) # stg
+			netmap1.get_net('rd',None,cntd,cntd,1) # driver cell 
+			netmap1.get_net('rx',None, xdr_start+cntd*cc_w*2, xdr_start+cntd*cc_w*2, 1) # X coordinate 
+			netmap1.get_net('ry',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate
+			netmap1.get_net('RS',None,ig,ig,1) # stg
+			netmap1.get_net('RD',None,cntd,cntd,1) # driver cell 
+			netmap1.get_net('RX',None, xdr_start+cntd*cc_w*2+cc_w, xdr_start+cntd*cc_w*2+cc_w, 1) # X coordinate 
+			netmap1.get_net('RY',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate
+		for cntc in range(ncc_fb):
+			netmap1.get_net('Ns',None,ig,ig,1) # stg
+			netmap1.get_net('nc',None,cntc,cntc,1) # coarse cell 
+			netmap1.get_net('Lx',None, xd_end+cntc*cc_w*2, xd_end+cntc*cc_w*2, 1) # X coordinate 
+			netmap1.get_net('Ly',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate 
+			netmap1.get_net('cS',None,ig,ig,1) # stg
+			netmap1.get_net('nC',None,cntc,cntc,1) # coarse cell 
+			netmap1.get_net('cX',None, xd_end+cntc*cc_w*2+cc_w, xd_end+cntc*cc_w*2+cc_w, 1) # X coordinate 
+			netmap1.get_net('cY',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate
+		for cntc in range(ncc_ref):
+			netmap1.get_net('Rs',None,ig,ig,1) # stg
+			netmap1.get_net('Rc',None,cntc,cntc,1) # coarse cell 
+			netmap1.get_net('Rx',None, xdr_end+cntc*cc_w*2, xdr_end+cntc*cc_w*2, 1) # X coordinate 
+			netmap1.get_net('Ry',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate
+			netmap1.get_net('rS',None,ig,ig,1) # stg
+			netmap1.get_net('rC',None,cntc,cntc,1) # coarse cell 
+			netmap1.get_net('rX',None, xdr_end+cntc*cc_w*2+cc_w, xdr_end+cntc*cc_w*2+cc_w, 1) # X coordinate 
+			netmap1.get_net('rY',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate
+		#---------------------------------------------
+		# place dffs 
+		#---------------------------------------------
+		netmap1.get_net('nS',None,ig,ig,1) # stg
+	#	netmap1.get_net('lX',None, xfr_end+nspace*fine_w, xfr_end+nspace*fine_w, 1) # X coordinate 
+		netmap1.get_net('lX',None, xdff_start, xdff_start, 1) # X coordinate 
+		netmap1.get_net('lY',None,yoff+ig*cc_h,yoff+ig*cc_h,1) # Y coordinate 
 
 	with open(outputDir+"custom_place.tcl","w") as w_tcl:
 		for line in lines:

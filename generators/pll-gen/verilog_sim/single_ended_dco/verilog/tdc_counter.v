@@ -212,16 +212,29 @@ module tdc_encoder (
 			always @* begin 
 				// single ended decoding
 				case(sampled_phases_curr)
+					// first version: this is for intN operarion, assuming the ref edge will ALWAYS come between 4~12
+					// If you wanna use this for fracN, post-processing is required to make it more linear
+					//5'b00000: 	tdc_out_binary <= 0;  
+					//5'b00001: 	tdc_out_binary <= 2; // -1 will be added in the pll_controller for mid-rise 
+					//5'b00011: 	tdc_out_binary <= 4; 
+					//5'b00111: 	tdc_out_binary <= 6; 
+					//5'b01111: 	tdc_out_binary <= 8;
+					//5'b11111: 	tdc_out_binary <= 10;
+					//5'b11110: 	tdc_out_binary <= 12;
+					//5'b11100: 	tdc_out_binary <= 14;
+					//5'b11000: 	tdc_out_binary <= 16;
+					//5'b10000: 	tdc_out_binary <= 18;
+					// second version: linear approximated
 					5'b00000: 	tdc_out_binary <= 0;  
-					5'b00001: 	tdc_out_binary <= 2; // -1 will be added in the pll_controller for mid-rise 
-					5'b00011: 	tdc_out_binary <= 4; 
-					5'b00111: 	tdc_out_binary <= 6; 
-					5'b01111: 	tdc_out_binary <= 8;
-					5'b11111: 	tdc_out_binary <= 10;
-					5'b11110: 	tdc_out_binary <= 12;
-					5'b11100: 	tdc_out_binary <= 14;
-					5'b11000: 	tdc_out_binary <= 16;
-					5'b10000: 	tdc_out_binary <= 18;
+					5'b00001: 	tdc_out_binary <= 3; // -1 will be added in the pll_controller for mid-rise 
+					5'b00011: 	tdc_out_binary <= 7; 
+					5'b00111: 	tdc_out_binary <= 10; 
+					5'b01111: 	tdc_out_binary <= 14;
+					5'b11111: 	tdc_out_binary <= 17;
+					5'b11110: 	tdc_out_binary <= 21;
+					5'b11100: 	tdc_out_binary <= 24;
+					5'b11000: 	tdc_out_binary <= 28;
+					5'b10000: 	tdc_out_binary <= 31;
 					default: 
 					    tdc_out_binary <= 0;
 				endcase

@@ -6,7 +6,7 @@
 +EMGRLOG
 irun_comp.log
 -XLSTIME
-1594777998
+1595821465
 -XLKEEP
 -XLMODE
 ./INCA_libs/irun.lnx8664.15.20.nc
@@ -18,6 +18,6 @@ irun_comp.log
 -XLNAME
 irun
 -XLVERSION
-"TOOL:	irun(64)	15.20-s005"
+"TOOL:	irun(64)	15.20-s084"
 -XLNAME
-./INCA_libs/irun.lnx8664.15.20.nc/grandtraverse.eecs.umich.edu_23181
+./INCA_libs/irun.lnx8664.15.20.nc/grandtraverse.eecs.umich.edu_13912

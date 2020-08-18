@@ -9,3 +9,5 @@ s4::(09Jan2020:16:52:23):( irun -64bit -R -sv -sem2009 -access +rwc -input dump_
 s5::(09Jan2020:16:54:03):( irun -64bit -R -sv -sem2009 -access +rwc -input dump_irun.tcl +delay_mode_unit -timescale 1ns/1ps -l irun_run.log )
 s6::(09Jan2020:16:56:49):( irun -64bit -R -sv -sem2009 -access +rwc -input dump_irun.tcl +delay_mode_unit -timescale 1ns/1ps -l irun_run.log )
 s7::(09Jan2020:17:04:42):( irun -64bit -R -sv -sem2009 -access +rwc -input dump_irun.tcl +delay_mode_unit -timescale 1ns/1ps -l irun_run.log )
+s8::(26Jul2020:13:49:34):( irun -64bit -elaborate -sv -sem2009 -sysv_ext +.vh -access +rwc -timescale 1ns/1ps -f ./flist.f -l irun_comp.log )
+s9::(26Jul2020:13:49:36):( irun -64bit -R -sv -sem2009 -access +rwc -input dump_irun.tcl +delay_mode_unit -timescale 1ns/1ps -l irun_run.log )

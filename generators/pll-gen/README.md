@@ -79,13 +79,13 @@ Date    : May 27, 2020
    All the options specified in square brackets [] are optional. When `--clean` option is provided, the tool exits after a cleanup of the workspace. Each of the command line variables are described below in detail.
    
    __{Input_Spec_File.json}__
-   - This file is similar to `test.json` file and contains the input specifications of the LDO module.
+   - This file is similar to `test_beta65.json, test_alpha12.json` files and contains the input specifications of the PLL module.
    
    __{Output_Folder}__
    - This variable specifies the directory where the final outputs of the tool are saved.
    
    __{Technology_Node}__
-   - This variable must be either "tsmc65lp" or "gfbicmos8hp" as of now.
+   - This variable must be either "tsmc65lp" or "gf12lp" as of now.
    
    __{Run_Mode}__
    - This must be either "verilog", "macro" or "full". Default mode used is "verilog" if this option is not specified. 

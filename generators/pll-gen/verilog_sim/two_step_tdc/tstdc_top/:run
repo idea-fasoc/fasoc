@@ -1,0 +1,24 @@
+#!/bin/bash
+irun    -64bit      \
+        -elaborate  \
+        -sv         \
+        -sem2009    \
+        -sysv_ext +.vh \
+        -access +rwc    \
+        -timescale 1ns/1ps \
+        -f ./flist.f   \
+        -l irun_comp.log
+
+irun    -64bit      \
+        -R          \
+        -sv         \
+        -sem2009    \
+        -access +rwc    \
+        -input dump_irun.tcl \
++delay_mode_unit \
+        -timescale 1ns/1ps \
+        -l irun_run.log
+
+
+
+#diff goldenbrick/gb_out_mult_add_res_reuse.txt ./testbench_mult_add_res_reuse.txt | tee ./diff_functional_mult_add_res_reuse.txt #5

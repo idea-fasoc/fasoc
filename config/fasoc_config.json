@@ -2,7 +2,7 @@
   "schema_version": 0.1,
   "generators": {
     "pll-gen": {
-      "path": "./generators/pll-gen/tsmc65lp/tools/PLL_GEN.py",
+      "path": "./generators/pll-gen/tools/PLL_GEN_Beta.py",
       "interfaces": [
         {
           "name": "PLL_APBS",

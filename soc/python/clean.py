@@ -34,6 +34,8 @@ fasoc_dir	= os.path.relpath(os.path.join(soc_dir,"../.."))
 parser = argparse.ArgumentParser(description='Cleaning FASoC Integration Tool')
 parser.add_argument('--design', required=True,
 					help='Resolved design description json file path')
+parser.add_argument('--platform', default="tsmc65lp",
+					help='PDK/process kit for cadre flow (.e.g tsmc65lp)')
 parser.add_argument('--platform_config', default=os.path.join(fasoc_dir, "config/platform_config.json"),
 					help='Platform configuration json file path')
 parser.add_argument('--connection', default="remove",
@@ -62,7 +64,7 @@ except ValueError as e:
 	sys.exit(1)
 
 designDir = os.path.dirname(args.design)
-databaseDir = platformJson["platforms"]["tsmc65lp"]["database"]
+databaseDir = platformJson["platforms"][args.platform]["database"]
 rubiDir = os.path.join(soc_dir,'..','rubi')
 
 print("Cleaning design directory ...")

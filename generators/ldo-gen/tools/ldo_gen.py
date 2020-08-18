@@ -30,6 +30,7 @@ extDir           = os.path.join(pvtGenDir, './extraction')
 simDir           = os.path.join(pvtGenDir, './simulation')
 pyModulesDir     = os.path.join(pvtGenDir, './pymodules')
 verilogDir       = os.path.join(genDir, './verilog')
+supportedInputs  = os.path.join(genDir, './tools/supported_inputs.json')
 
 #------------------------------------------------------------------------------
 # Parse the command line arguments
@@ -58,6 +59,7 @@ if not os.path.isfile(args.specfile):
    print('File Path: ' + args.specfile)
    sys.exit(1)
 
+# Should change this condition to use supportedInputs file
 if args.platform != 'tsmc65lp' and args.platform != 'gfbicmos8hp' and \
    args.platform != 'gf12lp':
    print('Error: Only supports TSMC65lp, GFBiCmos8hp and GF12LP kits ' + \
@@ -78,7 +80,58 @@ if os.path.isdir(pvtGenDir):
    import run_pex_flow      as pex
    import run_sim_flow      as sim
 
-# Load json spec file
+# Load json supported inputs file
+print('Loading supportedInputsFile...')
+try:
+   with open(supportedInputs) as file:
+      jsonSupportedInputs = json.load(file)
+except ValueError as e:
+   print('Error: Supported Inputs json file has an invalid format. %s' % str(e))
+   sys.exit(1)
+
+try:
+   supportedSpecs = jsonSupportedInputs['platforms'][args.platform]
+except KeyError as e: 
+   print('Error: \'' + args.platform + '\' tech is missing from supported platforms.')
+   sys.exit(1)
+
+try:
+   vin_max = float(supportedSpecs['vin']['max'])
+except KeyError as e:
+   print('Error: Bad Supported Inputs file. \'vin[max]\' value is missing.')
+   sys.exit(1)
+except ValueError as e:
+   print('Error: Bad Input Specfile. Please use a float value for \'vin[max]\'.')
+   sys.exit(1)
+
+try:
+   vin_min = float(supportedSpecs['vin']['min'])
+except KeyError as e:
+   print('Error: Bad Supported Inputs file. \'vin[min]\' value is missing.')
+   sys.exit(1)
+except ValueError as e:
+   print('Error: Bad Input Specfile. Please use a float value for \'vin[min]\'.')
+   sys.exit(1)
+
+try:
+   maxLoad_max = float(supportedSpecs['maxLoad']['max'])
+except KeyError as e:
+   print('Error: Bad Supported Inputs file. \'maxLoad[max]\' value is missing.')
+   sys.exit(1)
+except ValueError as e:
+   print('Error: Bad Input Specfile. Please use a float value for \'maxLoad[max]\'.')
+   sys.exit(1)
+
+try:
+   maxLoad_min = float(supportedSpecs['maxLoad']['min'])
+except KeyError as e:
+   print('Error: Bad Supported Inputs file. \'maxLoad[min]\' value is missing.')
+   sys.exit(1)
+except ValueError as e:
+   print('Error: Bad Input Specfile. Please use a float value for \'maxLoad[min]\'.')
+   sys.exit(1)
+
+# Load json input spec file
 print('Loading specfile...')
 try:
    with open(args.specfile) as file:
@@ -164,9 +217,9 @@ except ValueError as e:
    print('Error: Bad Input Specfile. Please use a float value for \'vin\' '+ \
          'under \'specifications\'.')
    sys.exit(1)
-if vin > 1.3 or vin < 0.6:
-   print('Error: Only support vin from the set ' + \
-         '[0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3] now')
+if vin > vin_max or vin < vin_min:
+   print('Error: Only support vin from ' + str(vin_min) + ' to ' + \
+          str(vin_max) + ' with increments of 0.1V now')
    sys.exit(1)
 
 try:
@@ -178,8 +231,9 @@ except KeyError as e:
 except ValueError as e:
    print('Error: Bad Input Specfile. Please use a float value for \'imax\' '+ \
          'under \'specifications\'.')
-if imax > 19.5e-3 or imax < 0.5e-3:
-   print('Error: Only support imax in the range [0.5e-03, 19.5e-03] now')
+if imax > maxLoad_max or imax < maxLoad_min:
+   print('Error: Only support imax in the range [' + str(maxLoad_min) + ', ' + \
+         str(maxLoad_max)+'] now')
    sys.exit(1)
 
 print('Run Config:')
@@ -392,12 +446,10 @@ if args.mode != 'verilog':
    p = sp.Popen(['cp', flowDir+'/export/'+designName+'.lef', \
                  args.outputDir+'/'+designName+'.lef'])
    p.wait()
-   p = sp.Popen(['cp', flowDir+'/export/'+designName+'_min.lib', \
-                 args.outputDir+'/'+designName+'.lib'])
-   p.wait()
-   p = sp.Popen(['cp', flowDir+'/export/'+designName+'_min.db', \
-   	         args.outputDir+'/'+designName+'.db'])
-   p.wait()
+   for file in glob.glob(flowDir+'/export/'+designName+'_*.lib'):
+      shutil.copy(file, args.outputDir+'/'+designName+'.lib')
+   for file in glob.glob(flowDir+'/export/'+designName+'_*.db'):
+      shutil.copy(file, args.outputDir+'/'+designName+'.db')
    p = sp.Popen(['cp', flowDir+'/export/'+designName+'.lvs.v', \
    	         args.outputDir+'/'+designName+'.v'])
    p.wait()
@@ -406,6 +458,7 @@ if args.mode != 'verilog':
 
 jsonSpec['results'] = {'platform': args.platform}
 jsonSpec['results'].update({'area': designArea})
+jsonSpec['results'].update({'aspect_ratio': "1:1"})
 jsonSpec['results'].update({'power': 0.0009})
 jsonSpec['results'].update({'vin': vin})
 jsonSpec['results'].update({'imax': iMaxOut})

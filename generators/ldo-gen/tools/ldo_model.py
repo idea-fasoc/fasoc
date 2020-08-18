@@ -174,9 +174,8 @@ results = []
 areaValues = []
 numIter = 0
 startDT = datetime.datetime.now()
-for arrSize in [2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, \
-                100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, \
-                220]:
+for arrSize in [3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, \
+                110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220]:
    print('#---------------------------------------------------------------' + \
          '------')
    print('# Running the sim loop for array size = %s...' % arrSize)
@@ -292,8 +291,6 @@ for i in range(len(results)):
 print(areaValues)
 x = [item[0] for item in areaValues[0:]]
 y = [item[1] for item in areaValues[0:]]
-print(x)
-print(y)
 z = np.polyfit(x,y,8)
 for item in z:
    jsonModel['area'].append(item)

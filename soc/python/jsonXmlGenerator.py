@@ -346,16 +346,17 @@ def jsonXmlGenerator(configJson,designJson,units,outputDir,ipXactDir):
 					spec_name.appendChild(IDEA_maximum_value)
 					
 					IDEA_minimum_value = root.createElement('IDEA:minimum')
-					if key in units:
+					if jsn_result in units:
 						IDEA_minimum_value.setAttribute("IDEA:unit",units[jsn_result])
 					IDEA_minimum_value.appendChild(root.createTextNode(str(jsn_generator_results[jsn_result]["min"])))
 					spec_name.appendChild(IDEA_minimum_value)
 
-					IDEA_typical_value = root.createElement('IDEA:typical')
-					if key in units:
-						IDEA_typical_value.setAttribute("IDEA:unit",units[jsn_result])
-					IDEA_typical_value.appendChild(root.createTextNode(str(jsn_generator_results[jsn_result]["typ"])))
-					spec_name.appendChild(IDEA_typical_value)
+					if "typ" in jsn_generator_results[jsn_result]:
+						IDEA_typical_value = root.createElement('IDEA:typical')
+						if jsn_result in units:
+							IDEA_typical_value.setAttribute("IDEA:unit",units[jsn_result])
+						IDEA_typical_value.appendChild(root.createTextNode(str(jsn_generator_results[jsn_result]["typ"])))
+						spec_name.appendChild(IDEA_typical_value)
 					
 				else:
 					IDEA_typical_value = root.createElement('IDEA:typical')

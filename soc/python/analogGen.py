@@ -35,12 +35,12 @@ from checkDB import checkDB
 from jsonXmlGenerator import jsonXmlGenerator
 from connectionGen import connectionGen
 
-def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args_platform,args_mode,args_database,units,module_number,designJson,designDir,connection_done_flag,ldo_number,pll_number):
+def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args_platform,args_mode,args_database,units,module_number,designJson,designDir,connection_done_flag,ldo_number,pll_number,temp_sense_number):
 
 	if module["generator"] in configJson["generators"] and "rtl" not in module["generator"]:
 		if not connection_done_flag:
 			print("connections for the instance: " + module["instance_name"] + " is generating")
-			connectionGen(module["generator"],module["instance_name"],module_number,designJson,designDir,ldo_number,pll_number)
+			connectionGen(module["generator"],module["instance_name"],module_number,designJson,designDir,ldo_number,pll_number,temp_sense_number)
 		foundDB = checkDB(module,databaseDir,outputDir,ipXactDir,module_number,designJson['design_name'])
 
 #---------------------------------------------------------------------------------------

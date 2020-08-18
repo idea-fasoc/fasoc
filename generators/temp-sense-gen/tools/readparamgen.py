@@ -134,14 +134,14 @@ if args.mode != 'verilog':
 #    print("Error: Only support calibredrv netlist tool now")
 #    sys.exit(1)
 
-if args.mode == 'full':
-   calibreRulesDir = platformConfig['calibreRules']
-
 try:
    platformConfig = jsonConfig['platforms'][args.platform]
 except ValueError as e:
    print('Error: \"' + args.platform + '\" config not available')
    sys.exit(1)
+
+if args.mode == 'full':
+   calibreRulesDir = platformConfig['calibreRules']
 
 #Open the json file and read the content
 #with open('./data.json', 'r') as myfile:

@@ -2,7 +2,7 @@ gen_65lp:
 	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform tsmc65lp --mode verilog
 
 gen_12lp:
-	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform gf12lp --mode macro
+	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform gf12lp --mode full
 
 gen_sky130:
 	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform sky130 --mode macro

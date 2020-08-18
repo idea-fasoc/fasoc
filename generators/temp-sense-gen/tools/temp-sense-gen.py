@@ -380,7 +380,7 @@ else:
 
 
 # Calculate and update the core cell area dimensions
-coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*6
+coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*8
 with open(flowDir + '/scripts/innovus/always_source.tcl', 'r') as file:
    filedata = file.read()
 filedata = re.sub(r'set core_width.*', r'set core_width    ' + \
@@ -599,8 +599,8 @@ else:
 p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.pex',
              simDir+'/spice/'])
 p.wait()
-p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.'+
-             designName+'.pxi', simDir+'/spice/'])
+p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.pxi', 
+             simDir+'/spice/'])
 p.wait()
 
 
@@ -622,8 +622,6 @@ filedata = filedata.replace('designName', designName)
 #filedata = filedata.replace('imax', str(imax))
 with open(simDir+'/spice/'+designName+'.sp', 'w') as file:
    file.write(filedata)
-
-
 
 
 
@@ -687,6 +685,7 @@ for i in range(0, len(stage_var)):
       w_file1 = open(genDir + "./%s/inv%d_header%d/run_sim"%(simDir+'/run/',stage_var[i], header_var[j]), "w") ##run_simgeneration
       for k in range(0, len(temp_var)):
          dataspice = "hspice  %s_%d.sp >log &\n"%(designName, temp_var[k])
+      #   dataspice = "finesim -spice -np 8 %s_%d.sp -o %s_%d >log &\n"%(designName, temp_var[k], designName, temp_var[k])
       #  data = "hspice %s_%e.sp >log &\n"%(file_name, temp_var[k])
          w_file1.write(dataspice)
       w_file2 = open(genDir + "./%s/inv%d_header%d/cal_result"%(simDir+'/run/', stage_var[i], header_var[j]), "w")
@@ -718,8 +717,11 @@ for folder in folders:
    os.chdir("%s/%s/%s"%(current,simDir+'/run',folder))
    for k in range(0, len(temp_var)-1):
       sp.call(['hspice', '-mp', '12', '-mt', '32', '-hpp', '-i', designName+'_'+str(temp_var[k])+'.sp', '>','log'+str(temp_var[k])])
+      #sp.call(['finesim', '-spice', '-np', '8', designName+'_'+str(temp_var[k])+'.sp', '-o', designName+'_'+str(temp_var[k])])
+      #sp.call(['source', 'run_sim'])
       p.wait()
       sp.call(['python', 'result.py', designName+'_'+str(temp_var[k])+'.mt0'])
+      #sp.call(['source', 'cal_result'])
 
 
 #sp.call(['python', 'result_error.py'])
@@ -792,8 +794,6 @@ for val in data0:
    print("postif")
    i=i+1
 
-
-
 #
 #
 #
@@ -862,9 +862,6 @@ print('# Temperature Sensor - Hspice Sim Completed')
 #------------------------------------------------------------------------------
 # Parse the Sim Results
 #------------------------------------------------------------------------------
-
-
-
 
 r_results_list = open("./all_result", "r")
 results_lines=r_results_list.readlines()

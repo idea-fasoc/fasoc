@@ -1,3 +1,4 @@
 [submodule "private"]
 	path = private
 	url = git@github.com:idea-fasoc/fasoc_private.git
+  branch = master

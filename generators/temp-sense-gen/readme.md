@@ -1,88 +1,105 @@
-# This is the readme
-
 # TEMP-SENSE-GEN: Temperature sensor generator
+
 This is a fully autonomous tool to generate a low drop out regulator circuit from user specification to GDSII enabling temperature sensing in SoC design.
 See more at https://fasoc.engin.umich.edu/thermal-sensor/
 
 # Environment Setup
+
 1. Ensure that your machine has all of the required tools setup and have access to the technology PDK. More instructions on this step can be found at https://github.com/idea-fasoc/fasoc/blob/master/README.md
 
-1. Add the Auxiliary library and Model directory paths to the `fasoc/config/platform_config.json` file under the corresponding technology node (currently only supports tsmc65lp node). An example of the platform_config is shown below
+2. Add the Auxiliary library and Model directory paths to the `fasoc/config/platform_config.json` file under the corresponding technology node (currently only supports tsmc65lp node). An example of the platform_config is shown below
      ```bash
-   "tsmc65lp": {
-      "nominal_voltage": 1.2,
+   "gf12lp": {
+      "nominal_voltage": 0.8,
       "aux_lib": "<PATH_TO_AUX_LIB>",
       "model_lib": "<PATH_TO_MODEL_LIB>",
-      "sram_2kb_lib": "This is not necessary for LDO-GEN",
       "calibreRules": "<PATH_TO_PDK_CALIBRE_RULES>",
       "hspiceModels": "<PATH_TO_PDK_SPICE_MODELS>"
     }
-    ```  
+   ```
 
 
-1. Run the test script to ensure the generator tool and the model tool are correctly setup
+3. Run the test script to ensure the generator tool and the model tool are correctly setup
     ```bash
-    make gen
+    make gen_12lp
     ```
 
-    The ldo gen tool is successfully setup if the the builds generates `generators/temp-sense-gen/work/*.gds.gz` at the end of the run. 
+    The tempsensor gen tool is successfully setup if the build generates `generators/temp-sense-gen/work/*.gds.gz` at the end of the run. 
 
 # Running the generators
+
 1. Prepare an input spec "Input_Spec_File.json" file similar to `fasoc/generators/temp-sense-gen/test.json`
 
-1. Running the temp-sense-gen generator. 
-   "--ouptut" specifies the directory to store the final output directory of the tool
-     ```bash
-    .{Path_to_Generator_Folder}/tools/ldo_gen.py --specfile {Input_Spec_File.json} --output {Output_Folder} --platform {Technology_Node} [--mode {Run_Mode}] [--clean]
-    ```
+2. Running the temp-sense-gen generator. 
 
-1. Running the model generator in standalone mode. 
-   Ensure you have the correct `fasoc/config/platform_config.json` file and run the following commands
-    ```bash
-    python tools/temp-sense-gen.py --platform tsmc65lp
-    ```
+   ```
+   python {Path_to_Generator_Folder}/tools/temp-sense-gen.py --specfile {Input_Spec_File.json} --output {Output_Folder} --platform {Technology_Node} [--mode {Run_Mode}] [--clean]
+   ```
 
-Folder with source scripts of the tool that encapsulates the temp-sense-gen macro generation process.
-Makefile
+   `--specfile` : specify the input json file
 
-Makefile to perform a test run of the temp-sense-gen generator.
-Readme.md
+   `--ouptut`: specify the directory to store the final output directory of the tool
 
-Read me file with the instructions for running the tool.
-test.json
+   `--platform`: specify the platform to use, now only gf12lp is verfied, gen_65lp/sky130 need to update
 
-Sample temp-sense-gen input specification file in json format. Makefile uses this file to perform a test run of the tool.
-
+   `--mode` : three modes supported now: **verilog**, **macro**, **full**.
 
 # Tool Directory Structure
+
 ```bash
-    temp-sense-gen
-    |--- extraction
-    |--- flow
-    |--- hspice   
-    |--- tools
-    |--- Makefile
-    |--- README.md
-    |--- test.json
+fasoc    
+|--- generators/temp-sense-gen 
+     |--- tools
+     |--- Makefile
+     |--- README.md
+     |--- test.json
+|--- private/generators/temp-sense-gen
+     |--- extraction
+     |--- flow
+     |--- hspice  
+   
 ```
-   __extraction__
-   - Folder with PEX config files to extract parasitics of the final desgin.
-  
-   __flow__
-   - Folder with the synthesis and APR scripts that runs the CADRE flow.  
-  
-   __hspice__
-   - Folder with model simulation files to run post-pex simulations.
+  **tools** : folder with source scripts of the tool that encapsulates the temp-sense-gen macro generation process
 
-   __tools__
-   - Folder with source scripts of the tool that encapsulates the temp-sense-gen macro generation process. 
+  **makefile** : makefile to perform a test run of the temp-sense-gen generator
 
-   __Makefile__
-   - Makefile to perform a test run of the temp-sense-gen generator.
+  **readme.md**: readme file with the instructions for running the tool
 
-   __Readme.md__
-   - Read me file with the instructions for running the tool.
+  **test.json**: a sample temp-sense-gen input specification file in json format. Makefile uses this file to perform a test run of the tool
 
-   __test.json__
-   - Sample temp-sense-gen input specification file in json format. Makefile uses this file to perform a test run of the tool. 
+  **work**: folder where the design's netlist, gds, lib, db, lef files will be collected
+
+  **src**: folder with the source verilog files
+
+
+
+  **extraction**: Folder with PEX config files to extract parasitics of the final desgin.
+
+```
+extraction
+|--- layout       // sotres the designName.gds.gz file 
+|--- ruleFiles    // stores the calibre PEX rule file
+|--- runsets      // stores different plaforms' pex runset templates
+|--- run          // saves the generated pex runset and extracted pex netlists
+|--- sch          // saves the spice netlist generated by v2lvs
+```
+
+  **flow**: Folder with the synthesis and APR scripts that runs the CADRE flow.  
+```
+flow
+|--- blocks       // stores the lef/lib/db/gds files for aux cells
+|--- export       // stores outputs of the flow: lef/sdf/gds/verilog files
+|--- scripts      // stores synthesis and APR scripts
+|--- src          // stores the input verilog files
+|--- Makefile     // cmds to run the syn/apr flow
+|--- include.mk   // basic setups for the flow
+```
+
+  **hspice**: Folder with model simulation files to run post-pex simulations.
+```
+hspice
+|--- ModelSimFile  //stores the spice simulation templates for deifferent platforms
+|--- run           //stores the generated testbench
+|--- spice         //pex netlists which are copied from extraction/run/
+```
 

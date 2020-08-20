@@ -35,7 +35,7 @@ HEAD14 a_header_4(.VIN(VIN));
 HEAD14 a_header_5(.VIN(VIN));
 HEAD14 a_header_6(.VIN(VIN));
 SLC_cell a_lc_0(.A(out), .AB(outb), .Y(lc_0));
-BUF_X0P4N_A10P5PP84TR_C14 a_buffer_0 (.A(lc_0), .Y(lc_out));
+BUF_X0P4N_A10P5PP84TH_C16 a_buffer_0 (.A(lc_0), .Y(lc_out));
 	
 endmodule
 

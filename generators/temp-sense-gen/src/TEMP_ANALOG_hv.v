@@ -28,8 +28,8 @@ counter async_counter_0(
 
 
 @@ @nf a_header_@nh(.VIN(VIN));
-SLC_cell a_lc_0(.A(out), .AB(outb), .Y(lc_0));
-BUF_X0P4N_A10P5PP84TR_C14 a_buffer_0 (.A(lc_0), .Y(lc_out));
+SLC
+@@ @no a_buffer_0 (.A(lc_0), .nbout(lc_out));
 	
 endmodule
 

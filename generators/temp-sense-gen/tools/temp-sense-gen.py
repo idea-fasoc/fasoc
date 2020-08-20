@@ -123,18 +123,18 @@ if args.platform == 'tsmc65lp' :
   aux6 = 'LC1P2TO3P6X1RVT_VDDX4'
 if args.platform == 'gf12lp' :
   print("Selecting Aux Cells from platform: " + args.platform)
-  aux1 = 'NAND2_X0P4N_A10P5PP84TR_C14'
-  aux2 = 'INVP_X0P4N_A10P5PP84TR_C14'
-  aux3 = 'BUF_X0P4N_A10P5PP84TR_C14'
-  aux4 = 'BUF_X0P4N_A10P5PP84TR_C14'
+  aux1 = 'NAND2_X0P4N_A10P5PP84TH_C16'
+  aux2 = 'INVP_X0P4N_A10P5PP84TH_C16'
+  aux3 = 'BUF_X0P4N_A10P5PP84TH_C16'
+  aux4 = 'BUF_X0P4N_A10P5PP84TH_C16'
   aux5 = 'HEAD14'
   aux6 = 'SLC_cell'
 if args.platform == 'sky130':
   print("Selecting Aux Cells from platform: " + args.platform)
-  aux1 = 'scs8hs_nand2_1'
-  aux2 = 'scs8hs_inv_1'
-  aux3 = 'scs8hs_buf_1'
-  aux4 = 'scs8hs_buf_1'
+  aux1 = 'scs8hd_nand2_1'
+  aux2 = 'scs8hd_inv_1'
+  aux3 = 'scs8hd_buf_1'
+  aux4 = 'scs8hd_buf_1'
   aux5 = 'HEADER'
   aux6 = 'SLC'
 
@@ -228,6 +228,9 @@ with open(flowDir + '/scripts/dc/constraints.tcl', 'w') as file:
 flowPtExportDir = flowDir+"/blocks/PT_UNIT_CELL/export"
 if not os.path.exists(flowPtExportDir):
   os.makedirs(flowPtExportDir)
+else:
+  for file in glob.glob(flowPtExportDir+'/*'):
+    os.remove(file)
 
 #shutil.copyfile(aLib + '/cdl/' + aux1 + '.cdl',  flowPtExportDir + "/" + aux1 + '.cdl')
 if args.platform == 'tsmc65lp' :   
@@ -266,7 +269,7 @@ if args.platform == 'tsmc65lp' :
   shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '_tt.gds',   flowPtExportDir + "/" + aux5 + '_tt.gds')
   shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '_tt.gds',   flowPtExportDir + "/" + aux6 + '_tt.gds')
 
-if args.platform == 'gf12lp' :
+if args.platform == 'gf12lp' or args.platform == 'sky130' :
   #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.db',   flowPtExportDir + "/" + aux1 + '.db')
   #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.db',   flowPtExportDir + "/" + aux2 + '.db')
   #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.db',   flowPtExportDir + "/" + aux3 + '.db')
@@ -302,44 +305,6 @@ if args.platform == 'gf12lp' :
   shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.gds',   flowPtExportDir + "/" + aux5 + '.gds')
   shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.gds',   flowPtExportDir + "/" + aux6 + '.gds')
   
-
-if args.platform == 'sky130':
-  #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.db',   flowPtExportDir + "/" + aux1 + '.db')
-  #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.db',   flowPtExportDir + "/" + aux2 + '.db')
-  #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.db',   flowPtExportDir + "/" + aux3 + '.db')
-  #shutil.copyfile(aLib + '/' + aux4 + '/latest/'  + aux4 + '.db',   flowPtExportDir + "/" + aux4 + '.db')
-  shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.db',   flowPtExportDir + "/" + aux5 + '.db')
-  shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.db',   flowPtExportDir + "/" + aux6 + '.db')
-
-  #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.lib',   flowPtExportDir + "/" + aux1 + '.lib')
-  #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.lib',   flowPtExportDir + "/" + aux2 + '.lib')
-  #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.lib',   flowPtExportDir + "/" + aux3 + '.lib')
-  #shutil.copyfile(aLib + '/' + aux4 + '/latest/'  + aux4 + '.lib',   flowPtExportDir + "/" + aux4 + '.lib')
-  shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.lib',   flowPtExportDir + "/" + aux5 + '.lib')
-  shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.lib',   flowPtExportDir + "/" + aux6 + '.lib')
-
-  #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.lef',   flowPtExportDir + "/" + aux1 + '.lef')
-  #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.lef',   flowPtExportDir + "/" + aux2 + '.lef')
-  #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.lef',   flowPtExportDir + "/" + aux3 + '.lef')
-  #shutil.copyfile(aLib + '/' + aux4 + '/latest/'  + aux4 + '.lef',   flowPtExportDir + "/" + aux4 + '.lef')
-  shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.lef',   flowPtExportDir + "/" + aux5 + '.lef')
-  shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.lef',   flowPtExportDir + "/" + aux6 + '.lef')
-
-  #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.cdl',   flowPtExportDir + "/" + aux1 + '.cdl')
-  #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.cdl',   flowPtExportDir + "/" + aux2 + '.cdl')
-  #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.cdl',   flowPtExportDir + "/" + aux3 + '.cdl')
-  #shutil.copyfile(aLib + '/' + aux4 + '/latest/'  + aux4 + '.cdl',   flowPtExportDir + "/" + aux4 + '.cdl')
-  shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.cdl',   flowPtExportDir + "/" + aux5 + '.cdl')
-  shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.cdl',   flowPtExportDir + "/" + aux6 + '.cdl')
-
-  #shutil.copyfile(aLib + '/' + aux1 + '/latest/'  + aux1 + '.gds',   flowPtExportDir + "/" + aux1 + '.gds')
-  #shutil.copyfile(aLib + '/' + aux2 + '/latest/'  + aux2 + '.gds',   flowPtExportDir + "/" + aux2 + '.gds')
-  #shutil.copyfile(aLib + '/' + aux3 + '/latest/'  + aux3 + '.gds',   flowPtExportDir + "/" + aux3 + '.gds')
-  #shutil.copyfile(aLib + '/' + aux4 + '/latest/'  + aux4 + '.gds',   flowPtExportDir + "/" + aux4 + '.gds')
-  shutil.copyfile(aLib + '/' + aux5 + '/latest/'  + aux5 + '.gds',   flowPtExportDir + "/" + aux5 + '.gds')
-  shutil.copyfile(aLib + '/' + aux6 + '/latest/'  + aux6 + '.gds',   flowPtExportDir + "/" + aux6 + '.gds')
-
-
 #shutil.copyfile(aLib + '/gds/' + ptCell + '.gds2', flowPtExportDir + "/" + ptCell + '.gds2')
 
 time.sleep(1)
@@ -380,7 +345,7 @@ else:
 
 
 # Calculate and update the core cell area dimensions
-coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*8
+coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*6
 with open(flowDir + '/scripts/innovus/always_source.tcl', 'r') as file:
    filedata = file.read()
 filedata = re.sub(r'set core_width.*', r'set core_width    ' + \
@@ -430,12 +395,12 @@ p.wait()
 p = sp.Popen(['cp', './export/'+designName+'.lef', \
         '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lef'], cwd=flowDir)
 p.wait()
-p = sp.Popen(['cp', './export/'+designName+'_typ.lib', \
-         '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lib'], cwd=flowDir)
-p.wait()
-p = sp.Popen(['cp', './export/'+designName+'_typ.db', \
-          '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.db'], cwd=flowDir)
-p.wait()
+#p = sp.Popen(['cp', './export/'+designName+'_typ.lib', \
+#         '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lib'], cwd=flowDir)
+#p.wait()
+#p = sp.Popen(['cp', './export/'+designName+'_typ.db', \
+#          '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.db'], cwd=flowDir)
+#p.wait()
 p = sp.Popen(['cp', './export/'+designName+'.lvs.v', \
           '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.v'], cwd=flowDir)
 p.wait()
@@ -588,9 +553,6 @@ else:
                 'pex.runset'],cwd=extDir+'/run')
    p.wait()
 
-
-
-
 #------------------------------------------------------------------------------
 # Run Hspice Sims
 #------------------------------------------------------------------------------
@@ -607,7 +569,7 @@ p.wait()
 
 with open(extDir+'/run/'+designName+'.pex.netlist', 'r') as file:
    filedata = file.read()
-filedata = re.sub(r'\.subckt .*\n(\+.*\n)*', r'.subckt ' + designName + \
+filedata = re.sub(r'\.SUBCKT .*\n(\+.*\n)*', r'.SUBCKT ' + designName + \
                   ' VSS VDD DOUT[12] DOUT[13] lc_out DOUT[15] DOUT[2] VIN en DOUT[14] DOUT[11] out outb DOUT[23] DOUT[9] DOUT[16] DOUT[22] DOUT[1] DOUT[0] CLK_REF DOUT[10] DOUT[18] DOUT[3] DOUT[21] DOUT[19] DOUT[8] DOUT[4] DOUT[17] DOUT[20] DONE DOUT[6] DOUT[7] DOUT[5] SEL_CONV_TIME[1] RESET_COUNTERn SEL_CONV_TIME[3] SEL_CONV_TIME[0] SEL_CONV_TIME[2] \n', filedata)
 with open(simDir+'/spice/'+designName+'.pex.netlist', 'w') as file:
    file.write(filedata)
@@ -704,8 +666,6 @@ for i in range(0, len(stage_var)):
       shutil.copy2(genDir + "./tools/result.py", '%s/inv%d_header%d'%(simDir+'/run/',stage_var[i], header_var[j]))
       shutil.copy2(genDir + "./tools/result_error.py", '%s/inv%d_header%d'%(simDir+'/run/',stage_var[i], header_var[j]))
 
-
-
 folders = os.listdir("%s"%(simDir+'/run/'))
 
 current = os.getcwd()
@@ -716,8 +676,8 @@ for folder in folders:
 
    os.chdir("%s/%s/%s"%(current,simDir+'/run',folder))
    for k in range(0, len(temp_var)-1):
-      sp.call(['hspice', '-mp', '12', '-mt', '32', '-hpp', '-i', designName+'_'+str(temp_var[k])+'.sp', '>','log'+str(temp_var[k])])
-      #sp.call(['finesim', '-spice', '-np', '8', designName+'_'+str(temp_var[k])+'.sp', '-o', designName+'_'+str(temp_var[k])])
+      #sp.call(['hspice', '-mp', '12', '-mt', '32', '-hpp', '-i', designName+'_'+str(temp_var[k])+'.sp', '>','log'+str(temp_var[k])])
+      sp.call(['finesim', '-spice', '-np', '8', designName+'_'+str(temp_var[k])+'.sp', '-o', designName+'_'+str(temp_var[k])])
       #sp.call(['source', 'run_sim'])
       p.wait()
       sp.call(['python', 'result.py', designName+'_'+str(temp_var[k])+'.mt0'])
@@ -923,10 +883,10 @@ p.wait()
 p = sp.Popen(['cp', './flow/export/'+designName+'.lef', \
         '../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lef'])
 p.wait()
-p = sp.Popen(['cp', './flow/export/'+designName+'_min.lib', \
+p = sp.Popen(['cp', './flow/export/'+designName+'_typ.lib', \
          '../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lib'])
 p.wait()
-p = sp.Popen(['cp', './flow/export/'+designName+'_min.db', \
+p = sp.Popen(['cp', './flow/export/'+designName+'_typ.db', \
           '../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.db'])
 p.wait()
 p = sp.Popen(['cp', './flow/export/'+designName+'.lvs.v', \

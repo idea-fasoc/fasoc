@@ -5,13 +5,13 @@ module tempsenseInst
 	input [3:0] SEL_CONV_TIME,
 	input en,
 	
-	inout VIN, 
         output [23:0] DOUT,
 	output DONE,
 	output out, outb,
 	output lc_out
 	);
-
+	
+	wire VIN;
 	TEMP_ANALOG_lv temp_analog_0(
 		.EN(en),
 		.OUT(out),

@@ -1,4 +1,5 @@
 ##for HSPICE netlist
+import re
 import function
 from readparamgen import check_search_done, platformConfig, designName, args, jsonSpec
 #import os
@@ -8,15 +9,16 @@ def gen_temp_netlist(ninv,nhead,aux1,aux2,aux3,aux4,aux5, srcDir):
 		r_netlist=open(srcDir + "/TEMP_ANALOG_test.nl.v","r")
 		lines=list(r_netlist.readlines())
 		w_netlist=open(srcDir + "/TEMP_ANALOG.nl.v","w")
-	if args.platform == 'gf12lp' :
+	if args.platform == 'gf12lp' or args.platform == 'sky130':
 		r_netlist=open(srcDir + "/TEMP_ANALOG_lv.v","r")
 		lines=list(r_netlist.readlines())
 		w_netlist=open(srcDir + "/TEMP_ANALOG_lv.nl.v","w")
-#	if args.platform == 'sky130' :
-#		r_netlist=open(srcDir + "/sky130/TEMP_ANALOG_lv.v","r")
-#		lines=list(r_netlist.readlines())
-#		w_netlist=open(srcDir + "/sky130/TEMP_ANALOG_lv.nl.v","w")
-		
+		port = 'Y' if args.platform == 'gf12lp' else 'X'
+		if args.platform == 'sky130':
+			slc_cell = "SLC a_lc_0(.IN(out), .INB(outb), .VOUT(lc_0));"
+		else:
+			slc_cell = "SLC_cell a_lc_0(.A(out), .AB(outb), .Y(lc_0));"
+
 		netmap1=function.netmap() #modify here
 		netmap1.get_net('nn',None,1,int(ninv),1)
 		netmap1.get_net('n0',None,int(ninv),int(ninv),1)
@@ -35,7 +37,9 @@ def gen_temp_netlist(ninv,nhead,aux1,aux2,aux3,aux4,aux5, srcDir):
 		netmap1.get_net('nd',aux4,1,1,1)
 		netmap1.get_net('ne',aux4,1,1,1)
 		for line in lines:
+			line = line.replace("nbout", port)
 			netmap1.printline(line,w_netlist)
+		
 	
 		r_netlist=open(srcDir + "/TEMP_ANALOG_hv.v","r")	
 		lines=list(r_netlist.readlines())
@@ -43,7 +47,19 @@ def gen_temp_netlist(ninv,nhead,aux1,aux2,aux3,aux4,aux5, srcDir):
 
 		netmap1.get_net('nf',aux5,0,int(nhead)-1,1)
 		netmap1.get_net('nh',None,0,int(nhead)-1,1)
+		netmap1.get_net('no',aux3,1,1,1)
 		for line in lines:
+			line = line.replace("SLC", slc_cell)
+			line = line.replace("nbout", port)
+			netmap1.printline(line,w_netlist)
+		
+		r_netlist=open(srcDir + "/counter_generic.v","r")	
+		lines=list(r_netlist.readlines())
+		w_netlist=open(srcDir + "/counter.v","w")
+
+		netmap1.get_net('np',aux3,1,1,1)
+		for line in lines:
+			line = line.replace("nbout", port)
 			netmap1.printline(line,w_netlist)
 
 		return;

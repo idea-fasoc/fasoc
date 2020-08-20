@@ -10,9 +10,9 @@ wire nx1, nx2, nx3, nb1, nb2;
 @@ @ng a_inv_m1 ( .A(n@n3), .Y(nx1));
 @@ @nk a_inv_m2 ( .A(n@n4), .Y(nx2));
 @@ @nm a_inv_m3 ( .A(nx2), .Y(nx3));
-@@ @np a_buf_3 ( .A(nx3), .Y(nb2));
-@@ @nc a_buf_0 ( .A(nx1), .Y(nb1));
-@@ @nd a_buf_1 ( .A(nb1), .Y(OUT));
-@@ @ne a_buf_2 ( .A(nb2), .Y(OUTB));
+@@ @np a_buf_3 ( .A(nx3), .nbout(nb2));
+@@ @nc a_buf_0 ( .A(nx1), .nbout(nb1));
+@@ @nd a_buf_1 ( .A(nb1), .nbout(OUT));
+@@ @ne a_buf_2 ( .A(nb2), .nbout(OUTB));
 
 endmodule

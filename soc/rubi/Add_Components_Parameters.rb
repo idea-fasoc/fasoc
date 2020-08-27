@@ -35,7 +35,7 @@ createPort(component, :name => "HADDR", :direction => "in", :msb => "ADDRWIDTH-1
 createPort(component, :name => "PADDR", :direction => "out", :msb => "ADDRWIDTH-1", :lsb => 0)
 saveDesignElement(component, :force_overwrite => true)
 
-component = findComponent(:name => "cmsdk_apb_slave_mux2")
+component = findComponent(:name => "cmsdk_apb_slave_mux11")
 if component.element("Model").element("ModelParameters") == nil
   createModelParameter(component, :name => "PORT0_ENABLE", :value => 0)
   createModelParameter(component, :name => "PORT1_ENABLE", :value => 0)

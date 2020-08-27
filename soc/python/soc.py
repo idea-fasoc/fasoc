@@ -34,6 +34,7 @@ import webbrowser as wb
 from rtlXmlGenerator import rtlXmlGenerator
 from analogGen import analogGen
 from closedLoop import closedLoop
+from synthesis import synthesis
 
 # Parse and validate arguments
 # ==============================================================================
@@ -54,6 +55,8 @@ parser.add_argument('--mode', default="verilog",
 										help='Run Mode')
 parser.add_argument('--database', default="add",
 										help='Add to database')
+parser.add_argument('--filelist', required=True,
+										help='List of files .tcl file path')
 args = parser.parse_args()
 
 
@@ -93,13 +96,17 @@ except ValueError as e:
 	print("Exception: ", str(e))
 	sys.exit(1)
 
-design_dir = os.path.dirname(args.design)
+designDir = os.path.dirname(args.design)
 databaseDir = platformJson["platforms"][args.platform]["database"]
 designName = designJson['design_name']
 socrates_installDir = platformJson["socratesInstall"]
-ipXactDir = os.path.join(design_dir,'ipxact')
+ipXactDir = os.path.join(designDir,'ipxact')
 rubiDir = os.path.join(soc_dir,'..','rubi')
-jsnDir = os.path.join(design_dir,'json')
+jsnDir = os.path.join(designDir,'json')
+if args.platform == "tsmc65lp":
+	synthDir = os.path.join(designDir,"fasoc_test")
+elif args.platform == "gf12lp":
+	synthDir = os.path.join(designDir,"fasoc_test_12")
 
 try:
 	os.mkdir(ipXactDir)
@@ -150,7 +157,7 @@ for module in designJson["modules"]:
 
 	if module['module_name'] not in module_list:
 		module_list.append(module['module_name'])
-		outputDir = os.path.join(design_dir, module["module_name"], "export")
+		outputDir = os.path.join(designDir, module["module_name"], "export")
 		try:
 			os.makedirs(outputDir)
 			print("Directory " + outputDir + " Created ") 
@@ -161,7 +168,7 @@ for module in designJson["modules"]:
 				for output_file in os.listdir(outputDir):
 					os.remove(os.path.join(outputDir,output_file))
 
-		inputDir = os.path.join(design_dir, module["module_name"], "import")
+		inputDir = os.path.join(designDir, module["module_name"], "import")
 		try:
 			os.makedirs(inputDir)
 			print("Directory " + inputDir + " Created ") 
@@ -186,7 +193,20 @@ for module in designJson["modules"]:
 #---------------------------------------------------------------------------------------		 
 # If generator is rtl
 		if not moduleIsGenerator and "rtl" in module["generator"]:
-			shutil.copy(module['src'],outputDir)
+			if module["generator"] == "m0mcu_rtl":
+				m0_module_name = module["module_name"]
+				m0_instance_name = module["instance_name"]
+			shutil.copy(module['src'],os.path.join(outputDir,module["module_name"] + ".v"))
+
+			with open(os.path.join(outputDir,module["module_name"] + ".v"), "r") as outputDir_module_verilog:
+				outputDir_module_ver = outputDir_module_verilog.read()
+			if module["generator"] != "ldo_mux_rtl":
+				outputDir_module_ver = outputDir_module_ver.replace("module " + module["generator"] + " #(", "module " + module["module_name"] + " #(")
+			else:
+				outputDir_module_ver = outputDir_module_ver.replace("module " + module["generator"] + " (", "module " + module["module_name"] + " (")
+			with open(os.path.join(outputDir,module["module_name"] + ".v"), 'w') as outputDir_module_verilog:
+				outputDir_module_verilog.write(outputDir_module_ver)
+			
 			rtlXmlGenerator(configJson["generators"][module["generator"]],module,outputDir,ipXactDir)
 #--------------------------------------------------------------------------------------- 
 
@@ -204,60 +224,66 @@ for module in designJson["modules"]:
 
 # STEP 6: Check constraints and close the loop
 # ==============================================================================
-closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,ipXactDir,fasoc_dir,args.platform,args.mode,args.database,units,module_number,args.design)
+closedLoop(designJson,jsnDir,designDir,platformJson,configJson,databaseDir,ipXactDir,fasoc_dir,args.platform,args.mode,args.database,units,module_number,args.design)
 
 # STEP 7: Call Socrates for stitching
 # ==============================================================================
+# workplaceDir = designDir
+# projectName = designName + '_socrates_proj'
+# projectDir = os.path.join(workplaceDir,projectName)
+# design_vendor =	'arm.com'
+# design_library = projectName
+# design_version = 'r0p0'
+# socVerilogDir = os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'
 
-workplaceDir = design_dir
-projectName = designName + '_socrates_proj'
-projectDir = os.path.join(workplaceDir,projectName)
-design_vendor =	'arm.com'
-design_library = projectName
-design_version = 'r0p0'
-subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,
-'--project', projectName,'--flow', 'AddNewProject'])
+# subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,
+# '--project', projectName,'--flow', 'AddNewProject'])
 
-for file in os.listdir(ipXactDir):
-	shutil.copy(os.path.join(ipXactDir,file), projectDir)
-shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4.xml'), projectDir)
-shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4_rtl.xml'), projectDir)
-shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite.xml'), projectDir)
-shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite_rtl.xml'), projectDir)
-for file in os.listdir(platformJson["socrates_DRC_config"]):
-	shutil.copy(os.path.join(platformJson["socrates_DRC_config"],file), workplaceDir)
+# for file in os.listdir(ipXactDir):
+# 	shutil.copy(os.path.join(ipXactDir,file), projectDir)
+# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4.xml'), projectDir)
+# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA4','APB4','r0p0_0','APB4_rtl.xml'), projectDir)
+# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite.xml'), projectDir)
+# shutil.copy(os.path.join(socrates_installDir,'catalog','busdefs','amba.com','AMBA3','AHBLite','r2p0_0','AHBLite_rtl.xml'), projectDir)
+# for file in os.listdir(platformJson["socrates_DRC_config"]):
+# 	shutil.copy(os.path.join(platformJson["socrates_DRC_config"],file), workplaceDir)
 
-subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'--project', projectName,
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/clean.rb?arg1='+designName,
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/convert_json.rb?arg1='+args.design+'&arg2='+designName+'&arg3='+rubiDir+'&arg4='+rubiDir+'/create_Hier.rb&arg5='+rubiDir+'/connect.rb',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/create_Hier.rb',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/connect.rb',
-'--check',
-'--result', projectDir+'/DRC.log',
-'--set', "IDEA_Checks",
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/report.rb?arg1='+rubiDir+'&arg2='+designName+'&arg3='+projectDir+'/Design_Report.txt',
-'--flow', 'RunScript', 'ScriptFile='+rubiDir+'/generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical'),
-'--flow', 'PrintIpxactSchematic', 'Vendor='+design_vendor, 'Library='+design_library, 'Name='+designName, 'Version='+design_version, 'FileType=pdf', 'Filter=Connections', 'OutputDir='+os.path.join(projectDir,'logical','Schematic')])
+# subprocess.call([socrates_installDir + '/socrates_cli', '-data', workplaceDir,'--project', projectName,
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/clean.rb?arg1='+designName,
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/convert_json.rb?arg1='+args.design+'&arg2='+designName+'&arg3='+rubiDir+'&arg4='+rubiDir+'/create_Hier.rb&arg5='+rubiDir+'/connect.rb',
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/create_Hier.rb',
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/connect.rb',
+# '--check',
+# '--result', projectDir+'/DRC.log',
+# '--set', "IDEA_Checks",
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/report.rb?arg1='+rubiDir+'&arg2='+designName+'&arg3='+projectDir+'/Design_Report.txt',
+# '--flow', 'RunScript', 'ScriptFile='+rubiDir+'/generate.rb?arg1='+designName+'&arg2='+os.path.join(projectDir,'logical'),
+# '--flow', 'PrintIpxactSchematic', 'Vendor='+design_vendor, 'Library='+design_library, 'Name='+designName, 'Version='+design_version, 'FileType=pdf', 'Filter=Connections', 'OutputDir='+os.path.join(projectDir,'logical','Schematic')])
 
-# Unifying names
-with open (os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'r') as socrates_verilog:
-	soc_ver=socrates_verilog.read()
-with open(args.design) as fdesign:
-	designJson = json.load(fdesign)
-for module in designJson["modules"]:
-	soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
-with open(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'),'w') as socrates_verilog:
-	socrates_verilog.write(soc_ver)
+# # Unifying names
+# with open (socVerilogDir,'r') as socrates_verilog:
+# 	soc_ver=socrates_verilog.read()
+# with open(args.design) as fdesign:
+# 	designJson = json.load(fdesign)
+# for module in designJson["modules"]:
+# 	soc_ver = soc_ver.replace(module['generator'] + ' ' + module['instance_name'], module['module_name'] + ' ' + module['instance_name'])
+# with open(socVerilogDir,'w') as socrates_verilog:
+# 	socrates_verilog.write(soc_ver)
 
-# Opening Socrates outputs 
-wb.open_new(os.path.join(projectDir,'logical','Schematic','schematic_Connections_'+designName+'_'+design_version+'.pdf'))
-wb.open_new(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'))
-wb.open_new(os.path.join(projectDir,'arm.com-'+projectName+'-'+designName+'_design-'+design_version+'.xml'))
-wb.open_new(os.path.join(projectDir,'arm.com-'+projectName+'-'+designName+'-'+design_version+'.xml'))
+# # Opening Socrates outputs 
+# wb.open_new(os.path.join(projectDir,'logical','Schematic','schematic_Connections_'+designName+'_'+design_version+'.pdf'))
+# wb.open_new(os.path.join(projectDir,'logical',designName,'verilog', designName+'.v'))
+# wb.open_new(os.path.join(projectDir,'arm.com-'+projectName+'-'+designName+'_design-'+design_version+'.xml'))
+# wb.open_new(os.path.join(projectDir,'arm.com-'+projectName+'-'+designName+'-'+design_version+'.xml'))
 
-# STEP 7: Assemble SoC run chip level Cadre Flow
+# STEP 7: SoC Synthesis
 # ==============================================================================
-
+with open(args.design) as f:
+	designJson = json.load(f)
+socVerilogDir = "/n/trenton/v/fayazi/test.v"
+synthesis(designJson,designName,socVerilogDir,m0_module_name,m0_instance_name,synthDir,args.filelist)
+subprocess.check_call(["make","bleach_synth"],cwd=synthDir)
+subprocess.check_call(["make","synth"],cwd=synthDir)
 
 # STEP 8: Run chip level Cadre Flow
 # ==============================================================================

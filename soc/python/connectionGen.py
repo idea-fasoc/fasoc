@@ -283,7 +283,7 @@ def connectionGen(generator,instance,module_number,designJson,designDir,ldo_numb
 			addConnection_from_to("adhoc",False,instance_slave,"PREADY" + str(module_number+2),[0,0],[instance],["pready"],[[0,0]],[False,0])
 			addConnection_from_to("adhoc",False,instance_slave,"PSLVERR" + str(module_number+2),[0,0],[instance],["pslverr"],[[0,0]],[False,0])
 
-			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[13,0],[instance],["paddr"],[[11,0]],[False,0])
+			addConnection_from_to("adhoc",True,instance_m0,"i_paddr",[13,0],[instance],["paddr"],[[13,0]],[False,0])
 			addConnection_from_to("adhoc",False,instance_m0,"i_pwrite",[0,0],[instance],["pwrite"],[[0,0]],[False,0])
 			addConnection_from_to("adhoc",False,instance_m0,"i_penable",[0,0],[instance],["penable"],[[0,0]],[False,0])
 			addConnection_from_to("adhoc",True,instance_m0,"i_pwdata",[31,0],[instance],["pwdata"],[[31,0]],[False,0])

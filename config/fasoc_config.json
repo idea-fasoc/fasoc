@@ -378,7 +378,7 @@
                "psel":"PSELx",
                "paddr":{
                   "name":"PADDR",
-                  "width":12},
+                  "width":14},
                "penable":"PENABLE",
                "pwrite":"PWRITE",
                "pwdata":{

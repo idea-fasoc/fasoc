@@ -24,7 +24,7 @@ for mt0_line in mt0_files:
 	r_file = open(genDir + "./%s"%(mt0_line))
 	mt0_data = r_file.readlines()
 	data_col = 1
-	data_temp.append(mt0_data[4].split())
+	data_temp.append(mt0_data[3].split())
 for line in data_temp:
 	data0.append(line[0])
 

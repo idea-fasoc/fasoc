@@ -91,6 +91,7 @@ if args.mode != 'verilog':
 
 
 temp, power, error, ninv, nhead, hist = check_search_done()
+
 print ('Error : ' , error)
 print('Inv : ' , ninv)
 print('Header : ' , nhead)
@@ -98,9 +99,6 @@ print('History : ' , hist)
 #print("Number of bits:")
 #nbit=int(input())
 print("INV:{0}\nHEADER:{1}\n".format(ninv,nhead))
-
-
-
 
 
 
@@ -123,10 +121,10 @@ if args.platform == 'tsmc65lp' :
   aux6 = 'LC1P2TO3P6X1RVT_VDDX4'
 if args.platform == 'gf12lp' :
   print("Selecting Aux Cells from platform: " + args.platform)
-  aux1 = 'NAND2_X0P4N_A10P5PP84TH_C16'
-  aux2 = 'INVP_X0P4N_A10P5PP84TH_C16'
-  aux3 = 'BUF_X0P4N_A10P5PP84TH_C16'
-  aux4 = 'BUF_X0P4N_A10P5PP84TH_C16'
+  aux1 = 'NAND2_X0P4N_A10P5PP84TR_C14'
+  aux2 = 'INVP_X0P4N_A10P5PP84TR_C14'
+  aux3 = 'BUF_X0P4N_A10P5PP84TR_C14'
+  aux4 = 'BUF_X0P4N_A10P5PP84TR_C14'
   aux5 = 'HEAD14'
   aux6 = 'SLC_cell'
 if args.platform == 'sky130':
@@ -395,12 +393,12 @@ p.wait()
 p = sp.Popen(['cp', './export/'+designName+'.lef', \
         '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lef'], cwd=flowDir)
 p.wait()
-#p = sp.Popen(['cp', './export/'+designName+'_typ.lib', \
-#         '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lib'], cwd=flowDir)
-#p.wait()
-#p = sp.Popen(['cp', './export/'+designName+'_typ.db', \
-#          '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.db'], cwd=flowDir)
-#p.wait()
+p = sp.Popen(['cp', './export/'+designName+'_typ.lib', \
+         '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.lib'], cwd=flowDir)
+p.wait()
+p = sp.Popen(['cp', './export/'+designName+'_typ.db', \
+          '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.db'], cwd=flowDir)
+p.wait()
 p = sp.Popen(['cp', './export/'+designName+'.lvs.v', \
           '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.v'], cwd=flowDir)
 p.wait()
@@ -557,7 +555,6 @@ else:
 # Run Hspice Sims
 #------------------------------------------------------------------------------
 
-
 p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.pex',
              simDir+'/spice/'])
 p.wait()
@@ -588,7 +585,6 @@ with open(simDir+'/spice/'+designName+'.sp', 'w') as file:
 
 
 
-
 ##### Directory name for result files
 # dir_name = 'run'
 
@@ -602,14 +598,16 @@ with open(simDir+'/spice/'+designName+'.sp', 'w') as file:
 
 ##### simulation points calculation
 
+stage_var = [int(ninv)-1]
+header_var = [int(nhead)]
+
+
 temp_start = -20
 temp_stop = 100
 temp_step = 20
 
 temp_points = int((temp_stop - temp_start) / temp_step)+1
 
-stage_var = [int(ninv)-1]
-header_var = [int(nhead)]
 ##### sweep temperature calculation
 temp_var=[]
 for i in range(0, temp_points+1):
@@ -639,7 +637,7 @@ for i in range(0, len(stage_var)):
                   if clist[ci] == '@':
                      w_file0.write('%e'%(temp_var[t]))
                   elif clist[ci] == '$':
-                     w_file0.write('%s'%(simDir+'/run/'))
+                     w_file0.write('../../spice/tempsenseInst_error.pex.netlist')
                   else:
                      w_file0.write(clist[ci])
             else:
@@ -666,6 +664,7 @@ for i in range(0, len(stage_var)):
       shutil.copy2(genDir + "./tools/result.py", '%s/inv%d_header%d'%(simDir+'/run/',stage_var[i], header_var[j]))
       shutil.copy2(genDir + "./tools/result_error.py", '%s/inv%d_header%d'%(simDir+'/run/',stage_var[i], header_var[j]))
 
+
 folders = os.listdir("%s"%(simDir+'/run/'))
 
 current = os.getcwd()
@@ -677,7 +676,7 @@ for folder in folders:
    os.chdir("%s/%s/%s"%(current,simDir+'/run',folder))
    for k in range(0, len(temp_var)-1):
       #sp.call(['hspice', '-mp', '12', '-mt', '32', '-hpp', '-i', designName+'_'+str(temp_var[k])+'.sp', '>','log'+str(temp_var[k])])
-      sp.call(['finesim', '-spice', '-np', '8', designName+'_'+str(temp_var[k])+'.sp', '-o', designName+'_'+str(temp_var[k])])
+      sp.call(['finesim', '-model', 'spice', '-np', '6', designName+'_'+str(temp_var[k])+'.sp', '-o', designName+'_'+str(temp_var[k])])
       #sp.call(['source', 'run_sim'])
       p.wait()
       sp.call(['python', 'result.py', designName+'_'+str(temp_var[k])+'.mt0'])
@@ -730,7 +729,7 @@ for mt0_line in mt0_files:
    r_file = open(cwd1+"/%s"%(mt0_line))
    mt0_data = r_file.readlines()
    data_col = 1
-   data_temp.append(mt0_data[4].split())
+   data_temp.append(mt0_data[3].split())
 for line in data_temp:
    data0.append(line[0])
 

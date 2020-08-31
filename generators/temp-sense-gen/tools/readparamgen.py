@@ -180,7 +180,27 @@ if not os.path.isfile(mFile1):
       mFile1 = mFilePublic1
    else:
       print('Please provide/generate a model file')
-      p.wait()
+      sys.exit(1)
+      #genDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../")
+      #modelDir = genDir + 'models/'
+      #print("generating test cases")      
+      #p = sp.Popen(['python','input_gen.py', 'tsweep_pex'], cwd=modelDir)
+      #p.wait()
+      #  
+      #tcs = glob.glob(genDir+'models/run/*/')
+      #for tc in tcs:
+      #   print("running model file generation on " + tc)
+      #   for spfile in glob.glob(tc + "tsweep_pex_*.sp"):
+      #      spname = spfile.split('/')[-1]   
+      #      p = sp.Popen(['finesim', '-spice', '-np', '8', spname , '>>', spname+'.log'], cwd=tc)
+      #      p.wait() 
+      #      spout = spname.replace("sp", "mt0")
+      #      p = sp.Popen(['python', 'result.py', spout, '>>', 'code_result'], cwd=tc)
+      #   p = sp.Popen(['python', 'result_error.py'], cwd=tc)
+      #   p.wait()
+      #p = sp.Popen(['python', 'genModelFile.py'], cwd=modelDir)
+      #p.wait() 
+      #mFile1 = genDir + '/models/ModelFile'
 
 #store content in objects
 #Temp = obj['temperature']
@@ -188,10 +208,6 @@ Power = jsonSpec['specifications']['power']
 Error = jsonSpec['specifications']['error']
 Optimization = jsonSpec['specifications']['optimization']
 Model = mFile1
-
-
-
-
 
 
 # Get the design spec & parameters from spec file

@@ -531,7 +531,7 @@ class MemGen():
                                         sys.exit(1)
                        #LIB File
                        try:
-                                lib = fileName+'_min.lib'
+                                lib = fileName+'_typ.lib'
                                 shutil.copy(lib, p_options['Opdir'])
                        except IOError as e:
                                 log.error("Unable to copy the file %s to the outputs dir, %s"%(lib, p_options['Opdir']))
@@ -541,7 +541,7 @@ class MemGen():
                                         sys.exit(1)
                        #DB Files
                        try:
-                                db = fileName+'_min.db'
+                                db = fileName+'_typ.db'
                                 shutil.copy(db, p_options['Opdir'])
                        except IOError as e:
                                 log.error("Unable to copy the file %s to the outputs dir, %s"%(db, p_options['Opdir']))

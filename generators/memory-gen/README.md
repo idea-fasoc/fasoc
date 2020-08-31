@@ -151,19 +151,17 @@ Update only the following variables according to the user requirements.
      - To run the tool in this mode, add the option **-m macro** to the MemGen executable.
 2. Once the tool setup is completed, update the input specification file **./SRAM_input_spec.json** as per the requirements. Refer the inputs section above for the details of spec file. 
 3. Execute either of the following commands in the **memory-gen** folder to run the generator to produce a multi-bank memory macro.
-
-```
-python ./bin/MemGen --specfile ./SRAM_input_spec.json --output ./outputs --platform tsmc65lp -m verilog
-
-					or
-				    
-				     make MemGen
-				     
-					or
-					
-				       make
-``` 
 3. After the run is complete, all the outputs will be under the user speicifed output directory. 
+```
+                                    make mem_<platform>_<mode>
+```
+ - **platform** is the PDK technology memory needs to be generated.  
+   - For TSMC 65nm, platform is *tsmc65lp*. 
+   - For GF 12nm, it is *gf12lp*.
+ - **mode** is the operating mode of memory.
+   - For verilog generation, mode is *verilog*.
+   - For macro generation, mode is *macro*.
+  - For example: To generate memory macro in TSMC 65nm, execute **make mem_tsmc65lp_macro** 
  
 # Known Issues/Limitations:
 1. Capacity is in multiples of 2KB. 

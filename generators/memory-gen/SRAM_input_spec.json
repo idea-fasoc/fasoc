@@ -3,6 +3,6 @@
       "generator": "memory-gen",
       "specifications": {
         "word_size": 32,
-        "nowords": 4096
+        "nowords": 2048
       }
     }

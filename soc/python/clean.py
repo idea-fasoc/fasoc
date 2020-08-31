@@ -71,6 +71,8 @@ except ValueError as e:
 designDir = os.path.dirname(args.design)
 databaseDir = platformJson["platforms"][args.platform]["database"]
 rubiDir = os.path.join(soc_dir,'..','rubi')
+designName = designJson['design_name']
+
 if args.platform == "tsmc65lp":
 	synthDir = os.path.join(designDir,"fasoc_test")
 elif args.platform == "gf12lp":
@@ -159,5 +161,10 @@ with open(constraintsDir, 'r') as constraints_file, open(temp_constraintsDir, 'w
 				continue
 		temp_constraints_file.write(line)
 os.rename(temp_constraintsDir,constraintsDir)
+
+try:
+	os.remove(os.path.join(synthDir,"m0sdk","systems","cortex_m0_mcu","verilog",designName + ".v")) 
+except FileNotFoundError:
+	pass
 
 subprocess.check_call(["make","bleach_synth"],cwd=synthDir)

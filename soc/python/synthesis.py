@@ -32,21 +32,21 @@ def synthesis (designJson,designName,socVerilogDir,m0_module_name,m0_instance_na
 
 # Adding socrates output verilog file parameters
 # ==============================================================================
-	if "parameters" in designJson:
+	if "synth_parameters" in designJson:
 		param_line = ""
-		if "`include" in designJson["parameters"]:
-			for parameter_name in designJson["parameters"]:
+		if "`include" in designJson["synth_parameters"]:
+			for parameter_name in designJson["synth_parameters"]:
 				if parameter_name == "`include":
-					param_line = param_line + parameter_name + " \"" + designJson["parameters"][parameter_name] + "\"\n"
+					param_line = param_line + parameter_name + " \"" + designJson["synth_parameters"][parameter_name] + "\"\n"
 		param_line = param_line + "module " + designName + " #(\n"
 
-		for counter, parameter_name in enumerate(designJson["parameters"]):
+		for counter, parameter_name in enumerate(designJson["synth_parameters"]):
 			if parameter_name != "`include":
-				if counter != len(designJson["parameters"]) - 1:
-					if not isinstance(designJson["parameters"][parameter_name],list):
-						param_line = param_line + "parameter " + parameter_name + " = " + str(designJson["parameters"][parameter_name]) + ",\n"
+				if counter != len(designJson["synth_parameters"]) - 1:
+					if not isinstance(designJson["synth_parameters"][parameter_name],list):
+						param_line = param_line + "parameter " + parameter_name + " = " + str(designJson["synth_parameters"][parameter_name]) + ",\n"
 					else:
-						for parameter_dict in designJson["parameters"][parameter_name]:
+						for parameter_dict in designJson["synth_parameters"][parameter_name]:
 							for parameter_dict_item in parameter_dict:
 								if parameter_dict_item == "value":
 									param_line = param_line + "parameter " + parameter_name + " = " + str(parameter_dict[parameter_dict_item]) + ",\n"
@@ -55,7 +55,7 @@ def synthesis (designJson,designName,socVerilogDir,m0_module_name,m0_instance_na
 								elif (parameter_dict_item == "`endif" or parameter_dict_item == "`else"):
 									param_line = param_line + parameter_dict_item + "\n"
 				else:
-					param_line = param_line + "parameter " + parameter_name + " = " + str(designJson["parameters"][parameter_name]) + "\n"
+					param_line = param_line + "parameter " + parameter_name + " = " + str(designJson["synth_parameters"][parameter_name]) + "\n"
 		param_line = param_line + ")"
 			
 		with open(socVerilogDir, "r") as socrates_verilog:
@@ -133,14 +133,14 @@ def synthesis (designJson,designName,socVerilogDir,m0_module_name,m0_instance_na
 
 # Adding generators parameters to socrates output verilog file
 # =================================================================================
-		if "parameters" in module:
+		if "synth_parameters" in module:
 			param_line = module["module_name"] + " #(\n"
-			for counter, parameter_name in enumerate(module["parameters"]):
-				if counter != len(module["parameters"]) - 1:
-					if not isinstance(module["parameters"][parameter_name],list):
-						param_line = param_line + "." + parameter_name + " (" + str(module["parameters"][parameter_name]) + "),\n"
+			for counter, parameter_name in enumerate(module["synth_parameters"]):
+				if counter != len(module["synth_parameters"]) - 1:
+					if not isinstance(module["synth_parameters"][parameter_name],list):
+						param_line = param_line + "." + parameter_name + " (" + str(module["synth_parameters"][parameter_name]) + "),\n"
 					else:
-						for parameter_dict in module["parameters"][parameter_name]:
+						for parameter_dict in module["synth_parameters"][parameter_name]:
 							for parameter_dict_item in parameter_dict:
 								if parameter_dict_item == "value":
 									param_line = param_line + "." + parameter_name + " (" + str(parameter_dict[parameter_dict_item]) + "),\n"
@@ -149,7 +149,7 @@ def synthesis (designJson,designName,socVerilogDir,m0_module_name,m0_instance_na
 								elif (parameter_dict_item == "`endif" or parameter_dict_item == "`else"):
 									param_line = param_line + parameter_dict_item + "\n"
 				else:
-					param_line = param_line + "." + parameter_name + " (" + str(module["parameters"][parameter_name]) + ")\n"
+					param_line = param_line + "." + parameter_name + " (" + str(module["synth_parameters"][parameter_name]) + ")\n"
 			param_line = param_line + ")" + module["instance_name"]
 			
 			with open(socVerilogDir, "r") as socrates_verilog:
@@ -264,3 +264,5 @@ def synthesis (designJson,designName,socVerilogDir,m0_module_name,m0_instance_na
 	constraints_f = constraints_f.replace("set_dont_touch  [get_nets " + m0_initial_instance_name+ "/u_pin_mux/VIN_TEMPSENSE*]", "set_dont_touch  [get_nets " + m0_instance_name + "/u_pin_mux/VIN_TEMPSENSE*]")
 	with open(constraintsDir, 'w') as constraints_file:
 		constraints_file.write(constraints_f)
+
+	shutil.copy(socVerilogDir,os.path.join(synthDir,"m0sdk","systems","cortex_m0_mcu","verilog"))

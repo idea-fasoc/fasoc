@@ -101,6 +101,14 @@ print('History : ' , hist)
 print("INV:{0}\nHEADER:{1}\n".format(ninv,nhead))
 
 
+if args.ninv:
+  print("target number of inverters: " + args.ninv)
+  ninv = int(args.ninv)
+
+if args.nhead:
+  print("target number of headers: " + args.nhead)
+  nhead = int(args.nhead)
+
 
 print('#----------------------------------------------------------------------')
 print('# Verilog Generation')
@@ -384,6 +392,13 @@ print('#----------------------------------------------------------------------')
 print('# DRC finished')
 print('#----------------------------------------------------------------------')
 
+time.sleep(2)
+
+print('# Exporting files....')
+time.sleep(1)
+
+p = sp.Popen(['make','export'], cwd=flowDir)
+p.wait()
 
 
 #shutil.copytree(flow + '/export', args.outputDir)
@@ -402,10 +417,9 @@ p.wait()
 p = sp.Popen(['cp', './export/'+designName+'.lvs.v', \
           '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.v'], cwd=flowDir)
 p.wait()
-p = sp.Popen(['cp', '../extraction/sch/'+designName+'.spi', \
-          '../../../../generators/temp-sense-gen/' + args.outputDir+'/'+designName+'.spi'], cwd=flowDir)
-p.wait()
 
+for file in glob.glob(flowDir+'/results/calibre/lvs/_'+designName+'*.sp'):
+   shutil.copy(file, genDir+args.outputDir+'/'+designName+'.cdl')
 
 time.sleep(2)
 print()
@@ -413,14 +427,6 @@ if args.mode == 'macro':
   print("Exiting tool....")
   exit()
 
-
-time.sleep(2)
-
-print('# Exporting files....')
-time.sleep(1)
-
-p = sp.Popen(['make','export'], cwd=flowDir)
-p.wait()
 
 # if platform != 'gf12lp':
 #   p = sp.Popen(['make','export'], cwd=flowDir)

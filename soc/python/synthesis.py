@@ -28,7 +28,7 @@ import json	# json parsing
 import subprocess	# process
 import re
 
-def synthesis (designJson,designName,socVerilogDir,m0_module_name,m0_instance_name,synthDir,filelistDir):
+def synthesis (designJson,designName,socVerilogDir,m0_module_name,m0_instance_name,synthDir,filelistDir,platform):
 
 # Adding socrates output verilog file parameters
 # ==============================================================================
@@ -66,7 +66,10 @@ def synthesis (designJson,designName,socVerilogDir,m0_module_name,m0_instance_na
 
 # Copying the associated verilog files and rename them and change their module name, and adding/changing create_clock for plls to constraints.tcl
 # ================================================================================================================================================
-	src_module_verilogDir = os.path.join("/afs","eecs.umich.edu","cadre","projects","fasoc","share","integration_tool","verilog")
+	if platform == "tsmc65lp":
+		src_module_verilogDir = os.path.join("/afs","eecs.umich.edu","cadre","projects","fasoc","share","integration_tool","verilog","65lp")
+	elif platform == "gf12lp":
+		src_module_verilogDir = os.path.join("/afs","eecs.umich.edu","cadre","projects","fasoc","share","integration_tool","verilog","gf12")
 	constraintsDir = os.path.join(synthDir,"scripts","dc","constraints.tcl")
 	vco_period_pat = r'set VCO_PERIOD'
 	previous_create_clock_added = 0
@@ -83,20 +86,21 @@ def synthesis (designJson,designName,socVerilogDir,m0_module_name,m0_instance_na
 				m0_initial_instance_names = re.findall(set_dont_touch_pat,line)
 				if len(m0_initial_instance_names) != 0:
 					m0_initial_instance_name = m0_initial_instance_names[0]
-				if re.match(vco_period_pat,line):
-					create_clock_line_no = line_no + previous_create_clock_added
-			new_constraints_line = [None] * (len(constraints_lines) + 6)
-			new_constraints_line[0 : create_clock_line_no + 1] =  constraints_lines[0 : create_clock_line_no + 1]
-			new_constraints_line[create_clock_line_no + 1] = "create_clock [get_pins " + module["instance_name"] + "/synth_pll/CLK_OUT] \\\n"
-			new_constraints_line[create_clock_line_no + 2] = "             -name CLK_OUT \\\n"
-			new_constraints_line[create_clock_line_no + 3] = "             -period $VCO_PERIOD\n"
-			new_constraints_line[create_clock_line_no + 4] = "create_clock [get_pins " + module["instance_name"] + "/synth_pll/CLKREF_RETIMED_1] \\\n"
-			new_constraints_line[create_clock_line_no + 5] = "             -name CLK_OUT \\\n"
-			new_constraints_line[create_clock_line_no + 6] = "             -period $VCO_PERIOD\n"
-			new_constraints_line[create_clock_line_no + 7 : len(constraints_lines) + 6] =  constraints_lines[create_clock_line_no + 1 : len(constraints_lines)]
-			previous_create_clock_added = previous_create_clock_added + 6
-			with open(constraintsDir,'w') as constraints_file:
-				constraints_file.writelines(new_constraints_line)
+				if platform == "tsmc65lp":
+					if re.match(vco_period_pat,line):
+						create_clock_line_no = line_no + previous_create_clock_added
+					new_constraints_line = [None] * (len(constraints_lines) + 6)
+					new_constraints_line[0 : create_clock_line_no + 1] =  constraints_lines[0 : create_clock_line_no + 1]
+					new_constraints_line[create_clock_line_no + 1] = "create_clock [get_pins " + module["instance_name"] + "/synth_pll/CLK_OUT] \\\n"
+					new_constraints_line[create_clock_line_no + 2] = "             -name CLK_OUT \\\n"
+					new_constraints_line[create_clock_line_no + 3] = "             -period $VCO_PERIOD\n"
+					new_constraints_line[create_clock_line_no + 4] = "create_clock [get_pins " + module["instance_name"] + "/synth_pll/CLKREF_RETIMED_1] \\\n"
+					new_constraints_line[create_clock_line_no + 5] = "             -name CLK_OUT \\\n"
+					new_constraints_line[create_clock_line_no + 6] = "             -period $VCO_PERIOD\n"
+					new_constraints_line[create_clock_line_no + 7 : len(constraints_lines) + 6] =  constraints_lines[create_clock_line_no + 1 : len(constraints_lines)]
+					previous_create_clock_added = previous_create_clock_added + 6
+					with open(constraintsDir,'w') as constraints_file:
+						constraints_file.writelines(new_constraints_line)
 
 # verilog files modifications
 		if module["generator"] == "memory-gen":
@@ -256,12 +260,23 @@ def synthesis (designJson,designName,socVerilogDir,m0_module_name,m0_instance_na
 	with open(constraintsDir, 'r') as constraints_file:
 		constraints_f = constraints_file.read()
 	constraints_f = constraints_f.replace("set_dont_touch [get_cells " + m0_initial_instance_name + "/u_pin_mux/IO_*]", "set_dont_touch [get_cells " + m0_instance_name + "/u_pin_mux/IO_*]")
-	constraints_f = constraints_f.replace("set_dont_touch  [get_pins " + m0_initial_instance_name + "/u_pin_mux/PLL_CLKOUT*]", "set_dont_touch  [get_pins " + m0_instance_name + "/u_pin_mux/PLL_CLKOUT*]")
-	constraints_f = constraints_f.replace("set_dont_touch  [get_pins " + m0_initial_instance_name + "/u_pin_mux/PLL_CLKREF*]", "set_dont_touch  [get_pins " + m0_instance_name + "/u_pin_mux/PLL_CLKREF*]")
-	constraints_f = constraints_f.replace("set_dont_touch  [get_nets " + m0_initial_instance_name + "/u_pin_mux/pll_clkref*]", "set_dont_touch  [get_nets " + m0_instance_name + "/u_pin_mux/pll_clkref*]")
-	constraints_f = constraints_f.replace("set_dont_touch  [get_cells " + m0_initial_instance_name + "/u_pin_mux/pll_clkref*]", "set_dont_touch  [get_cells " + m0_instance_name + "/u_pin_mux/pll_clkref*]")
 	constraints_f = constraints_f.replace("set_dont_touch  [get_nets " + m0_initial_instance_name + "/u_pin_mux/LDO_VREF*]", "set_dont_touch  [get_nets " + m0_instance_name + "/u_pin_mux/LDO_VREF*]")
-	constraints_f = constraints_f.replace("set_dont_touch  [get_nets " + m0_initial_instance_name+ "/u_pin_mux/VIN_TEMPSENSE*]", "set_dont_touch  [get_nets " + m0_instance_name + "/u_pin_mux/VIN_TEMPSENSE*]")
+	if platform == "tsmc65lp":
+		constraints_f = constraints_f.replace("set_dont_touch  [get_pins " + m0_initial_instance_name + "/u_pin_mux/PLL_CLKOUT*]", "set_dont_touch  [get_pins " + m0_instance_name + "/u_pin_mux/PLL_CLKOUT*]")
+		constraints_f = constraints_f.replace("set_dont_touch  [get_pins " + m0_initial_instance_name + "/u_pin_mux/PLL_CLKREF*]", "set_dont_touch  [get_pins " + m0_instance_name + "/u_pin_mux/PLL_CLKREF*]")
+		constraints_f = constraints_f.replace("set_dont_touch  [get_nets " + m0_initial_instance_name + "/u_pin_mux/pll_clkref*]", "set_dont_touch  [get_nets " + m0_instance_name + "/u_pin_mux/pll_clkref*]")
+		constraints_f = constraints_f.replace("set_dont_touch  [get_cells " + m0_initial_instance_name + "/u_pin_mux/pll_clkref*]", "set_dont_touch  [get_cells " + m0_instance_name + "/u_pin_mux/pll_clkref*]")
+		constraints_f = constraints_f.replace("set_dont_touch  [get_nets " + m0_initial_instance_name+ "/u_pin_mux/VIN_TEMPSENSE*]", "set_dont_touch  [get_nets " + m0_instance_name + "/u_pin_mux/VIN_TEMPSENSE*]")
+	elif platform == "gf12lp":
+		constraints_f = constraints_f.replace("set_dont_touch  [get_nets " + m0_initial_instance_name + "/u_pin_mux/sns_core]", "set_dont_touch  [get_nets " + m0_instance_name + "/u_pin_mux/sns_core]")
+		constraints_f = constraints_f.replace("set_dont_touch  [get_nets " + m0_initial_instance_name + "/u_pin_mux/rto_core]", "set_dont_touch  [get_nets " + m0_instance_name + "/u_pin_mux/rto_core]")
+		constraints_f = constraints_f.replace("set_dont_touch  [get_nets " + m0_initial_instance_name + "/u_pin_mux/sns_ldo]", "set_dont_touch  [get_nets " + m0_instance_name + "/u_pin_mux/sns_ldo]")
+		constraints_f = constraints_f.replace("set_dont_touch  [get_nets " + m0_initial_instance_name + "/u_pin_mux/rto_ldo]", "set_dont_touch  [get_nets " + m0_instance_name + "/u_pin_mux/rto_ldo]")
+		constraints_f = constraints_f.replace("set_dont_touch [get_cells " + m0_initial_instance_name + "/u_pin_mux/* -filter \"ref_name =~ PBRK_*\"]", "set_dont_touch [get_cells " + m0_instance_name + "/u_pin_mux/* -filter \"ref_name =~ PBRK_*\"]")
+		constraints_f = constraints_f.replace("set_dont_touch [get_cells " + m0_initial_instance_name + "/u_pin_mux/* -filter \"ref_name =~ P*VDD_*\"]", "set_dont_touch [get_cells " + m0_instance_name + "/u_pin_mux/* -filter \"ref_name =~ P*VDD_*\"]")
+		constraints_f = constraints_f.replace("set_dont_touch [get_cells " + m0_initial_instance_name + "/u_pin_mux/* -filter \"ref_name =~ P*VSS_*\"]", "set_dont_touch [get_cells " + m0_instance_name + "/u_pin_mux/* -filter \"ref_name =~ P*VSS_*\"]")
+		constraints_f = constraints_f.replace("set_dont_touch [get_cells " + m0_initial_instance_name + "/u_pin_mux/* -filter \"ref_name =~ PVSENSE*\"]", "set_dont_touch [get_cells " + m0_instance_name + "/u_pin_mux/* -filter \"ref_name =~ PVSENSE*\"]")
+		constraints_f = constraints_f.replace("set_dont_touch [get_cells " + m0_initial_instance_name + "/u_pin_mux/* -filter \"ref_name =~ PANALOG*\"]", "set_dont_touch [get_cells " + m0_instance_name + "/u_pin_mux/* -filter \"ref_name =~ PANALOG*\"]")
 	with open(constraintsDir, 'w') as constraints_file:
 		constraints_file.write(constraints_f)
 

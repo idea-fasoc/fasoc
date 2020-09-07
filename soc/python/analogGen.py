@@ -35,12 +35,12 @@ from checkDB import checkDB
 from jsonXmlGenerator import jsonXmlGenerator
 from connectionGen import connectionGen
 
-def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args_platform,args_mode,args_database,units,module_number,designJson,designDir,connection_done_flag,ldo_number,pll_number,temp_sense_number):
+def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,platform,args_mode,args_database,units,module_number,designJson,designDir,connection_done_flag,ldo_number,pll_number,temp_sense_number):
 
 	if module["generator"] in configJson["generators"] and "rtl" not in module["generator"]:
 		if not connection_done_flag:
 			print("connections for the instance: " + module["instance_name"] + " is generating")
-			connectionGen(module["generator"],module["instance_name"],module_number,designJson,designDir,ldo_number,pll_number,temp_sense_number)
+			connectionGen(module["generator"],module["instance_name"],module_number,designJson,designDir,ldo_number,pll_number,temp_sense_number,platform)
 		foundDB = checkDB(module,databaseDir,outputDir,ipXactDir,module_number,designJson['design_name'])
 
 #---------------------------------------------------------------------------------------
@@ -59,11 +59,11 @@ def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_d
 				cmd1 = os.path.join(fasoc_dir,configJson["generators"][module["generator"]]["path"])
 			except KeyError:
 				print("Please specify path for module: " + module["module_name"] + "instance: " + module["instance_name"])
-			cmd = cmd1 + " --specfile " + specFilePath + " --output " + outputDir + " --platform " + args_platform + " --mode " + args_mode
+			cmd = cmd1 + " --specfile " + specFilePath + " --output " + outputDir + " --platform " + platform + " --mode " + args_mode
 			print("Launching: ", cmd)
 			
 			try:
-				ret = subprocess.check_call([cmd1,"--specfile",specFilePath,"--output",outputDir,"--platform",args_platform,"--mode",args_mode])
+				ret = subprocess.check_call([cmd1,"--specfile",specFilePath,"--output",outputDir,"--platform",platform,"--mode",args_mode])
 				if ret:
 					print("Error: Command returned error: " + subprocess.CalledProcessError)
 					sys.exit(1)

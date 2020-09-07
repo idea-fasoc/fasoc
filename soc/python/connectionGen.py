@@ -24,7 +24,7 @@
 
 import json
 
-def connectionGen(generator,instance,module_number,designJson,designDir,ldo_number,pll_number,temp_sense_number):
+def connectionGen(generator,instance,module_number,designJson,designDir,ldo_number,pll_number,temp_sense_number,platform):
 
 #------------------------------------------------------------------------------------
 
@@ -158,10 +158,12 @@ def connectionGen(generator,instance,module_number,designJson,designDir,ldo_numb
 		addConnection_from_to("adhoc",False,instance_m0,"PLL_CLKOUT1_PAD",[0,0],["toplevel"],["PLL_CLKOUT1_PAD"],[[0,0]],[False,0])
 
 		addConnection_from_to("adhoc",False,instance_m0,"TEMP_0_CLKOUT_PAD",[0,0],["toplevel"],["TEMP_0_CLKOUT_PAD"],[[0,0]],[False,0])
-		addConnection_from_to("adhoc",False,instance_m0,"TEMP_1_CLKOUT_PAD",[0,0],["toplevel"],["TEMP_1_CLKOUT_PAD"],[[0,0]],[False,0])
 		addConnection_from_to("adhoc",False,"toplevel","TEMP_0_REFCLK_PAD",[0,0],[instance_m0],["TEMP_0_REFCLK_PAD"],[[0,0]],[False,0])
-		addConnection_from_to("adhoc",False,"toplevel","TEMP_1_REFCLK_PAD",[0,0],[instance_m0],["TEMP_1_REFCLK_PAD"],[[0,0]],[False,0])
-		addConnection_from_to("adhoc",False,"toplevel","VIN_TEMPSENSE_PAD",[0,0],[instance_m0],["VIN_TEMPSENSE_PAD"],[[0,0]],[False,0])
+		
+		if platform == "tsmc65lp":
+			addConnection_from_to("adhoc",False,instance_m0,"TEMP_1_CLKOUT_PAD",[0,0],["toplevel"],["TEMP_1_CLKOUT_PAD"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,"toplevel","TEMP_1_REFCLK_PAD",[0,0],[instance_m0],["TEMP_1_REFCLK_PAD"],[[0,0]],[False,0])
+			addConnection_from_to("adhoc",False,"toplevel","VIN_TEMPSENSE_PAD",[0,0],[instance_m0],["VIN_TEMPSENSE_PAD"],[[0,0]],[False,0])
 
 		addConnection_from_to("reset",False,"toplevel","nTRST",[0,0],[instance_m0],["nTRST"],[[0,0]],[False,0])
 		addConnection_from_to("reset",False,"toplevel","TDI",[0,0],[instance_m0],["TDI"],[[0,0]],[False,0])

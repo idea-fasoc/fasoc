@@ -468,7 +468,7 @@
          ]
        },
     "temp_sense_rtl": {
-      "path": "./private/tests/tool/tape_out/fasoc_test/src/temp0_apb.v",
+      "path": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool/verilog/temp_sense_rtl.v",
       "position": "E",
       "interfaces": [
         {
@@ -517,7 +517,7 @@
         ]
       },
     "dcdc_rtl": {
-      "path": "./private/tests/tool/tape_out/fasoc_test/src/dcdc_apb.v",
+      "path": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool/verilog/dcdc_rtl.v",
       "position": "E",
       "interfaces": [
         {
@@ -599,10 +599,10 @@
       ]
     },
     "ldo_mux_rtl": {
-      "path": "./private/tests/tool/tape_out/fasoc_test/src/ldo_mux.v"
+      "path": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool/verilog/ldo_mux_rtl.v"
     },
     "ble_rtl": {
-      "path": "./private/tests/tool/tape_out/fasoc_test/src/ble_apb.v",
+      "path": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool/verilog/ble_rtl.v",
       "position": "E",
       "interfaces": [
         {
@@ -631,7 +631,7 @@
       ]
     },
     "iram_rtl": {
-      "path": "./private/tests/tool/tape_out/fasoc_test/src/iram_apb.v",
+      "path": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool/verilog/iram_rtl.v",
       "position": "E",
       "interfaces": [
         {
@@ -660,7 +660,7 @@
       ]
     },
     "dram_rtl": {
-      "path": "./private/tests/tool/tape_out/fasoc_test/src/dram_apb.v",
+      "path": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool/verilog/dram_rtl.v",
       "position": "E",
       "interfaces": [
         {
@@ -689,7 +689,7 @@
       ]
     },
     "rom_rtl": {
-      "path": "./private/tests/tool/tape_out/fasoc_test/src/rom_apb.v",
+      "path": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool/verilog/rom_rtl.v",
       "position": "E",
       "interfaces": [
         {
@@ -718,7 +718,7 @@
       ]
     },
     "gpio_rtl": {
-      "path": "./private/tests/tool/tape_out/fasoc_test/src/gpio_apb.v",
+      "path": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool/verilog/gpio_rtl.v",
       "position": "E",
       "interfaces": [
         {
@@ -756,7 +756,7 @@
       ]
     },
     "m0mcu_rtl": {
-      "path": "./private/tests/tool/tape_out/fasoc_test/m0sdk/systems/cortex_m0_mcu/verilog/m0_wrapper.v",
+      "path": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool/verilog/65lp/m0mcu_rtl.v",
       "interfaces": [
         {
           "name": "M0_APB0",
@@ -894,6 +894,7 @@
       ]  
     },
     "cmsdk_apb_slave_mux_rtl": {
+      "path": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/integration_tool/verilog/cmsdk_apb_slave_mux_rtl.v",
       "interfaces": [
         {
           "name": "APBM0",

@@ -47,7 +47,7 @@ parser.add_argument('--design', required=True,
 										help='Resolved design description json file path')
 parser.add_argument('--platform', default="tsmc65lp",
 										help='PDK/process kit for cadre flow (.e.g tsmc65lp)')
-parser.add_argument('--fasoc_config', default=os.path.join(fasoc_dir, "config/fasoc_config.json"),
+parser.add_argument('--generator_config', default=os.path.join(fasoc_dir, "config/generator_config.json"),
 										help='SoC tool configuration json file path')
 parser.add_argument('--platform_config', default=os.path.join(fasoc_dir, "config/platform_config.json"),
 										help='Platform configuration json file path')
@@ -77,12 +77,12 @@ except ValueError as e:
 	print("Exception: ", str(e))
 	sys.exit(1)
 
-print("Loading FASoC Config: ", args.fasoc_config)
+print("Loading FASoC Config: ", args.generator_config)
 try:
-	with open(args.fasoc_config) as f:
+	with open(args.generator_config) as f:
 		configJson = json.load(f)
 except ValueError as e:
-	print("Error occurred opening or loading fasoc_config json file: ", args.fasoc_config)
+	print("Error occurred opening or loading generator_config json file: ", args.generator_config)
 	print("Exception: ", str(e))
 	sys.exit(1)
 
@@ -280,8 +280,7 @@ with open(socVerilogDir,'w') as socrates_verilog:
 # ==============================================================================
 with open(args.design) as f:
 	designJson = json.load(f)
-#socVerilogDir = "/n/trenton/v/fayazi/ldo_1pll_1mem_1temp_sens_1m0.v"
-synthesis(designJson,designName,socVerilogDir,m0_module_name,m0_instance_name,synthDir,args.filelist)
+synthesis(designJson,designName,socVerilogDir,m0_module_name,m0_instance_name,synthDir,args.filelist,args.platform)
 subprocess.check_call(["make","bleach_synth"],cwd=synthDir)
 subprocess.check_call(["make","synth"],cwd=synthDir)
 

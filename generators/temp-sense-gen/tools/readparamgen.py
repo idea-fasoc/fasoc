@@ -50,6 +50,10 @@ parser.add_argument('--platform', required=True,
                     help='PDK/process kit for cadre flow (.e.g tsmc16)')
 parser.add_argument('--mode', required=True,
                     help='Specify the outputs to be generated: verilog, macro, full (includes PEX extraction)')
+parser.add_argument('--ninv', required=False,
+                    help='Number of target inverters')
+parser.add_argument('--nhead', required=False,
+                    help='Number of target headers')
 parser.add_argument('--clean', action='store_true',
                     help='Clean the workspace.')
 args = parser.parse_args()
@@ -180,27 +184,28 @@ if not os.path.isfile(mFile1):
       mFile1 = mFilePublic1
    else:
       print('Please provide/generate a model file')
-      sys.exit(1)
-      #genDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../")
-      #modelDir = genDir + 'models/'
-      #print("generating test cases")      
-      #p = sp.Popen(['python','input_gen.py', 'tsweep_pex'], cwd=modelDir)
-      #p.wait()
-      #  
-      #tcs = glob.glob(genDir+'models/run/*/')
-      #for tc in tcs:
-      #   print("running model file generation on " + tc)
-      #   for spfile in glob.glob(tc + "tsweep_pex_*.sp"):
-      #      spname = spfile.split('/')[-1]   
-      #      p = sp.Popen(['finesim', '-spice', '-np', '8', spname , '>>', spname+'.log'], cwd=tc)
-      #      p.wait() 
-      #      spout = spname.replace("sp", "mt0")
-      #      p = sp.Popen(['python', 'result.py', spout, '>>', 'code_result'], cwd=tc)
-      #   p = sp.Popen(['python', 'result_error.py'], cwd=tc)
-      #   p.wait()
-      #p = sp.Popen(['python', 'genModelFile.py'], cwd=modelDir)
-      #p.wait() 
-      #mFile1 = genDir + '/models/ModelFile'
+      #sys.exit(1)
+      
+      genDir = os.path.join(os.path.dirname(os.path.relpath(__file__)),"../../../private/generators/temp-sense-gen/")
+      modelDir = genDir + 'models/'
+      p = sp.Popen(['python','input_gen.py', 'tsweep_pex'], cwd=modelDir)
+      p.wait()
+        
+      tcs = glob.glob(genDir+'models/run/*/')
+      for tc in tcs:
+         print("running model file generation in " + tc)
+         for spfile in glob.glob(tc + "tsweep_pex_*.sp"):
+            print("temp case: " + spfile)
+            spname = spfile.split('/')[-1]   
+            p = sp.Popen(['finesim', '-spice', '-np', '8', spname , '>', spname+'.log'], cwd=tc)
+            p.wait() 
+            spout = spname.replace("sp", "mt0")
+            p = sp.Popen(['python', 'result.py', spout, '>', 'code_result'], cwd=tc)
+         p = sp.Popen(['python', 'result_error.py'], cwd=tc)
+         p.wait()
+      p = sp.Popen(['python', 'genModelFile.py'], cwd=modelDir)
+      p.wait() 
+      mFile1 = genDir + '/models/ModelFile'
 
 #store content in objects
 #Temp = obj['temperature']

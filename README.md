@@ -9,22 +9,14 @@ FASoC tool can be operated in three modes, "Verilog", "Macro" and "Full" modes.
 ## Verilog Generation Mode
 The provided generators can generate fully synthesizable verilog products using the user input specification file. The generated verilog will be derived from pre-characterized modules. Future releases of the tool will also generate a human readable constraint guidance that will aid in maximizing post layout design performance.
 
-### Setup instructions
-1. Ensure your machine has the correct python version and all of the python modules required to run through the FASoC flow. 
-    - Requirements: Python 3.6/3.7 (packages getopt, math, numpy, os, re, shutil, subprocess, sys, smtplib, datetime, logging, matplotlib). Python versions below 3.6 are not supported.
-    
-1. Ensure you have ssh keys setup for github. Instructions for generating and adding ssh keys can be found [here](https://help.github.com/en/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
-
-1. Clone the FASoC repository
-    ```bash
-    git clone git@github.com:idea-fasoc/fasoc.git
-    ```
-
 ## Macro/Full Generation Mode
 The macro generation mode will generate hard macros in addition to the verilog. These hard macros are synthesized and implemented versions of the verilog output using recommended constraints and physical guidance. This mode will require the commercial tools, access to the standard/cells, PDK and other tools. It will also require an automated flow (cadre flow) as well as several private files that are restricted due to NDA requirements.
 
 ### Setup instructions
-1. Additional tool requirements:
+- Requirements: Python 3.6/3.7 (packages getopt, math, numpy, os, re, shutil, subprocess, sys, smtplib, datetime, logging, matplotlib). Python versions below 3.6 are not supported.
+
+1. Tool requirements:
+    - General: Python 3.6/3.7 (packages getopt, math, numpy, os, re, shutil, subprocess, sys, smtplib, datetime, logging, matplotlib). Python versions below 3.6 are not supported.
     - Cadre Flow:
       - Synopsys Library Compiler (2018.06)
       - Synopsys Design Compiler (2018.06)

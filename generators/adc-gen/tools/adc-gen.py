@@ -215,17 +215,17 @@ else:
 # Calculate and update the core cell area dimensions
 #coreDim = 100
 #coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*5
-coreHeight = math.ceil(math.sqrt(coreCellArea*2.5)/5/1.25)*5
-coreWidth = math.ceil(math.sqrt(coreCellArea*2.5)/5)*5*2.1
-
-with open(flowDir + '/scripts/innovus/always_source.tcl', 'r') as file:
-   filedata = file.read()
-filedata = re.sub(r'set core_width.*', r'set core_width    ' + \
-        str(coreWidth) + ' ;# Core Area Width', filedata)
-filedata = re.sub(r'set core_height.*', r'set core_height   ' + \
-        str(coreHeight) + ' ;# Core Area Height', filedata)
-with open(flowDir + '/scripts/innovus/always_source.tcl', 'w') as file:
-   file.write(filedata)
+# coreHeight = math.ceil(math.sqrt(coreCellArea*2.5)/5/1.25)*5
+# coreWidth = math.ceil(math.sqrt(coreCellArea*2.5)/5)*5*2.1
+# 
+# with open(flowDir + '/scripts/innovus/always_source.tcl', 'r') as file:
+#    filedata = file.read()
+# filedata = re.sub(r'set core_width.*', r'set core_width    ' + \
+#         str(coreWidth) + ' ;# Core Area Width', filedata)
+# filedata = re.sub(r'set core_height.*', r'set core_height   ' + \
+#         str(coreHeight) + ' ;# Core Area Height', filedata)
+# with open(flowDir + '/scripts/innovus/always_source.tcl', 'w') as file:
+#    file.write(filedata)
 
 time.sleep(1)
 

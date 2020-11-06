@@ -20,9 +20,9 @@ The macro generation mode will generate hard macros in addition to the verilog. 
     - Cadre Flow:
       - Synopsys Library Compiler (2018.06)
       - Synopsys Design Compiler (2018.06)
-      - Quantus QRC extraction (15.23.000) (For nodes <20nm and it should be loaded before Innovus)
-      - Cadence Innovus (v15.21-s080_1)
-      - Synopsys Primetime (2016.06)
+      - Quantus QRC extraction (15.23.000)
+      - Cadence Innovus (v18.10)
+      - Synopsys Primetime (2018.06)
       - Mentor Graphics Calibre (2019.3_25)
     - Synopsys HSPICE (2017.03-SP1)
     - Cadence Liberate (16.1.1.132)

@@ -130,7 +130,7 @@ Ensure that your machine has all of the required tools setup and have access to 
    - This file is similar to `test.json` file and contains the input specifications of the LDO module.
    
    __{Output_Folder}__
-   - This variable specifies the directory where the final outputs of the tool are saved.
+   - This variable specifies the directory where the final outputs of the tool are saved. Make sure the "Output folder" is different from the default repo folders.
    
    __{Technology_Node}__
    - This variable must be either "tsmc65lp" or "gfbicmos8hp" as of now.

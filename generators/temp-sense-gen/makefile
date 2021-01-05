@@ -1,6 +1,15 @@
 gen_65lp:
 	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform tsmc65lp --mode verilog
 
+gen_65lp_macro:
+	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform tsmc65lp --mode macro
+
+gen_65lp_full:
+	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform tsmc65lp --mode full
+
+65lp_clean:
+	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform tsmc65lp --mode macro --clean
+
 gen_12lp:
 	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform gf12lp --mode macro
 
@@ -26,7 +35,7 @@ gen_sky130_macro:
 	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform sky130 --mode macro
 
 gen_sky130_full:
-	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform sky130 --mode fulli
+	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform sky130 --mode full
 
 sky130_clean:
 	python tools/temp-sense-gen.py --specfile test.json --output ./work --platform sky130 --mode macro --clean

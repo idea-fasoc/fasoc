@@ -68,6 +68,10 @@ if os.path.isdir(extDir + '/run'):
 # if (args.clean):
 # print('Workspace cleaning done. Exiting the flow.')
 # sys.exit(0)
+try:
+   os.mkdir(flowDir + '/src')
+except OSError:
+   print('Unable to create the "src" directory in "flow" folder')
 
 try:
    os.mkdir(extDir + '/run')
@@ -564,7 +568,7 @@ else:
 p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.pex',
              simDir+'/spice/'])
 p.wait()
-p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.pxi', 
+p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.'+designName+'.pxi', 
              simDir+'/spice/'])
 p.wait()
 
@@ -572,8 +576,8 @@ p.wait()
 
 with open(extDir+'/run/'+designName+'.pex.netlist', 'r') as file:
    filedata = file.read()
-filedata = re.sub(r'\.SUBCKT .*\n(\+.*\n)*', r'.SUBCKT ' + designName + \
-                  ' VSS VDD DOUT[12] DOUT[13] lc_out DOUT[15] DOUT[2] VIN en DOUT[14] DOUT[11] out outb DOUT[23] DOUT[9] DOUT[16] DOUT[22] DOUT[1] DOUT[0] CLK_REF DOUT[10] DOUT[18] DOUT[3] DOUT[21] DOUT[19] DOUT[8] DOUT[4] DOUT[17] DOUT[20] DONE DOUT[6] DOUT[7] DOUT[5] SEL_CONV_TIME[1] RESET_COUNTERn SEL_CONV_TIME[3] SEL_CONV_TIME[0] SEL_CONV_TIME[2] \n', filedata)
+filedata = re.sub(r'\.(SUBCKT|subckt).*\n(\+.*\n)*', r'.SUBCKT ' + designName + \
+                  ' VSS VDD DOUT[12] DOUT[13] lc_out DOUT[15] DOUT[2] en DOUT[14] DOUT[11] out outb DOUT[23] DOUT[9] DOUT[16] DOUT[22] DOUT[1] DOUT[0] CLK_REF DOUT[10] DOUT[18] DOUT[3] DOUT[21] DOUT[19] DOUT[8] DOUT[4] DOUT[17] DOUT[20] DONE DOUT[6] DOUT[7] DOUT[5] SEL_CONV_TIME[1] RESET_COUNTERn SEL_CONV_TIME[3] SEL_CONV_TIME[0] SEL_CONV_TIME[2] \n', filedata)
 with open(simDir+'/spice/'+designName+'.pex.netlist', 'w') as file:
    file.write(filedata)
 

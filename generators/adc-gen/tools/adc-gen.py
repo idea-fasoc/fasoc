@@ -64,6 +64,9 @@ if os.path.isdir(extDir + '/run'):
 # print('Workspace cleaning done. Exiting the flow.')
 # sys.exit(0)
 
+p = sp.Popen(['make','bleach_all'], cwd=flowDir)
+p.wait()
+
 try:
    os.mkdir(extDir + '/run')
 except OSError:
@@ -116,7 +119,7 @@ aLib = platformConfig['aux_lib']
 
 calibreRulesDir = platformConfig['calibreRules']
 
-ADC_netlist.gen_adc_netlist(resolution, nisw, ncsw, simDir, genDir)
+ADC_netlist.gen_adc_netlist(resolution, nisw, ncsw, simDir, genDir, args.platform)
 
 print('#----------------------------------------------------------------------')
 print('# Verilog Generated')
@@ -130,6 +133,15 @@ jsonSpec['results'].update({'power': power_with_inx})
 with open(args.outputDir + '/' + designName + '.json', 'w') as resultSpecfile:
    json.dump(jsonSpec, resultSpecfile, indent=True)
 
+with open(flowDir + '/src/cdac.v', 'r') as file:
+  filedata = file.read()
+if args.platform == 'tsmc65lp':
+  filedata = re.sub('sw_input (\S*) \(\.in0l(\S+) \.in0r(\S+) \.in1(\S+) \.out(\S+) \.sw0(\S+) \.sw1(\S+)', 'SW_INPUT \g<1> (.IN0L\g<2> .IN0R\g<3> .IN1\g<4> .OUT\g<5> .SW0\g<6> .SW1\g<7>', filedata)
+  filedata = re.sub('sw_vcm (\S*) \(.in(\S*) .out(\S*) .sw_ctrl(\S*)', 'SW_VCM \g<1> (.IN\g<2> .OUT\g<3> .SW_CTRL\g<4>', filedata)
+  filedata = re.sub('unit_cap (\S*) \(.top(\S*) .bot(\S*)', 'UNIT_CAP \g<1> (.VTOP\g<2> .VBOT\g<3>', filedata)
+with open(flowDir + '/src/cdac.v', 'w') as file:
+  filedata = file.write(filedata)
+
 time.sleep(2)
 
 print()
@@ -140,6 +152,9 @@ if args.mode == 'verilog':
 print('#----------------------------------------------------------------------')
 print('# Configuring Synth and APR scripts...')
 print('#----------------------------------------------------------------------')
+
+
+
 
 with open(flowDir + '/include.mk', 'r') as file:
    filedata = file.read()
@@ -198,6 +213,11 @@ print('#----------------------------------------------------------------------')
 time.sleep(1)
 print("Checking required files....")
 
+
+
+# shutil.copyfile(srcDir+'/sar_logic.v', flowDir+'/src/sar_logic.v')
+
+
 # Run the Synthesis flow
 p = sp.Popen(['make','synth'], cwd=flowDir)
 p.wait()
@@ -213,19 +233,22 @@ else:
    sys.exit(1)
 
 # Calculate and update the core cell area dimensions
-#coreDim = 100
-#coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*5
-# coreHeight = math.ceil(math.sqrt(coreCellArea*2.5)/5/1.25)*5
-# coreWidth = math.ceil(math.sqrt(coreCellArea*2.5)/5)*5*2.1
-# 
-# with open(flowDir + '/scripts/innovus/always_source.tcl', 'r') as file:
-#    filedata = file.read()
-# filedata = re.sub(r'set core_width.*', r'set core_width    ' + \
-#         str(coreWidth) + ' ;# Core Area Width', filedata)
-# filedata = re.sub(r'set core_height.*', r'set core_height   ' + \
-#         str(coreHeight) + ' ;# Core Area Height', filedata)
-# with open(flowDir + '/scripts/innovus/always_source.tcl', 'w') as file:
-#    file.write(filedata)
+coreDim = 100
+if args.platform == 'tsmc65lp':
+   coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*25
+else:
+   coreDim = math.ceil(math.sqrt(coreCellArea*2.3)/5)*10
+coreHeight = math.ceil(math.sqrt(coreCellArea*2.5)/5/1.25)*5
+coreWidth = math.ceil(math.sqrt(coreCellArea*2.5)/5)*5*2.1
+
+with open(flowDir + '/scripts/innovus/always_source.tcl', 'r') as file:
+   filedata = file.read()
+filedata = re.sub(r'set core_width.*', r'set core_width    ' + \
+        str(coreDim) + ' ;# Core Area Width', filedata)
+filedata = re.sub(r'set core_height.*', r'set core_height   ' + \
+        str(coreDim) + ' ;# Core Area Height', filedata)
+with open(flowDir + '/scripts/innovus/always_source.tcl', 'w') as file:
+   file.write(filedata)
 
 time.sleep(1)
 

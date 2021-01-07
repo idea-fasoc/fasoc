@@ -23,6 +23,7 @@ NBIT = int(sys.argv[1])
 nisw = int(sys.argv[2])
 ncsw = int(sys.argv[3])
 ncv = int(sys.argv[4])
+platform = sys.argv[5]
 
 value = []
 result_out = []
@@ -80,7 +81,7 @@ result_out_reverse_v = ' '.join(result_out_reverse_v)
 
 
 ## sar
-inFile0 = open(genDir + "./0_spice_template/sar").read()
+inFile0 = open(genDir + "./0_spice_template/" + platform + "/sar").read()
 
 inFile0 = inFile0.replace('@value', value)
 inFile0 = inFile0.replace('@result_out', result_out)
@@ -92,7 +93,7 @@ outFile0.close()
 
 
 ## sar verilog
-inFile0_v = open(genDir + "./0_spice_template/sar.v").read()
+inFile0_v = open(genDir + "./0_spice_template/" + platform + "/sar.v").read()
 
 inFile0_v = inFile0_v.replace('@NBIT', str(NBIT))
 
@@ -105,10 +106,8 @@ outFile0_v.write(inFile0_v)
 outFile0_v.close()
 
 
-
-
 ## cdac
-inFile1 = open(genDir + "./0_spice_template/cdac").read()
+inFile1 = open(genDir + "./0_spice_template/" + platform + "/cdac").read()
 
 inFile1 = inFile1.replace('@value', value)
 
@@ -167,7 +166,7 @@ for line in lines:
 w_file0.close()
 
 ## cdac verilog
-inFile1_v = open(genDir + "./0_spice_template/cdac.v").read()
+inFile1_v = open(genDir + "./0_spice_template/" + platform + "/cdac.v").read()
 
 inFile1_v = inFile1_v.replace('@value', value)
 
@@ -237,7 +236,7 @@ w_file0_v.close()
 
 
 ## sar logic
-inFile2 = open(genDir + "./0_spice_template/sar_logic").read()
+inFile2 = open(genDir + "./0_spice_template/" + platform + "/sar_logic").read()
 
 inFile2 = inFile2.replace('@value_reverse', value_reverse)
 inFile2 = inFile2.replace('@result_out_reverse', result_out_reverse)
@@ -250,7 +249,7 @@ outFile2.close()
 
 
 ## dac
-inFile3 = open(genDir + "./0_spice_template/dac").read()
+inFile3 = open(genDir + "./0_spice_template/" + platform + "/dac").read()
 
 inFile3 = inFile3.replace('@NBIT',str(NBIT))
 
@@ -260,7 +259,7 @@ outFile3.close()
 
 
 ## copy netlist
-shutil.copy2(genDir + "./0_spice_template/comp_nand.cdl", simDir)
-shutil.copy2(genDir + "./0_spice_template/meas_card", simDir + "/../run")
-shutil.copy2(genDir + "./0_spice_template/comp_nand.v", srcDir)
-shutil.copy2(genDir + "./0_spice_template/sar_logic.v", srcDir)
+shutil.copy2(genDir + "./0_spice_template/" + platform + "/comp_nand.cdl", simDir)
+shutil.copy2(genDir + "./0_spice_template/" + platform + "/meas_card", simDir + "/../run")
+shutil.copy2(genDir + "./0_spice_template/" + platform + "/comp_nand.v", srcDir)
+shutil.copy2(genDir + "./0_spice_template/" + platform + "/sar_logic.v", srcDir)

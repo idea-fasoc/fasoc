@@ -29,45 +29,45 @@ m3 in onb out vdd pch_25 l=280e-9 w='sw_width_vcm*fxxx_vcm' m=1 nf=fxxx_vcm sd=3
 
 .subckt cdac 
 + vcm_p vcm_n vin_p vin_n vrefh vrefl vtop_p vtop_n sample 
-+ value<0> value<1> value<2> value<3> value<4> value<5> value<6> value<7>
++ @value
 + vdd vss
 
-@in xsw_in_p0@ vrefh vin_p vrefl vbot_p<0> sample value<0> vdd vss SW_INPUT
-@in xsw_in_p1@ vrefh vin_p vrefl vbot_p<1> sample value<1> vdd vss SW_INPUT
-@in xsw_in_p2@ vrefh vin_p vrefl vbot_p<2> sample value<2> vdd vss SW_INPUT
-@in xsw_in_p3@ vrefh vin_p vrefl vbot_p<3> sample value<3> vdd vss SW_INPUT
-@in xsw_in_p4@ vrefh vin_p vrefl vbot_p<4> sample value<4> vdd vss SW_INPUT
-@in xsw_in_p5@ vrefh vin_p vrefl vbot_p<5> sample value<5> vdd vss SW_INPUT
-@in xsw_in_p6@ vrefh vin_p vrefl vbot_p<6> sample value<6> vdd vss SW_INPUT
-@in xsw_in_p7@ vrefh vin_p vrefl vbot_p<7> sample value<7> vdd vss SW_INPUT
+*bit0 @in xsw_in_p0@ vrefh vin_p vrefl vbot_p<0> sample value<0> vdd vss SW_INPUT
+*bit1 @in xsw_in_p1@ vrefh vin_p vrefl vbot_p<1> sample value<1> vdd vss SW_INPUT
+*bit2 @in xsw_in_p2@ vrefh vin_p vrefl vbot_p<2> sample value<2> vdd vss SW_INPUT
+*bit3 @in xsw_in_p3@ vrefh vin_p vrefl vbot_p<3> sample value<3> vdd vss SW_INPUT
+*bit4 @in xsw_in_p4@ vrefh vin_p vrefl vbot_p<4> sample value<4> vdd vss SW_INPUT
+*bit5 @in xsw_in_p5@ vrefh vin_p vrefl vbot_p<5> sample value<5> vdd vss SW_INPUT
+*bit6 @in xsw_in_p6@ vrefh vin_p vrefl vbot_p<6> sample value<6> vdd vss SW_INPUT
+*bit7 @in xsw_in_p7@ vrefh vin_p vrefl vbot_p<7> sample value<7> vdd vss SW_INPUT
 
-@in xsw_in_n0@ vrefl vin_n vrefh vbot_n<0> sample value<0> vdd vss SW_INPUT
-@in xsw_in_n1@ vrefl vin_n vrefh vbot_n<1> sample value<1> vdd vss SW_INPUT
-@in xsw_in_n2@ vrefl vin_n vrefh vbot_n<2> sample value<2> vdd vss SW_INPUT
-@in xsw_in_n3@ vrefl vin_n vrefh vbot_n<3> sample value<3> vdd vss SW_INPUT
-@in xsw_in_n4@ vrefl vin_n vrefh vbot_n<4> sample value<4> vdd vss SW_INPUT
-@in xsw_in_n5@ vrefl vin_n vrefh vbot_n<5> sample value<5> vdd vss SW_INPUT
-@in xsw_in_n6@ vrefl vin_n vrefh vbot_n<6> sample value<6> vdd vss SW_INPUT
-@in xsw_in_n7@ vrefl vin_n vrefh vbot_n<7> sample value<7> vdd vss SW_INPUT
+*bit0 @in xsw_in_n0@ vrefl vin_n vrefh vbot_n<0> sample value<0> vdd vss SW_INPUT
+*bit1 @in xsw_in_n1@ vrefl vin_n vrefh vbot_n<1> sample value<1> vdd vss SW_INPUT
+*bit2 @in xsw_in_n2@ vrefl vin_n vrefh vbot_n<2> sample value<2> vdd vss SW_INPUT
+*bit3 @in xsw_in_n3@ vrefl vin_n vrefh vbot_n<3> sample value<3> vdd vss SW_INPUT
+*bit4 @in xsw_in_n4@ vrefl vin_n vrefh vbot_n<4> sample value<4> vdd vss SW_INPUT
+*bit5 @in xsw_in_n5@ vrefl vin_n vrefh vbot_n<5> sample value<5> vdd vss SW_INPUT
+*bit6 @in xsw_in_n6@ vrefl vin_n vrefh vbot_n<6> sample value<6> vdd vss SW_INPUT
+*bit7 @in xsw_in_n7@ vrefl vin_n vrefh vbot_n<7> sample value<7> vdd vss SW_INPUT
 
 
-@cv c_cdac_p0@ vtop_p vbot_p<0> '1*cap_val'
-@cv c_cdac_p1@ vtop_p vbot_p<1> '2*cap_val'
-@cv c_cdac_p2@ vtop_p vbot_p<2> '4*cap_val'
-@cv c_cdac_p3@ vtop_p vbot_p<3> '8*cap_val'
-@cv c_cdac_p4@ vtop_p vbot_p<4> '16*cap_val'
-@cv c_cdac_p5@ vtop_p vbot_p<5> '32*cap_val'
-@cv c_cdac_p6@ vtop_p vbot_p<6> '64*cap_val'
-@cv c_cdac_p7@ vtop_p vbot_p<7> '128*cap_val'
+*bit0 @cv c_cdac_p0@ vtop_p vbot_p<0> '1*cap_val'
+*bit1 @cv c_cdac_p1@ vtop_p vbot_p<1> '2*cap_val'
+*bit2 @cv c_cdac_p2@ vtop_p vbot_p<2> '4*cap_val'
+*bit3 @cv c_cdac_p3@ vtop_p vbot_p<3> '8*cap_val'
+*bit4 @cv c_cdac_p4@ vtop_p vbot_p<4> '16*cap_val'
+*bit5 @cv c_cdac_p5@ vtop_p vbot_p<5> '32*cap_val'
+*bit6 @cv c_cdac_p6@ vtop_p vbot_p<6> '64*cap_val'
+*bit7 @cv c_cdac_p7@ vtop_p vbot_p<7> '128*cap_val'
 
-@cv c_cdac_n0@ vtop_n vbot_n<0> '1*cap_val'
-@cv c_cdac_n1@ vtop_n vbot_n<1> '2*cap_val'
-@cv c_cdac_n2@ vtop_n vbot_n<2> '4*cap_val'
-@cv c_cdac_n3@ vtop_n vbot_n<3> '8*cap_val'
-@cv c_cdac_n4@ vtop_n vbot_n<4> '16*cap_val'
-@cv c_cdac_n5@ vtop_n vbot_n<5> '32*cap_val'
-@cv c_cdac_n6@ vtop_n vbot_n<6> '64*cap_val'
-@cv c_cdac_n7@ vtop_n vbot_n<7> '128*cap_val'
+*bit0 @cv c_cdac_n0@ vtop_n vbot_n<0> '1*cap_val'
+*bit1 @cv c_cdac_n1@ vtop_n vbot_n<1> '2*cap_val'
+*bit2 @cv c_cdac_n2@ vtop_n vbot_n<2> '4*cap_val'
+*bit3 @cv c_cdac_n3@ vtop_n vbot_n<3> '8*cap_val'
+*bit4 @cv c_cdac_n4@ vtop_n vbot_n<4> '16*cap_val'
+*bit5 @cv c_cdac_n5@ vtop_n vbot_n<5> '32*cap_val'
+*bit6 @cv c_cdac_n6@ vtop_n vbot_n<6> '64*cap_val'
+*bit7 @cv c_cdac_n7@ vtop_n vbot_n<7> '128*cap_val'
 
 @cm xsw_vcmp@ vcm_p vtop_p sample vdd vss SW_VCM
 @cm xsw_vcmn@ vcm_n vtop_n sample vdd vss SW_VCM
@@ -75,22 +75,22 @@ m3 in onb out vdd pch_25 l=280e-9 w='sw_width_vcm*fxxx_vcm' m=1 nf=fxxx_vcm sd=3
 @cv x_inv_cm_up_p@ cm_up_p vdd vdd vss vss sample INV_X2B_A9TR
 @cv x_inv_cm_up_n@ cm_up_n vdd vdd vss vss sample INV_X2B_A9TR
 
-@cv c_cm_up_p0@ vtop_p cm_up_p '1*cap_val'
-@cv c_cm_up_p1@ vtop_p cm_up_p '1*cap_val'
-@cv c_cm_up_p2@ vtop_p cm_up_p '1*cap_val'
-@cv c_cm_up_p3@ vtop_p cm_up_p '2*cap_val'
-@cv c_cm_up_p4@ vtop_p cm_up_p '4*cap_val'
-@cv c_cm_up_p5@ vtop_p cm_up_p '8*cap_val'
-@cv c_cm_up_p6@ vtop_p cm_up_p '16*cap_val'
-@cv c_cm_up_p7@ vtop_p cm_up_p '32*cap_val'
+*bit0 @cv c_cm_up_p0@ vtop_p cm_up_p '1*cap_val'
+*bit1 @cv c_cm_up_p1@ vtop_p cm_up_p '1*cap_val'
+*bit2 @cv c_cm_up_p2@ vtop_p cm_up_p '1*cap_val'
+*bit3 @cv c_cm_up_p3@ vtop_p cm_up_p '2*cap_val'
+*bit4 @cv c_cm_up_p4@ vtop_p cm_up_p '4*cap_val'
+*bit5 @cv c_cm_up_p5@ vtop_p cm_up_p '8*cap_val'
+*bit6 @cv c_cm_up_p6@ vtop_p cm_up_p '16*cap_val'
+*bit7 @cv c_cm_up_p7@ vtop_p cm_up_p '32*cap_val'
 
-@cv c_cm_up_n0@ vtop_n cm_up_n '1*cap_val'
-@cv c_cm_up_n1@ vtop_n cm_up_n '1*cap_val'
-@cv c_cm_up_n2@ vtop_n cm_up_n '1*cap_val'
-@cv c_cm_up_n3@ vtop_n cm_up_n '2*cap_val'
-@cv c_cm_up_n4@ vtop_n cm_up_n '4*cap_val'
-@cv c_cm_up_n5@ vtop_n cm_up_n '8*cap_val'
-@cv c_cm_up_n6@ vtop_n cm_up_n '16*cap_val'
-@cv c_cm_up_n7@ vtop_n cm_up_n '32*cap_val'
+*bit0 @cv c_cm_up_n0@ vtop_n cm_up_n '1*cap_val'
+*bit1 @cv c_cm_up_n1@ vtop_n cm_up_n '1*cap_val'
+*bit2 @cv c_cm_up_n2@ vtop_n cm_up_n '1*cap_val'
+*bit3 @cv c_cm_up_n3@ vtop_n cm_up_n '2*cap_val'
+*bit4 @cv c_cm_up_n4@ vtop_n cm_up_n '4*cap_val'
+*bit5 @cv c_cm_up_n5@ vtop_n cm_up_n '8*cap_val'
+*bit6 @cv c_cm_up_n6@ vtop_n cm_up_n '16*cap_val'
+*bit7 @cv c_cm_up_n7@ vtop_n cm_up_n '32*cap_val'
 
 .ends cdac

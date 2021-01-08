@@ -1,0 +1,67 @@
+`include "constants.vams"
+`include "disciplines.vams"
+
+module dac(out, in, clk);
+    parameter integer bits = @NBIT from [1:24];	// resolution (bits)
+    parameter real vmin = 0.0;			// minimum input voltage (V)
+    parameter real vmax = pow(2,@NBIT) from (vmin:inf);	// maximum input voltage (V)
+    parameter real td = 0;			// delay from clock edge to output (s)
+    parameter real tt = 0;			// transition time of output (s)
+    parameter real vdd = 1.0;			// voltage level of logic 1 (V)
+    parameter real vss = 0;			// voltage level of logic 0 (V)
+    parameter real thresh = (vdd+vss)/2;	// logic threshold level (V)
+    parameter integer dir = +1 from [-1:1] exclude 0;
+    						// 1 for trigger on rising edge
+						// -1 for falling
+    localparam real fullscale = vmax - vmin;
+
+    output out;
+    input [0:bits-1] in;
+    input clk;
+    voltage out, clk;
+    voltage [0:bits-1] in;
+    real aout;
+    integer weight;
+    genvar i;
+
+    analog begin
+	@(cross(V(clk) - thresh, dir) or initial_step) begin
+	    aout = 0;
+	    weight = 2;
+	    for (i = bits - 1; i >= 0; i = i - 1) begin
+		if (V(in[i]) > thresh) begin
+		    aout = aout + fullscale/weight;
+		end
+		weight = weight*2;
+	    end
+	end
+	V(out) <+ transition(aout + vmin, td, tt);
+    end
+endmodule
+
+module ainv (in, out, dd);
+
+output out; voltage out;
+input in; voltage in;
+input dd; voltage dd;
+parameter real td = 1n from [0:inf);     // delay to start of output transition
+parameter real tt = 1n from [0:inf);     // transition time of output signals
+
+integer lout;
+
+analog begin
+    // make sure simulator sees the threshold crossing
+    @(cross(V(in) - V(dd)/2))
+        ;
+
+    // compute the logical value of the output
+    if (V(in) > V(dd)/2)
+       lout = 0;
+    else
+       lout = 1;
+
+    // create an analog version of logical output
+    V(out) <+ V(dd)*transition(lout, td, tt);
+end
+endmodule
+

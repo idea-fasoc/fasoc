@@ -27,15 +27,15 @@ counter async_counter_0(
 );
 
 
-HEAD14 a_header_0(.VIN(VIN));
-HEAD14 a_header_1(.VIN(VIN));
-HEAD14 a_header_2(.VIN(VIN));
-HEAD14 a_header_3(.VIN(VIN));
-HEAD14 a_header_4(.VIN(VIN));
-HEAD14 a_header_5(.VIN(VIN));
-HEAD14 a_header_6(.VIN(VIN));
-SLC_cell a_lc_0(.A(out), .AB(outb), .Y(lc_0));
-BUF_X0P4N_A10P5PP84TH_C16 a_buffer_0 (.A(lc_0), .Y(lc_out));
+HEADERX1RVT a_header_0(.VIN(VIN));
+HEADERX1RVT a_header_1(.VIN(VIN));
+HEADERX1RVT a_header_2(.VIN(VIN));
+HEADERX1RVT a_header_3(.VIN(VIN));
+HEADERX1RVT a_header_4(.VIN(VIN));
+HEADERX1RVT a_header_5(.VIN(VIN));
+HEADERX1RVT a_header_6(.VIN(VIN));
+LC1P2TO3P6X1RVT_VDDX4 a_lc_0(.A(out), .AB(outb), .Y(lc_0));
+BUFX4RVT_ISOVDD a_buffer_0 (.A(lc_0), .Y(lc_out));
 	
 endmodule
 

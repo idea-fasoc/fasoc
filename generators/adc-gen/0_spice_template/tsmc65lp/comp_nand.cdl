@@ -1,0 +1,14 @@
+** Library name: SYN_ANALOG
+** Cell name: COMP_NAND_VER0
+** View name: schematic
+.subckt comp_nand_ver0 clk_sar vinn vinp outn outp vdd vss
+xi11 outp vdd vdd vss vss net018 INV_X0P5B_A9TR
+xi10 outn vdd vdd vss vss net024 INV_X0P5B_A9TR
+xi7 net026 vdd vdd vss vss op INV_X0P5B_A9TR
+xi4 net027 vdd vdd vss vss on INV_X0P5B_A9TR
+xi1 op vdd vdd vss vss on clk_sar vinn NAND3_X2A_A9TR
+xi0 on vdd vdd vss vss op clk_sar vinp NAND3_X2A_A9TR
+xi6 net024 vdd vdd vss vss net018 net026 NOR2_X0P5A_A9TR
+xi5 net018 vdd vdd vss vss net027 net024 NOR2_X0P5A_A9TR
+.ends comp_nand_ver0
+** End of subcircuit definition.

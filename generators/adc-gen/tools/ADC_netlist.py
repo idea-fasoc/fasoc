@@ -4,7 +4,7 @@ import shutil
 import string
 import time
 
-def gen_adc_netlist(resolution_in, nisw_in, ncsw_in,simDir,genDir):
+def gen_adc_netlist(resolution_in, nisw_in, ncsw_in,simDir,genDir, platform):
 	##### Directory name for result files
 	dir_name = simDir + '/run'
 	#dir_name2 = './hspice/run'
@@ -102,7 +102,7 @@ def gen_adc_netlist(resolution_in, nisw_in, ncsw_in,simDir,genDir):
 									result_data="python ./tools/result.py %s/tbSar_capVal_%s_widthi_%s_widthc_%s_fsmpl_%s_config_%s.mt0 >> result_sorted\n"%(dir_name, capVal[i], widthi[j], widthc[k], fsmpl[l], config)
 									result_file.write(result_data)
 	
-									netgen_data="python" +" %stools/auto_netgen.py %s %s %s %s\n"%(genDir,NBIT[ii],nisw[jj],ncsw[kk],ncv[ll])
+									netgen_data="python" +" %stools/auto_netgen.py %s %s %s %s %s\n"%(genDir,NBIT[ii],nisw[jj],ncsw[kk],ncv[ll], platform)
 									netgen_file.write(netgen_data)
 	
 									#####

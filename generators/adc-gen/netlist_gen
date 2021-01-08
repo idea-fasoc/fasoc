@@ -1,1 +1,1 @@
-python tools/../tools/auto_netgen.py 8 1 1 1
+python tools/../tools/auto_netgen.py 8 1 1 1 tsmc65lp

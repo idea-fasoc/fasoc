@@ -8,7 +8,7 @@
   "model": "modelfile.csv"
  },
  "results": {
-  "platform": "gf12lp",
+  "platform": "tsmc65lp",
   "area": 1000,
   "enob": 7.652437,
   "power": 1.7095e-06

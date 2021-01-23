@@ -11,7 +11,7 @@ module tempsenseInst
 	output lc_out
 	);
 	
-	wire VIN;
+        wire VIN;
 	TEMP_ANALOG_lv temp_analog_0(
 		.EN(en),
 		.OUT(out),
@@ -22,7 +22,6 @@ module tempsenseInst
 	       	.CLK_REF(CLK_REF),
         	.RESET_COUNTERn(RESET_COUNTERn),
         	.SEL_CONV_TIME(SEL_CONV_TIME),
-		.en(en),
 		.out(out),
 		.outb(outb),
 		.DOUT(DOUT),

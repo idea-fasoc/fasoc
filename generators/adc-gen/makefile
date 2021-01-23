@@ -5,6 +5,9 @@ gen_65lp_verilog:
 gen_65lp_macro:
 	python tools/adc-gen.py --specfile adc_data.json --output ./work --platform tsmc65lp --mode macro
 
+gen_65lp_full:
+	python tools/adc-gen.py --specfile adc_data.json --output ./work --platform tsmc65lp --mode full
+
 65lp_clean:
 	python tools/adc-gen.py --specfile adc_data.json --output ./work --platform tsmc65lp --mode macro --clean
 

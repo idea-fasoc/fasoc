@@ -20,6 +20,7 @@ import glob
 import operator
 import function
 import ADC_netlist
+import ADC_netlist_pex
 import readparamgen
 import os
 import time
@@ -414,35 +415,65 @@ print('# SAR - Post PEX netlist Generated')
 # Run Hspice Sims
 #------------------------------------------------------------------------------
 
+#generate pex testbench 
+ADC_netlist_pex.gen_adc_netlist(resolution, nisw, ncsw, simDir, genDir, args.platform)
 
+#copy pex netlist
 p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.pex',
              simDir+'/spice/'])
 p.wait()
-p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.'+
-             designName+'.pxi', simDir+'/spice/'])
+p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist.'+designName+'.pxi', simDir+'/spice/'])
+p.wait()
+p = sp.Popen(['cp',extDir+'/run/'+designName+'.pex.netlist', simDir+'/spice/'])
 p.wait()
 
+# process pex netlist port definition
+ports = ""
+for i in range(0, resolution):
+	ports += 'result<' + str(i) + '> '
+ports = '.SUBCKT sar en clk VSS VDD ' + ports + 'vrefh vinp vcm vrefl vinn\n'
+
+new_file_content = ""
+flag = 0
+with open(simDir+'/spice/' + designName + '.pex.netlist', 'r') as file:
+	for line in file:
+		if (re.match("^\.(SUBCKT|subckt) sar", line)):
+			line = ports
+			new_file_content += line
+			flag = 1
+		else:
+			if (flag and re.match("^\+", line)):
+				new_file_content += "\n"
+			else:
+				flag = 0
+				new_file_content += line
+	
+new_file_content = re.sub(r'\[', '<', new_file_content)
+new_file_content = re.sub(r'\]', '>', new_file_content)
+with open(simDir+'/spice/' + designName + '.pex.netlist', 'w') as file:
+	file.write(new_file_content)
+
+# replace the bracket [] with <>
+with open(simDir+'/spice/' + designName + '.pex.netlist.pex', 'r') as file:
+	filedata = file.read()
+filedata = re.sub(r'\[', '<', filedata)
+filedata = re.sub(r'\]', '>', filedata)
+with open(simDir+'/spice/' + designName + '.pex.netlist.pex', 'w') as file:
+	file.write(filedata)
+
+with open(simDir+'/spice/' + designName + '.pex.netlist.' + designName + '.pxi', 'r') as file:
+	filedata = file.read()
+filedata = re.sub(r'\[', '<', filedata)
+filedata = re.sub(r'\]', '>', filedata)
+with open(simDir+'/spice/' + designName + '.pex.netlist.' + designName + '.pxi', 'w') as file:
+	file.write(filedata)
+
+pex_sp = glob.glob(simDir + "/run/*.pex.sp")
+
+for pex in pex_sp:
+    p = sp.Popen(["finesim", "-spice", "-np", "8", pex.split("/")[-1]], cwd=simDir + "/run/")
+    p.wait()
+    p = sp.Popen(["python", "result.py", pex.split("/")[-1][0:-3] + ".mt0"], cwd=simDir + "/run/")
+    p.wait()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if args.mode == 'verilog':
-#  print("Exiting tool....")
-#  #sys.exit(1)
-#  exit()
-#
-#
-#if args.mode != 'verilog':
-#  print("Only verilog mode is supported [other modes are in-progress]....")
-#  sys.exit(1)

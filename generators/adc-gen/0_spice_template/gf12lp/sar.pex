@@ -1,0 +1,14 @@
+xsar
++en
++clk_sar
++vss
++vdd
++@result_out
++vrefh
++vin_p
++vcm
++vrefl
++vin_n
++sar
+
+xdac dac_out  @result_out enb dac

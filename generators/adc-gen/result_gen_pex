@@ -1,0 +1,2 @@
+echo cap_val,widthi,widthc,fsmpl,nbit,nisw,ncsw,ncv,pwr,area,enob >> result_sorted
+python ./tools/result.py tools/../../../private/generators/adc-gen/hspice/run/tbSar_capVal_3.2e-15_widthi_2_widthc_2_fsmpl_1000000.0_config_8_1_1_1.pex.mt0 >> result_sorted_pex

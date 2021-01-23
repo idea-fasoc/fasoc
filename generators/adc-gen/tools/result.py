@@ -9,7 +9,7 @@ file_name = sys.argv[1]
 r_file = open(file_name, "r")
 lines = r_file.readlines()
 
-file_name_parse = file_name[8:-4].split('_')
+file_name_parse = file_name[0:-8].split('_')
 
 stripped_index = lines[2].strip()
 index_in = stripped_index.split()

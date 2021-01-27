@@ -200,8 +200,8 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 	NFtotal=nstg*(nfc)
 	A_dco=NCtotal*W_CC*H_CC+NFtotal*W_FC*H_FC
 	if cust_place==0:
-		W_dco=math.ceil(math.sqrt(A_dco)*2.2/2)*2
-		H_dco=math.ceil(math.sqrt(A_dco)*2.2/2)*2
+		W_dco=math.ceil(math.sqrt(A_dco)*2.2/2)*3  # 01_09_2021
+		H_dco=math.ceil(math.sqrt(A_dco)*2.2/2)*3  # 01_09_2021
 	else:
 		nspace=1
 		#nxoff=4

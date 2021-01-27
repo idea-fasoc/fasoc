@@ -96,7 +96,7 @@ input vrefl;
 
 input sample;
 
-output [@NBIT-1:0] value;
+input [@NBIT-1:0] value;
 
 output vtop_p;
 output vtop_n;

@@ -1,0 +1,1 @@
+finesim -spice -np 8 tools/../../../private/generators/adc-gen/hspice/run/tbSar_capVal_3.2e-15_widthi_2_widthc_2_fsmpl_1000000.0_config_8_1_1_1.pex.sp -o tools/../../../private/generators/adc-gen/hspice/run/tbSar_capVal_3.2e-15_widthi_2_widthc_2_fsmpl_1000000.0_config_8_1_1_1.pex

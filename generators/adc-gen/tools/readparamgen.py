@@ -248,6 +248,7 @@ def main():
             print ('-----POWER : ------', power_with_inx)
         elif optimization == "area" :
             print ('-----AREA : ------', area)  
+
         return power_with_inx, fsampling, resolution, enob, area, nisw, ncsw
 
 

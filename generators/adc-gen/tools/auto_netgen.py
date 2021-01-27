@@ -91,6 +91,16 @@ outFile0.write(inFile0)
 outFile0.close()
 
 
+## sar.pex netlist
+inFile0 = open(genDir + "./0_spice_template/" + platform + "/sar.pex").read()
+
+inFile0 = inFile0.replace('@result_out', result_out)
+
+outFile0 = open(simDir + "/sar.pex.cdl", "w")
+outFile0.write(inFile0)
+outFile0.close()
+
+
 
 ## sar verilog
 inFile0_v = open(genDir + "./0_spice_template/" + platform + "/sar.v").read()
@@ -263,3 +273,6 @@ shutil.copy2(genDir + "./0_spice_template/" + platform + "/comp_nand.cdl", simDi
 shutil.copy2(genDir + "./0_spice_template/" + platform + "/meas_card", simDir + "/../run")
 shutil.copy2(genDir + "./0_spice_template/" + platform + "/comp_nand.v", srcDir)
 shutil.copy2(genDir + "./0_spice_template/" + platform + "/sar_logic.v", srcDir)
+shutil.copy2(genDir + "./0_spice_template/" + platform + "/meas_card_pex", simDir + "/../run")
+
+shutil.copy2(genDir + "./tools/result.py", simDir + "/../run")

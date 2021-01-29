@@ -95,7 +95,7 @@ if platform=='tsmc65lp':
 	outbuff_div=1
 	tdc_dff='DFFRPQ_X0P5M_A9TR'
 	H_stdc=1.8
-	custom_lvs=1
+	custom_lvs=0
 	cust_place=0
 	single_ended=0
 	CC_stack=2
@@ -382,7 +382,7 @@ if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	buf_bleach=1
 	buf_design=1
-	buf_lvs=1
+	buf_lvs=0
 	if outbuff_div==1:
 		run_digital_flow.outbuff_div_flow(pvtFormatDir,outbuff_div_flowDir,bufName,platform,buf_bleach,buf_design)
 		if buf_lvs==1:

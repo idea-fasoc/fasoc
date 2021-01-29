@@ -368,7 +368,7 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 	shutil.copyfile(formatDir+platform+'_pdpll_power_intent.cpf',flowDir+'/scripts/innovus/power_intent.cpf')	
 	shutil.copyfile(formatDir+'pdpll_pre_init.tcl',flowDir+'/scripts/innovus/pre_init.tcl')	
 	shutil.copyfile(formatDir+'pdpll_post_init.tcl',flowDir+'/scripts/innovus/post_init.tcl')	
-	shutil.copyfile(formatDir+'pdpll_pre_place.tcl',flowDir+'/scripts/innovus/pre_place.tcl')	
+	shutil.copyfile(formatDir+platform+'_pdpll_pre_place.tcl',flowDir+'/scripts/innovus/pre_place.tcl')	
 	shutil.copyfile(formatDir+'pdpll_pre_route.tcl',flowDir+'/scripts/innovus/pre_route.tcl')	
 	shutil.copyfile(formatDir+'pdpll_post_postroute.tcl',flowDir+'/scripts/innovus/post_postroute.tcl')	
 	shutil.copyfile(formatDir+'pre_signoff.tcl',flowDir+'/scripts/innovus/pre_signoff.tcl')	

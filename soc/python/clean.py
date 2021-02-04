@@ -44,9 +44,11 @@ parser.add_argument('--platform', default="tsmc65lp",
 parser.add_argument('--platform_config', default=os.path.join(fasoc_dir, "config/platform_config.json"),
 					help='Platform configuration json file path')
 parser.add_argument('--connection', default="remove",
-					help='whether removal connection in design file')
+					help='Whether removal connection in design file')
 parser.add_argument('--database', default="remove",
-					help='whether removal the module from the database')
+					help='Whether removal the module from the database')
+parser.add_argument('--synthesis', default="remove",
+					help='Whether removal the synthesis files')
 args = parser.parse_args()
 
 print("Loading design: ", args.design)
@@ -120,51 +122,52 @@ for file in os.listdir(rubiDir):
 		print("Cleaning rubi directory ...")
 
 # Removing the generated copied verilog files on synthesis directory
-print("Cleaning synthesis directory ...")
-for module in designJson["modules"]:
-	if module["generator"] == "memory-gen":
-		dst_module_verilogDir = os.path.join(synthDir,"src","mem",module["module_name"] + ".v")
-	elif module["generator"] == "m0mcu_rtl":
-		dst_module_verilogDir = os.path.join(synthDir,"m0sdk","systems","cortex_m0_mcu","verilog",module["module_name"] + ".v")
-	elif module["generator"] != "cmsdk_apb_slave_mux_rtl":
-		dst_module_verilogDir = os.path.join(synthDir,"src",module["module_name"] + ".v")
+if args.synthesis == "remove":
+	print("Cleaning synthesis directory ...")
+	for module in designJson["modules"]:
+		if module["generator"] == "memory-gen":
+			dst_module_verilogDir = os.path.join(synthDir,"src","mem",module["module_name"] + ".v")
+		elif module["generator"] == "m0mcu_rtl":
+			dst_module_verilogDir = os.path.join(synthDir,"m0sdk","systems","cortex_m0_mcu","verilog",module["module_name"] + ".v")
+		elif module["generator"] != "cmsdk_apb_slave_mux_rtl":
+			dst_module_verilogDir = os.path.join(synthDir,"src",module["module_name"] + ".v")
+		try:
+			os.remove(dst_module_verilogDir) 
+		except FileNotFoundError:
+			pass
+		if module["generator"] == "cmsdk_apb_slave_mux_rtl":
+			dst_module_verilogDir = os.path.join(synthDir,"m0sdk","logical",module["module_name"])
+		try:
+			shutil.rmtree(dst_module_verilogDir) 
+		except FileNotFoundError:
+			pass
+
+	# Removing create_clock in constraints.tcl
+	constraintsDir = os.path.join(synthDir,"scripts","dc","constraints.tcl")
+	temp_constraintsDir = os.path.join(synthDir,"scripts","dc","temp_constraints.tcl")
+	with open(constraintsDir, 'r') as constraints_file, open(temp_constraintsDir, 'w') as temp_constraints_file:
+		for line in constraints_file:
+			remove_line_tag = False
+			if re.match(r'create_clock \[get_pins ',line) or re.match(r'             -name CLK_OUT \\',line) or re.match(r'             -period \$VCO_PERIOD',line):
+				remove_line_tag = True
+				create_clock_pat = r'create_clock \[get_pins (\S+)/synth_pll/'
+				pll_instance_name = re.findall(create_clock_pat,line)
+				if pll_instance_name != []:
+					initial_first_create_clock_line = rf'create_clock \[get_pins {pll_instance_name[0]}/synth_pll/CLK_OUT\] \\'
+					line = re.sub(initial_first_create_clock_line,"",line)
+					initial_second_create_clock_line = rf'create_clock \[get_pins {pll_instance_name[0]}/synth_pll/CLKREF_RETIMED_1\] \\'
+					line = re.sub(initial_second_create_clock_line,"",line)
+				line = re.sub(r"             -name CLK_OUT \\","",line)
+				line = re.sub("             -period \$VCO_PERIOD","",line)
+			if remove_line_tag:
+				if not line.strip():
+					continue
+			temp_constraints_file.write(line)
+	os.rename(temp_constraintsDir,constraintsDir)
+
 	try:
-		os.remove(dst_module_verilogDir) 
+		os.remove(os.path.join(synthDir,"m0sdk","systems","cortex_m0_mcu","verilog",designName + ".v")) 
 	except FileNotFoundError:
 		pass
-	if module["generator"] == "cmsdk_apb_slave_mux_rtl":
-		dst_module_verilogDir = os.path.join(synthDir,"m0sdk","logical",module["module_name"])
-	try:
-		shutil.rmtree(dst_module_verilogDir) 
-	except FileNotFoundError:
-		pass
 
-# Removing create_clock in constraints.tcl
-constraintsDir = os.path.join(synthDir,"scripts","dc","constraints.tcl")
-temp_constraintsDir = os.path.join(synthDir,"scripts","dc","temp_constraints.tcl")
-with open(constraintsDir, 'r') as constraints_file, open(temp_constraintsDir, 'w') as temp_constraints_file:
-	for line in constraints_file:
-		remove_line_tag = False
-		if re.match(r'create_clock \[get_pins ',line) or re.match(r'             -name CLK_OUT \\',line) or re.match(r'             -period \$VCO_PERIOD',line):
-			remove_line_tag = True
-			create_clock_pat = r'create_clock \[get_pins (\S+)/synth_pll/'
-			pll_instance_name = re.findall(create_clock_pat,line)
-			if pll_instance_name != []:
-				initial_first_create_clock_line = rf'create_clock \[get_pins {pll_instance_name[0]}/synth_pll/CLK_OUT\] \\'
-				line = re.sub(initial_first_create_clock_line,"",line)
-				initial_second_create_clock_line = rf'create_clock \[get_pins {pll_instance_name[0]}/synth_pll/CLKREF_RETIMED_1\] \\'
-				line = re.sub(initial_second_create_clock_line,"",line)
-			line = re.sub(r"             -name CLK_OUT \\","",line)
-			line = re.sub("             -period \$VCO_PERIOD","",line)
-		if remove_line_tag:
-			if not line.strip():
-				continue
-		temp_constraints_file.write(line)
-os.rename(temp_constraintsDir,constraintsDir)
-
-try:
-	os.remove(os.path.join(synthDir,"m0sdk","systems","cortex_m0_mcu","verilog",designName + ".v")) 
-except FileNotFoundError:
-	pass
-
-subprocess.check_call(["make","bleach_synth"],cwd=synthDir)
+	subprocess.check_call(["make","bleach_synth"],cwd=synthDir)

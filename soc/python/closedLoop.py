@@ -28,7 +28,7 @@ import numpy as np
 from ML_model import ML_model
 from analogGen import analogGen
 
-def closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,ipXactDir,fasoc_dir,args_platform,args_mode,args_database,units,module_orig_number,args_design):
+def closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,ipXactDir,fasoc_dir,args_platform,args_mode,args_database,units,module_orig_number,args_design,databaseScriptDir):
 	
 	target_power_constraint = designJson["constraints"]["power"]
 	target_area_constraint = designJson["constraints"]["area"]
@@ -131,7 +131,7 @@ def closedLoop(designJson,jsnDir,design_dir,platformJson,configJson,databaseDir,
 						print("Cleaning input directory:" + inputDir + " ...")
 						for file in os.listdir(inputDir):
 							os.remove(os.path.join(inputDir,file))
-						moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args_platform,args_mode,args_database,units,module_number,designJson,args_design,connection_done_flag)
+						moduleIsGenerator = analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,args_platform,args_mode,args_database,units,module_number,designJson,args_design,connection_done_flag,databaseScriptDir)
 
 						for updated_module_counter,updated_module in enumerate(updated_designJsn[iterate_count]["modules"]):
 							if updated_module["module_name"] == module_constraint[0]:

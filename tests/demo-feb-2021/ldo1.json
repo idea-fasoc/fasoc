@@ -1,0 +1,16 @@
+{
+ "module_name": "ldo1",
+ "generator": "ldo-gen",
+ "specifications": {
+  "vin": 0.8,
+  "imax": 0.001
+ },
+ "results": {
+  "platform": "gf12lp",
+  "area": 1034.6405207079638,
+  "aspect_ratio": "1:1",
+  "power": 0.0009,
+  "vin": 0.8,
+  "imax": 0.001
+ }
+}

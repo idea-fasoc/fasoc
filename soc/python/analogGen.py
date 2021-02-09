@@ -35,7 +35,7 @@ from checkDB import checkDB
 from jsonXmlGenerator import jsonXmlGenerator
 from connectionGen import connectionGen
 
-def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,platform,args_mode,args_database,units,module_number,designJson,designDir,connection_done_flag,ldo_number,pll_number,temp_sense_number):
+def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_dir,jsnDir,platform,args_mode,args_database,units,module_number,designJson,designDir,connection_done_flag,ldo_number,pll_number,temp_sense_number,databaseScriptDir):
 
 	if module["generator"] in configJson["generators"] and "rtl" not in module["generator"]:
 		if not connection_done_flag:
@@ -59,7 +59,7 @@ def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_d
 				cmd1 = os.path.join(fasoc_dir,configJson["generators"][module["generator"]]["path"])
 			except KeyError:
 				print("Please specify path for module: " + module["module_name"] + "instance: " + module["instance_name"])
-			cmd = cmd1 + " --specfile " + specFilePath + " --output " + outputDir + " --platform " + platform + " --mode " + args_mode
+			cmd = cmd1 + " --filename " + specFilePath + " --output " + outputDir + " --platform " + platform + " --mode " + args_mode
 			print("Launching: ", cmd)
 			
 			try:
@@ -75,6 +75,17 @@ def analogGen(module,configJson,databaseDir,outputDir,inputDir,ipXactDir,fasoc_d
 # Add to database/cache
 			if args_database == 'add':
 				print(module["module_name"] + " is going to be added to the database")
+				cmd_database = databaseScriptDir + " --filename " + os.path.join(outputDir,module['module_name'] + '.json')
+				print("Launching: ", cmd_database)
+				try:
+					ret = subprocess.check_call([databaseScriptDir,"--filename",os.path.join(outputDir,module['module_name'] + '.json')])
+					if ret:
+						print("Error: Command returned error: " + subprocess.CalledProcessError)
+						sys.exit(1)
+				except:
+					print ("Error/Exception occurred while running command:", sys.exc_info()[0])
+
+
 				try:
 					os.makedirs(os.path.join(databaseDir,'ZIP'))
 					print("Directory " + os.path.join(databaseDir,'ZIP') +	" Created in the database") 

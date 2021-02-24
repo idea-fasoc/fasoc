@@ -271,14 +271,14 @@ if args.platform == 'tsmc65lp' :
 if args.platform == 'gf12lp' :
   shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.db',   flowPtExportDir + "/" + aux10 + '.db')
   shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.db',   flowPtExportDir + "/" + aux11 + '.db')
-  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.db',   flowPtExportDir + "/" + aux10 + '.lib')
-  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.db',   flowPtExportDir + "/" + aux11 + '.lib')
-  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.db',   flowPtExportDir + "/" + aux10 + '.lef')
-  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.db',   flowPtExportDir + "/" + aux11 + '.lef')
-  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.db',   flowPtExportDir + "/" + aux10 + '.cdl')
-  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.db',   flowPtExportDir + "/" + aux11 + '.cdl')
-  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.db',   flowPtExportDir + "/" + aux10 + '.gds')
-  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.db',   flowPtExportDir + "/" + aux11 + '.gds')
+  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.lib',   flowPtExportDir + "/" + aux10 + '.lib')
+  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.lib',   flowPtExportDir + "/" + aux11 + '.lib')
+  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.lef',   flowPtExportDir + "/" + aux10 + '.lef')
+  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.lef',   flowPtExportDir + "/" + aux11 + '.lef')
+  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.cdl',   flowPtExportDir + "/" + aux10 + '.cdl')
+  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.cdl',   flowPtExportDir + "/" + aux11 + '.cdl')
+  shutil.copyfile(aLib + '/' + aux10 + '/latest/'  + aux10 + '.gds',   flowPtExportDir + "/" + aux10 + '.gds')
+  shutil.copyfile(aLib + '/' + aux11 + '/latest/'  + aux11 + '.gds',   flowPtExportDir + "/" + aux11 + '.gds')
 
 
 time.sleep(1)
@@ -314,12 +314,18 @@ else:
 
 # Calculate and update the core cell area dimensions
 coreDim = math.ceil(math.sqrt(coreCellArea*8)/5)*5
+if args.platform == 'gf12lp':
+   coreHeight = 35
+   coreWidth = coreDim
+else:
+   coreHeight = coreDim
+   coreWidth = coreDim
 with open(flowDir + '/scripts/innovus/always_source.tcl', 'r') as file:
    filedata = file.read()
 filedata = re.sub(r'set core_width.*', r'set core_width    ' + \
-        str(coreDim) + ' ;# Core Area Width', filedata)
+        str(coreWidth) + ' ;# Core Area Width', filedata)
 filedata = re.sub(r'set core_height.*', r'set core_height   ' + \
-        str(coreDim) + ' ;# Core Area Height', filedata)
+        str(coreHeight) + ' ;# Core Area Height', filedata)
 with open(flowDir + '/scripts/innovus/always_source.tcl', 'w') as file:
    file.write(filedata)
 

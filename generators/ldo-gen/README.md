@@ -85,7 +85,7 @@ Ensure that your machine has all of the required tools setup and have access to 
     ```bash
     make gen_65lp_full (for TSMC65lp) or
     make gen_8hp_full  (for GFBICMOS8HP) or
-    make gen_12lp_full (for GF12LP)
+    make gen_12lp_full (for GF12LP) --> use calibre version "2019.3_39.25" or higher for 12LP technology.
     ``` 
     
 

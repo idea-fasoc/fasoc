@@ -1,14 +1,23 @@
 ### SoC Integration
-These are steps for running SoC integration:
-1. Please navigate to soc folder.
+These are steps for running correct-by-construction SoC integration:
+* `cd soc`
 
-2. Please refer to [here](https://github.com/idea-fasoc/fasoc/tree/master/generators/ldo-gen) for ldo,  [here](https://github.com/idea-fasoc/fasoc/tree/master/generators/pll-gen) for pll, [here](https://github.com/idea-fasoc/fasoc/tree/master/generators/memory-gen) for memory README and see what should be provided for aux_lib, calibreRuleFiles, model, SRAM_2KB directories. Please write these directoriers paths in platform_config.json inside config directory. Here is an example of how platform_config.json should look like.
+* Refer to each of [generators](https://github.com/idea-fasoc/fasoc/tree/master/generators) to see instructions for providing aux_lib, calibreRuleFiles, model, SRAM_2KB directories. Please write these directoriers in `fasoc/config/platform_config.json` based on the technology node. Here is an example of platform_config.json for tsmc65lp:
 
 ![](docs/platform_config.png)
 
-3. There are several sample designs (json and makefile) in tests/tool_integration directory that you can refer to create your own design.
+* Providing a design in json format. These are elements of such a design:
+    * "constrains": The total power and area budget of the desired SoC
+    * "modules": Different generators with different specfications that are desired to be included in the SoC
+          *  "module_name": The design should have unique name for each module
+          *  "instance_name": The name of each instances of the module. It should be noted even if one of the specifications of two modules are different, this means different modules not different instances. Instances are used if multiple instances from a module is needed.
+          *  "generator": The generator name of the module. It should be one of the generators that is listed [here](https://github.com/idea-fasoc/fasoc/tree/master/generators).
+          *  "specifications": Specifications of each module. Please refer to each [generator](https://github.com/idea-fasoc/fasoc/tree/master/generators) to find these specifications.
+    * There are several sample designs [here](https://github.com/idea-fasoc/fasoc/tree/master/tests) that it can be refered to.
 
-The below loop will start after running make soc:
+* `soc.py --design design_dir --mode design_mode --database add_remove` 
+
+The below loop will start after running make the SoC:
 
 ![](docs/flow.jpg)
 

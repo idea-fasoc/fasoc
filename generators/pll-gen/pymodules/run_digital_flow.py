@@ -1439,3 +1439,50 @@ def pre_dltdc_custom_place(formatDir,outputDir,dltdc_dim,cccell_dim,finecell_dim
 	with open(outputDir+"custom_place.tcl","w") as w_tcl:
 		for line in lines:
 			netmap1.printline(line,w_tcl)
+
+
+def dco_inv_flow_genus(formatDir,flowDir,dcoName,bleach,ndrv,nstg,platform,INV_name):
+	print ('#======================================================================')
+	print('# setting up flow directory for dco')
+	print ('#======================================================================')
+	#-------------------------------------------
+	# flow setup 
+	#-------------------------------------------
+	#--- copy scripts files to flowDir/scripts/ ---
+	shutil.copyfile(formatDir+'dco_floorplan.tcl',flowDir+'/scripts/innovus/floorplan.tcl')	
+	shutil.copyfile(formatDir+'pdpll_pre_init.tcl',flowDir+'/scripts/innovus/pre_init.tcl')	
+	shutil.copyfile(formatDir+'form_kbr_always_source.tcl',flowDir+'/scripts/innovus/always_source.tcl')	
+	shutil.copyfile(formatDir+'dco_power_intent.cpf',flowDir+'/scripts/innovus/power_intent.cpf')	
+	shutil.copyfile(formatDir+platform+'_dco_post_init.tcl',flowDir+'/scripts/innovus/post_init.tcl')	
+	shutil.copyfile(formatDir+'dco_pre_route.tcl',flowDir+'/scripts/innovus/pre_route.tcl')	
+	shutil.copyfile(formatDir+'dco_post_postroute.tcl',flowDir+'/scripts/innovus/post_postroute.tcl')	
+	shutil.copyfile(formatDir+'dco_post_signoff.tcl',flowDir+'/scripts/innovus/post_signoff.tcl')	
+	shutil.copyfile(formatDir+'pre_signoff.tcl',flowDir+'/scripts/innovus/pre_signoff.tcl')	
+	shutil.copyfile(formatDir+'cadre_Makefile_genus',flowDir+'/Makefile')	
+	shutil.copyfile(formatDir+'form_genus.constraints.tcl', flowDir+'/scripts/genus/constraints.tcl')
+	shutil.copyfile(formatDir+'form_genus.filelist.tcl', flowDir+'/scripts/genus/genus.filelist.tcl')
+	shutil.copyfile(formatDir+'form_genus.read_design.tcl', flowDir+'/scripts/genus/genus.read_design.tcl')
+
+
+	#--- generate  include.mk file ---
+	rmkfile=open(formatDir+'/form_include_genus.mk','r')
+	nm1=txt_mds.netmap()
+	nm1.get_net('iN',dcoName,None,None,None)
+	nm1.get_net('pf',platform,None,None,None)
+	with open(flowDir+'include.mk','w') as wmkfile:
+		lines_const=list(rmkfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wmkfile)
+	#--- generate verilog file ---
+	nm1=txt_mds.netmap()
+	rvfile=open(formatDir+'/form_dco_inv.v','r')
+	nm1.get_net('iN',dcoName,None,None,None)
+	nm1.get_net('nM',None,nstg,nstg,1)
+	nm1.get_net('nD',None,ndrv,ndrv,1)
+	nm1.get_net('NC',INV_name,None,None,None)
+	nm1.get_net('CN',INV_name,None,None,None)
+
+	with open(flowDir+'src/'+dcoName+'.v','w') as wvfile:
+		lines_const=list(rvfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wvfile)

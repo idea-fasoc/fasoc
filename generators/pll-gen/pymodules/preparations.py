@@ -290,3 +290,12 @@ def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,f
 	if outputDir!=0:
 		gen_subDirs([outputDir])
 
+def dir_tree_genus(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform):
+	if outMode=="macro" or outMode=="full":
+		gen_subDirs([absPvtDir_plat])
+
+		dco_flowDirs=[dco_flowDir,dco_flowDir+'/src',dco_flowDir+'/scripts',dco_flowDir+'/scripts/innovus',dco_flowDir+'/scripts/genus']
+		gen_subDirs(dco_flowDirs)
+
+	if outputDir!=0:
+		gen_subDirs([outputDir])

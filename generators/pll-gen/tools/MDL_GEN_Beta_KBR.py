@@ -106,7 +106,7 @@ if platform=='tsmc65lp':
 elif platform=='gf12lp':
 	fc_en_type = 2 # dco_FC en => decrease frequency
 	modelVersion='Alpha' 
-	dco_flowDir = absPvtDir_plat + 'flow_dco/'
+	dco_flowDir = absPvtDir_plat + 'flow_dco_KBR/'
 	fc_en_type = 2 # dco_FC en => decrease frequency
 	sim_time = 20e-9
 	corner_lib='TT' 
@@ -163,7 +163,8 @@ index=1
 show=0
 print_error=1
 
-INV_name = 'INVP_X0P6F_A10P5PP84TR_C14'
+#INV_name = 'INVP_X0P6F_A10P5PP84TR_C14'
+INV_name = 'INVP_X0P6F_A9PP84TR_C14'
 
 run_flow=1
 run_dig_flow=1
@@ -186,6 +187,8 @@ else:
 dcoNames=[]
 finesim=1
 
+preparations.dir_tree_genus(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform)
+
 if run_flow==1:
 	for i in range(1,len(vm1.comblist[0])):
 		Ndrv=vm1.comblist[0][i]
@@ -195,4 +198,4 @@ if run_flow==1:
 		print(dcoName)
 		print(dcoNames)
 		if run_dig_flow==1:
-			run_digital_flow.dco_inv_flow(pvtFormatDir,dco_flowDir,dcoName,bleach,Ndrv,Nstg,platform,INV_name)
+			run_digital_flow.dco_inv_flow_genus(pvtFormatDir,dco_flowDir,dcoName,bleach,Ndrv,Nstg,platform,INV_name)

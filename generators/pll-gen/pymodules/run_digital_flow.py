@@ -1457,7 +1457,6 @@ def dco_inv_flow_genus(formatDir,flowDir,dcoName,bleach,ndrv,nstg,platform,INV_n
 	shutil.copyfile(formatDir+'dco_pre_route.tcl',flowDir+'/scripts/innovus/pre_route.tcl')	
 	shutil.copyfile(formatDir+'dco_post_postroute.tcl',flowDir+'/scripts/innovus/post_postroute.tcl')	
 	shutil.copyfile(formatDir+'dco_post_signoff.tcl',flowDir+'/scripts/innovus/post_signoff.tcl')	
-	shutil.copyfile(formatDir+'pre_signoff.tcl',flowDir+'/scripts/innovus/pre_signoff.tcl')	
 	shutil.copyfile(formatDir+'cadre_Makefile_genus',flowDir+'/Makefile')	
 	shutil.copyfile(formatDir+'form_genus.constraints.tcl', flowDir+'/scripts/genus/constraints.tcl')
 	shutil.copyfile(formatDir+'form_genus.filelist.tcl', flowDir+'/scripts/genus/genus.filelist.tcl')

@@ -13,8 +13,6 @@ The provided generators can generate fully synthesizable verilog products using 
 The macro generation mode will generate hard macros in addition to the verilog. These hard macros are synthesized and implemented versions of the verilog output using recommended constraints and physical guidance. This mode will require the commercial tools, access to the standard/cells, PDK and other tools. It will also require an automated flow (cadre flow) as well as several private files that are restricted due to NDA requirements.
 
 ### Setup instructions
-- Requirements: Python 3.6/3.7 (packages getopt, math, numpy, os, re, shutil, subprocess, sys, smtplib, datetime, logging, matplotlib). Python versions below 3.6 are not supported.
-
 1. Tool requirements:
     - General: Python 3.6/3.7 (packages getopt, math, numpy, os, re, shutil, subprocess, sys, smtplib, datetime, logging, matplotlib). Python versions below 3.6 are not supported.
     - Cadre Flow:

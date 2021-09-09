@@ -164,7 +164,7 @@ show=0
 print_error=1
 
 #INV_name = 'INVP_X0P6F_A10P5PP84TR_C14'
-INV_name = 'INVP_X0P6F_A9PP84TR_C14'
+INV_name = 'INVP_X0P5N_A9PP84TR_C14'
 
 run_flow=1
 run_dig_flow=1

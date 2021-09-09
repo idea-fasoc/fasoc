@@ -1453,7 +1453,7 @@ def dco_inv_flow_genus(formatDir,flowDir,dcoName,bleach,ndrv,nstg,platform,INV_n
 	shutil.copyfile(formatDir+'pdpll_pre_init.tcl',flowDir+'/scripts/innovus/pre_init.tcl')	
 	shutil.copyfile(formatDir+'form_kbr_always_source.tcl',flowDir+'/scripts/innovus/always_source.tcl')	
 	shutil.copyfile(formatDir+'dco_power_intent.cpf',flowDir+'/scripts/innovus/power_intent.cpf')	
-	shutil.copyfile(formatDir+platform+'_dco_post_init.tcl',flowDir+'/scripts/innovus/post_init.tcl')	
+	shutil.copyfile(formatDir+'form_kbr_dco_post_init.tcl',flowDir+'/scripts/innovus/post_init.tcl')	
 	shutil.copyfile(formatDir+'dco_pre_route.tcl',flowDir+'/scripts/innovus/pre_route.tcl')	
 	shutil.copyfile(formatDir+'dco_post_postroute.tcl',flowDir+'/scripts/innovus/post_postroute.tcl')	
 	shutil.copyfile(formatDir+'dco_post_signoff.tcl',flowDir+'/scripts/innovus/post_signoff.tcl')	

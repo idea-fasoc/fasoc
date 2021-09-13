@@ -176,7 +176,10 @@ hspice=1
 finesim=0
 
 preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform)
+
 dco_CC_name,dco_FC_name=preparations.aux_copy_export(dco_flowDir,dco_CC_lib,dco_FC_lib)
+
+
 #------------------------------------------------------------------------------
 #  design & test_env sets definition
 #------------------------------------------------------------------------------
@@ -288,7 +291,7 @@ run_dig_flow=1
 gen_model=1
 
 tapeout_mode=0
-bleach=1
+bleach=0
 synth=1
 apr=1
 pex=1

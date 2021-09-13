@@ -257,12 +257,28 @@ def gen_subDirs (subDirs):
 				os.mkdir(subDir)
 				print(subDir+' generated')
 			except OSError:
-				print('unable to create'+Dir)
+				print('unable to create '+Dir)
 				sys.exit(1)
 
 def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform):
 	if outMode=="macro" or outMode=="full":
 		gen_subDirs([absPvtDir_plat])
+
+		hspiceDirs_split = hspiceDir.split("/")
+
+		hspiceDirs_pol = hspiceDirs_split[1:len(hspiceDirs_split)-1]
+
+		hspiceDirs_pol2 = []
+		Dir_accum = hspiceDirs_pol[0] 
+		for cnt in range(len(hspiceDirs_pol)):
+			if cnt==0:
+				Dir_accum = '/'+hspiceDirs_pol[0] 
+			else:	
+				Dir_accum = Dir_accum + "/" + hspiceDirs_pol[cnt] 
+			hspiceDirs_pol2.append(Dir_accum) 
+
+		print(hspiceDirs_pol2)
+		gen_subDirs(hspiceDirs_pol2)
 
 		hspiceDirs=[hspiceDir,hspiceDir+'/NETLIST',hspiceDir+'/TB',hspiceDir+'/DUMP_result',hspiceDir+'/TBrf',hspiceDir+'/DUMPrf_result',hspiceDir+'/pex_NETLIST',hspiceDir+'/pex_TB',hspiceDir+'/pex_DUMP_result',hspiceDir+'/pex_NETLIST_scs',hspiceDir+'/pex_TB_scs',hspiceDir+'/pex_DUMP_result_scs']
 		gen_subDirs(hspiceDirs)

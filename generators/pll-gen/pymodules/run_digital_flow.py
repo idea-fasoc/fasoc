@@ -108,6 +108,7 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 	shutil.copyfile(formatDir+'dco_post_postroute.tcl',flowDir+'/scripts/innovus/post_postroute.tcl')	
 	shutil.copyfile(formatDir+'dco_post_signoff.tcl',flowDir+'/scripts/innovus/post_signoff.tcl')	
 	shutil.copyfile(formatDir+'pre_signoff.tcl',flowDir+'/scripts/innovus/pre_signoff.tcl')	
+	shutil.copyfile(formatDir+'dcoPowerPlanGf14.tcl',flowDir+'/scripts/innovus/dcoPowerPlanGf14.tcl')	
 	shutil.copyfile(formatDir+'cadre_Makefile',flowDir+'/Makefile')	
 	#--- generate  include.mk file ---
 	rmkfile=open(formatDir+'/form_include.mk','r')

@@ -3,21 +3,8 @@ Memory-Gen is a technology agnostic python-based memory design platform that aut
 
 # Version Details:
 ```
-<<<<<<< HEAD
 Latest Version : Beta-0.1
 Date           : May 21, 2020
-```
-# What's in the release
-- First Beta version of the tool.
-- Supports the FinFET process in addition to all the features of the alpha-1.0 version. Refer below for alpha-1.0 details. 
-
-```
-Version : Alpha-1.0                                                             
-Date    : Apr 26, 2019 
-=======
-Current Version : Beta-0.1
-Date           : May 21, 2020
->>>>>>> a5bdc22825e086d7f9d4eabe2f38237b599c1e0b
 ```
 # What's in the release
 - First Beta version of the tool.
@@ -54,15 +41,7 @@ The tool is heavily dependent on the EDA tools as well as the technology PDK. He
 ```
   __apr__
 
-<<<<<<< HEAD
-  - Folder with the synthesis and APR scripts that runs the CADRE flow. Due to the NDA dependencies, the folder is moved under  **../../private/generators/memory-gen/**. To access this folder, Please contact ajayi@umich.edu.  
-```
-	apr
-	|--- 
-```
-
-=======
-  - Folder with the synthesis and APR scripts that runs the CADRE flow. Due to the NDA dependencies, the folder is moved under  **../../private/generators/memory-gen/**. To access this folder, Please contact ajayi@umich.edu.
+   - Folder with the synthesis and APR scripts that runs the CADRE flow. Due to the NDA dependencies, the folder is moved under  **../../private/generators/memory-gen/**. To access this folder, Please contact ajayi@umich.edu.
 ```
         apr
         |--- include.mk
@@ -70,7 +49,6 @@ The tool is heavily dependent on the EDA tools as well as the technology PDK. He
 	|--- scripts                           Placeholder for PDK specific apr scripts
 	|--- src                               Placeholder for design files.
 ```
->>>>>>> a5bdc22825e086d7f9d4eabe2f38237b599c1e0b
   __bin__
 
   - Directory with source scripts of the tool that encapsulates the memory macro generation process. 
@@ -166,18 +144,13 @@ Update only the following variables according to the user requirements.
 # Known Issues/Limitations:
 1. Capacity is in multiples of 2KB. 
 2. Word size is 32.
-<<<<<<< HEAD
 3. Supports only GF12LP and TSMC 65nm PDK.
-=======
-3. Supports TSMC 65nm and GF12nm PDKs.
->>>>>>> a5bdc22825e086d7f9d4eabe2f38237b599c1e0b
 
 # Contact Details:
 For further questions, please feel free to contact us at idea-uva@virginia.edu.
 
 # APPENDIX
 ## Bibliography
-1. Nalam, S.; Bhargava, M.; Ken Mai; Calhoun, B.H., **"Virtual prototyper (ViPro): An early design space exploration and optimization tool for SRAM designers"**, Design Automation Conference (DAC), 2010 47th ACM/IEEE , vol., no., pp.138,143, 13-18 June 2010 
-2. Satyanand Nalam, Mudit Bhargava, Kyle Ringgenberg, Ken Mai, and Benton H. Calhoun, **“A Technology-Agnostic Simulation Environment (TASE) for Iterative Custom IC Design across Processes”**, 2009 IEEE International Conference on Computer Design, Oct. 2009
+1. S. Kamineni, S. Gupta and B. H. Calhoun, "MemGen: An Open-Source Framework for Autonomous Generation of Memory Macros," 2021 IEEE Custom Integrated Circuits Conference (CICC), 2021, pp. 1-2, doi: 10.1109/CICC51472.2021.9431501.
 
 

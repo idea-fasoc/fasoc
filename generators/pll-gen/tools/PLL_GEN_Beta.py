@@ -214,8 +214,8 @@ try:
 		spec_priority={"Fnom":"dummy","IB_PN":"lo","Fmax":"hi","Fmin":"lo","Fres":"lo","FCR":"hi","dco_PWR":"lo"}					
 	except:
 		IB_PN=-200 # in case not specified: use dummy value 
-		#spec_priority={"Fnom":"dummy","Fmax":"hi","Fmin":"lo","Fres":"lo","FCR":"hi","dco_PWR":"lo"}					
-		spec_priority={"FCR":"hi","Fnom":"dummy","Fmax":"hi","Fmin":"lo","Fres":"lo","dco_PWR":"lo"}					
+		spec_priority={"Fnom":"dummy","Fmax":"hi","Fmin":"lo","Fres":"lo","FCR":"hi","dco_PWR":"lo"}					
+		#spec_priority={"FCR":"hi","Fnom":"dummy","Fmax":"hi","Fmin":"lo","Fres":"lo","dco_PWR":"lo"}					
 except:
 	print('Error: wrong categories in spec.json, refer to provided example')
 	sys.exit(1)	
@@ -395,7 +395,6 @@ else:
 	run_digital_flow.pll_verilog_gen_v2(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform,ND,dco_CC_name,dco_FC_name,buf1_name,buf2_name,buf3_name,tdc_width,Fcenter,Fbase,dFc,dFf)
 	run_pre_sim.run_pre_vsim(formatDir, vsimDir, FCW, Nstg, Ncc, Nfc, simOptions,tdc_width,dcoName, designName, Fref, Kp,outputDir)
 
-sys.exit(1)
 tapeout_mode=0
 
 
@@ -404,7 +403,7 @@ if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	# generate Feed Forward DCO 
 	#--------------------------------------------------------
-	dco_bleach=0 # test switch
+	dco_bleach=1 # test switch
 	dco_synth=1
 	dco_apr=1
 	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name,cp_version,welltap_dim,welltap_xc,ND,outputDir)
@@ -426,7 +425,6 @@ if outMode=='macro' or outMode=='full':
 	pdpll_apr=1
 	W_dco,H_dco,W_pll,H_pll=run_digital_flow.pdpll_flow(pvtFormatDir,pll_flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,pdpll_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,pdpll_synth,pdpll_apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,pll_max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc,FCW,vco_per,outputDir)
 	A_core=W_pll*H_pll	
-	sys.exit(1)
 	#--------------------------------------------------------
 	# run independent lvs 
 	#--------------------------------------------------------

@@ -6,11 +6,11 @@
 "frequency":
 	{
 "reference":10e6,
-"nom_min":0.58e9,
-"nom_max":1.00e9,
-"max":1.1e9,
-"min":0.5e9,
-"res":500e3
+"nom_min":0.80e9,
+"nom_max":0.88e9,
+"max":1e9,
+"min":0.7e9,
+"res":50e3
 	},
 "FCR_min":0.5,
 "dco_PWR": 15

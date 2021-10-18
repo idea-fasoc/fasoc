@@ -8,7 +8,8 @@
 		integer func_clog2_ii;
 
 		// keep going until 2^ii is larger than N
-		for (func_clog2_ii=0;2**func_clog2_ii<func_clog2_N;func_clog2_ii=func_clog2_ii+1)
+		//for (func_clog2_ii=0;2**func_clog2_ii<func_clog2_N;func_clog2_ii=func_clog2_ii+1)
+		for (func_clog2_ii=0;2**func_clog2_ii<=func_clog2_N;func_clog2_ii=func_clog2_ii+1)
 			func_clog2 = func_clog2_ii+1;
 
 	endfunction

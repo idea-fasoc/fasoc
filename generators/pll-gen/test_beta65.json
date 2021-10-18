@@ -5,6 +5,7 @@
    {
 "frequency":
 	{
+"reference":10e6,
 "nom_min":2.80e8,
 "nom_max":3.00e8,
 "max":480e6,

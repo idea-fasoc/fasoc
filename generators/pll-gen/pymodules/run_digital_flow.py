@@ -79,10 +79,129 @@ def pll_verilog_gen(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,
 			for line in lines_const:
 				nm1.printline(line,wvfile)
 
+def pll_verilog_gen_v2(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,nfc,nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform,ncc_dead,dco_CC_name,dco_FC_name,buf1_name,buf2_name,buf3_name,tdc_width,Fcenter,Fbase,dFc,dFf):
+
+	shutil.copyfile(verilogSrcDir+'FUNCTIONS.v',outDir+'/FUNCTIONS.v')	
+	shutil.copyfile(verilogSrcDir+'ssc_generator.v',outDir+'/ssc_generator.v')	
+	shutil.copyfile(verilogSrcDir+'dco_CC_se_3st.v',outDir+'/dco_CC_se_3st.v')	
+	shutil.copyfile(verilogSrcDir+'dco_FC_se2_half.v',outDir+'/dco_FC_se2_half.v')	
+	shutil.copyfile(verilogSrcDir+'pll_controller_v2.sv',outDir+'/pll_controller.sv')	
+	if outMode=='macro' or outMode=='full':
+		shutil.copyfile(verilogSrcDir+'FUNCTIONS.v',flowDir+'/src/FUNCTIONS.v')	
+		shutil.copyfile(verilogSrcDir+'ssc_generator.v',flowDir+'/src/ssc_generator.v')	
+		shutil.copyfile(verilogSrcDir+'dco_CC_se_3st.v',flowDir+'/src/dco_CC_se_3st.v')	
+		shutil.copyfile(verilogSrcDir+'dco_FC_se2_half.v',flowDir+'/src/dco_FC_se2_half.v')	
+		shutil.copyfile(verilogSrcDir+'pll_controller_v2.sv',flowDir+'/src/pll_controller.sv')	
+		print(outMode,'mode: verilog sources are generated in ',flowDir,'src/')
+	elif outMode=='verilog':
+		print(outMode,'mode: verilog sources are generated in ',outDir)
+
+	#--- bit-width cal. 
+#	tdc_width = int(np.floor(np.log2(nstg*2)) + 2)
+
+	#--- generate verilog file: tdc_counter_v2 ---
+	r_tdc_v = open(formatDir+'/form_tdc_counter_v2.sv','r')
+	nm1=txt_mds.netmap()
+	nm1.get_net('ns',None,nstg,nstg,1)	
+	#nm1.get_net('ew',None,tdc_width,tdc_width,1)
+	# EMBTDC decoding 'case'
+	nm1.get_net('Ns',None,None,nstg,nstg*2)
+
+	ph_list_start = '1'*nstg + '0'*nstg
+	ph_list=[None]*nstg	
+	for stgcnt in range(nstg):
+		if stgcnt==0:
+			ph_list[stgcnt]=ph_list_start
+		else:
+			ph_list[stgcnt]=ph_list[stgcnt-1][-nstg-1:]+ph_list[stgcnt-1][:-nstg-1]
+
+	for phcnt in range(2*nstg):
+		phval=''
+		for stgcnt in range(nstg):
+			phval=phval+ph_list[stgcnt][phcnt]
+		phval=phval[::-1]	
+		#print(phval)
+		if phcnt<np.floor(nstg*2/4)+1:
+			retime_edge_sel = 0
+			retime_lag = 0		
+		elif phcnt>= np.floor(nstg*2/4)+1 and phcnt <np.floor(nstg*2/4)*3+1:
+			retime_edge_sel = 1	
+			retime_lag = 0		
+		else:
+			retime_edge_sel = 0	
+			retime_lag = 1		
+		#nm1.get_net('er',phval,None,None,None)
+		nm1.get_net('er',None,phval,phval,1)
+		nm1.get_net('ei',None,phcnt,phcnt,1)
+		nm1.get_net('re',None,retime_edge_sel,retime_edge_sel,1)
+		nm1.get_net('rl',None,retime_lag,retime_lag,1)
+
+	with open(outDir+'/tdc_counter.sv','w') as wvfile:
+		lines_tdc=list(r_tdc_v.readlines())
+		for line in lines_tdc:
+			nm1.printline(line,wvfile)
+
+	#--- generate verilog file ---
+	r_pll_v=open(formatDir+'/form_pll_top_v2.sv','r')
+	nm1=txt_mds.netmap()
+	nm1.get_net('iN',designName,None,None,None)
+	nm1.get_net('nM',None,nstg,nstg,1)
+	nm1.get_net('nC',None,ncc,ncc,1)
+	nm1.get_net('nF',None,nfc,nfc,1)
+
+	# DCO analog performance
+	nm1.get_net('CF',None,Fcenter,Fcenter,1)
+	nm1.get_net('FB',None,Fbase,Fbase,1)
+	nm1.get_net('CS',None,dFc,dFc,1)
+	nm1.get_net('FS',None,dFf,dFf,1)
+
+	nm1.get_net('ew',None,tdc_width,tdc_width,1)
+	nm1.get_net('dN',dcoName,None,None,None)
+	with open(outDir+'/'+designName+'.sv','w') as wvfile:
+		lines_pll=list(r_pll_v.readlines())
+		for line in lines_pll:
+			nm1.printline(line,wvfile)
+
+	#--- generate verilog file: DCO ---
+	rvfile=open(formatDir+'/form_dco_v2.v','r')
+	nm1=txt_mds.netmap()
+	if edge_sel==1:
+		nm1.get_net('IE','INCLUDE_EDGE_SEL',None,None,None)
+	else:
+		nm1.get_net('IE','EXCLUDE_EDGE_SEL',None,None,None)
+	# design params
+	nm1.get_net('iN',dcoName,None,None,None)
+	nm1.get_net('nM',None,nstg,nstg,1)
+	nm1.get_net('nD',None,ndrv,ndrv,1)
+	nm1.get_net('nC',None,ncc,ncc,1)
+	nm1.get_net('nF',None,nfc,nfc,1)
+	nm1.get_net('ND',None,ncc_dead,ncc_dead,1)
+	
+	# cell names
+	nm1.get_net('cN',dco_CC_name,None,None,None)
+	nm1.get_net('Cn',dco_CC_name,None,None,None)
+	nm1.get_net('CN',dco_CC_name,None,None,None)
+	nm1.get_net('fN',dco_FC_name,None,None,None)
+	nm1.get_net('b1',buf1_name,None,None,None)
+	nm1.get_net('dn',dco_CC_name,None,None,None)
+	nm1.get_net('Dn',dco_CC_name,None,None,None)
+	nm1.get_net('dN',dco_CC_name,None,None,None)
+	nm1.get_net('DN',dco_CC_name,None,None,None)
+	nm1.get_net('FN',dco_FC_name,None,None,None)
+	nm1.get_net('b2',buf1_name,None,None,None)
+	nm1.get_net('b3',buf1_name,None,None,None)
+	nm1.get_net('b4',buf2_name,None,None,None)
+	nm1.get_net('b5',buf3_name,None,None,None)
+	with open(outDir+'/'+dcoName+'.v','w') as wvfile:
+		lines_const=list(rvfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wvfile)
+
+
 #------------------------------------------------------------------------------
 # generates ff_dco
 #------------------------------------------------------------------------------
-def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name, dcocp_version, welltap_dim, welltap_xc,ND):
+def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name, dcocp_version, welltap_dim, welltap_xc,ND,outputDir):
 	print ('#======================================================================')
 	print('# setting up flow directory for dco')
 	print ('#======================================================================')
@@ -121,7 +240,9 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 			nm1.printline(line,wmkfile)
 	#--- generate verilog file ---
 	nm1=txt_mds.netmap()
-	if single_ended==0:
+	if platform=='gf12lp':
+		shutil.copyfile(outputDir+'/'+dcoName+'.v',flowDir+'/src/'+dcoName+'.v')	
+	elif single_ended==0:
 		rvfile=open(formatDir+'/form_dco.v','r')
 		if edge_sel==1:
 			nm1.get_net('IE','INCLUDE_EDGE_SEL',None,None,None)
@@ -173,10 +294,11 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 		nm1.get_net('cN',dco_CC_name,None,None,None)
 		nm1.get_net('Cn',dco_CC_name,None,None,None)
 		nm1.get_net('NF',dco_FC_name,None,None,None)
-	with open(flowDir+'src/'+dcoName+'.v','w') as wvfile:
-		lines_const=list(rvfile.readlines())
-		for line in lines_const:
-			nm1.printline(line,wvfile)
+	if platform!='gf12lp':
+		with open(flowDir+'src/'+dcoName+'.v','w') as wvfile:
+			lines_const=list(rvfile.readlines())
+			for line in lines_const:
+				nm1.printline(line,wvfile)
 	#--- generate dc.filelist.tcl
 	rflfile=open(formatDir+'/form_dco_dc.filelist.tcl','r')
 	nm1=txt_mds.netmap()
@@ -260,7 +382,7 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 	if single_ended==0: 
 		editPin_gen(ndrv,ncc,nfc,nstg,formatDir,wfile_name)
 	elif single_ended==1: 
-		editPin_gen_se(ndrv,ncc,nfc,nstg,formatDir,wfile_name)
+		editPin_gen_se(ndrv,ncc,nfc,nstg,formatDir,wfile_name,platform)
 	print ('#======================================================================')
 	print('# ready for synth & apr')
 	print ('#======================================================================')
@@ -276,15 +398,16 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 		p = sp.Popen(['make','synth'], cwd=flowDir)
 		p.wait()
 	# read total estimated area of controller (it doesn't include the aux-cells)
-		with open(flowDir + '/reports/dc/' + dcoName + '.mapped.area.rpt', \
-			  'r')as file:
-		   filedata = file.read()
-		m = re.search('Total cell area: *([0-9.]*)', filedata)
-		if m:
-		   coreCellArea = float(m.group(1))
-		   print('estimated area after synthesis is: %e'%(coreCellArea))
-		else:
-		   print ('Synthesis Failed')
+		if bleach==1:
+			with open(flowDir + '/reports/dc/' + dcoName + '.mapped.area.rpt', \
+				  'r')as file:
+			   filedata = file.read()
+			m = re.search('Total cell area: *([0-9.]*)', filedata)
+			if m:
+			   coreCellArea = float(m.group(1))
+			   print('estimated area after synthesis is: %e'%(coreCellArea))
+			else:
+			   print ('Synthesis Failed')
 
 	if apr==1:
 		p = sp.Popen(['make','design'], cwd=flowDir)
@@ -298,9 +421,14 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 		
 		p = sp.Popen(['make','export'], cwd=flowDir)
 		p.wait()
+		
+		if platform=='gf12lp':
+			for file in glob.glob(flowDir+'/results/calibre/lvs/_'+dcoName+'*.sp'):
+				shutil.copy(file, flowDir+'/export/'+dcoName+'.cdl')
 
-		p = sp.Popen(['cp',dcoName+'_cutObs.lef','export/'+dcoName+'.lef'], cwd=flowDir)
-		p.wait()
+		if platform=='tsmc65lp':
+			p = sp.Popen(['cp',dcoName+'_cutObs.lef','export/'+dcoName+'.lef'], cwd=flowDir)
+			p.wait()
 	return W_dco, H_dco	
 
 #------------------------------------------------------------------------------
@@ -353,7 +481,7 @@ def outbuff_div_flow(formatDir,flowDir,bufName,platform,bleach,design):
 		p = sp.Popen(['cp','results/innovus/'+'outbuff_div_cutObs.lef','export/outbuff_div.lef'], cwd=flowDir)
 		p.wait()
 
-def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc):
+def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc,FCW,vco_per,outputDir):
 	print ('#======================================================================')
 	print ('# setting up flow directory for pdpll')
 	print ('#======================================================================')
@@ -365,10 +493,10 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 	shutil.copyfile(formatDir+'pdpll_dc.read_design.tcl',flowDir+'/scripts/dc/dc.read_design.tcl')	
 	shutil.copyfile(formatDir+'pdpll_dc_setup.tcl',flowDir+'/scripts/dc/dc_setup.tcl')	
 	shutil.copyfile(formatDir+'pdpll_report_timing.tcl',flowDir+'/scripts/dc/report_timing.tcl')	
-	shutil.copyfile(formatDir+'dco_floorplan.tcl',flowDir+'/scripts/innovus/floorplan.tcl')	
+	shutil.copyfile(formatDir+platform+'_floorplan.tcl',flowDir+'/scripts/innovus/floorplan.tcl')	
 	shutil.copyfile(formatDir+platform+'_pdpll_power_intent.cpf',flowDir+'/scripts/innovus/power_intent.cpf')	
 	shutil.copyfile(formatDir+'pdpll_pre_init.tcl',flowDir+'/scripts/innovus/pre_init.tcl')	
-	shutil.copyfile(formatDir+'pdpll_post_init.tcl',flowDir+'/scripts/innovus/post_init.tcl')	
+	shutil.copyfile(formatDir+platform+'_pdpll_post_init.tcl',flowDir+'/scripts/innovus/post_init.tcl')	
 	shutil.copyfile(formatDir+platform+'_pdpll_pre_place.tcl',flowDir+'/scripts/innovus/pre_place.tcl')	
 	shutil.copyfile(formatDir+'pdpll_pre_route.tcl',flowDir+'/scripts/innovus/pre_route.tcl')	
 	shutil.copyfile(formatDir+'pdpll_post_postroute.tcl',flowDir+'/scripts/innovus/post_postroute.tcl')	
@@ -390,6 +518,83 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 	dco_ex_list=['.cdl','.lef','.gds','_typ.lib']	
 	if os.path.isdir(flowDir+'blocks/'+dcoName+'/export')==0:
 		shutil.copytree(dco_flowDir+'export',flowDir+'blocks/'+dcoName+'/export')
+
+	#--- get DCO pin location
+	if platform=='gf12lp':
+		#shutil.copyfile(formatDir+'gf12lp_pdpllPowerPlanGf12.tcl',flowDir+'/scripts/innovus/pdpllPowerPlanGf12.tcl')	
+		dcoLefFile = open(flowDir+'blocks/'+dcoName+'/export/'+dcoName+'.lef','r')
+		lines_lef = list(dcoLefFile.readlines())
+		VDD_flag=0
+		OBS_flag=0
+		OBS_H2_flag=0
+		END_flag=0
+		H2_flag=0
+		xy_found=0
+		delete_line =0
+		write_lines=[]
+		for line in lines_lef:
+			words = line.split()
+			if len(words)>0:
+				if OBS_flag==0 and words[0]=='OBS':
+					print('INFO: OBS found in dco lef file')
+					OBS_flag=1
+				elif OBS_flag==1 and OBS_H2_flag==1 and END_flag==0:
+					if words[0]!='RECT':
+						END_flag=1
+						delete_line =0
+			if len(words)>1:
+				if VDD_flag==0:
+					if words[0]=='PIN' and words[1]=='VDD':
+						print('INFO: PIN VDD found in dco lef file')
+						VDD_flag=1
+				elif H2_flag==0:
+					if words[1]=='H2':
+						H2_flag=1
+				elif H2_flag==1 and xy_found==0:
+					pin_llx = float(words[1])	
+					pin_lly = float(words[2])		
+					pin_urx = float(words[3])		
+					pin_ury = float(words[4])
+					print('pin coordinates: (%.3f, %.3f) ~ (%.3f, %.3f)'%(pin_llx,pin_lly,pin_urx,pin_ury))
+					xy_found=1
+
+				#elif OBS_flag==0:
+				elif OBS_flag==1 and OBS_H2_flag==0:
+					if words[1]=='H2':
+						print('INFO: H2 layer found in OBS')
+						OBS_H2_flag=1
+						#delete_line =1
+						delete_line =0
+				elif END_flag==1:
+					delete_line =0
+			# append lines except when delete_line==1 
+			if delete_line==0:
+				write_lines.append(line)	
+		with open(flowDir+'blocks/'+dcoName+'/export/'+dcoName+'.lef','w') as wlef:
+			for line in write_lines:
+				wlef.write(line)
+
+
+		rpp=open(formatDir+'/form_'+platform+'_pdpllPowerPlan.tcl','r')
+		nm1=txt_mds.netmap()
+		nm1.get_net('vo',None,pin_llx,pin_llx,1)
+		with open(flowDir+'scripts/innovus/pdpllPowerPlanGf12.tcl','w') as wpp:
+			lines_pp=list(rpp.readlines())
+			for line in lines_pp:
+				nm1.printline(line,wpp)
+
+
+		rpp=open(formatDir+'/form_'+platform+'_pdpll_pre_place.tcl','r')
+		nm1=txt_mds.netmap()
+		nm1.get_net('lx',None,pin_llx,pin_llx,1)
+		nm1.get_net('ly',None,pin_lly,pin_lly,1)
+		nm1.get_net('ux',None,pin_urx,pin_urx,1)
+		nm1.get_net('uy',None,pin_ury,pin_ury,1)
+		with open(flowDir+'scripts/innovus/pre_place.tcl','w') as wpp:
+			lines_pp=list(rpp.readlines())
+			for line in lines_pp:
+				nm1.printline(line,wpp)
+
 	#--- copy exports from outbuff_div ---
 	if outbuff_div==1:
 		spfiles=glob.iglob(os.path.join(outbuff_div_flowDir+'results/calibre/lvs/','*.sp'))
@@ -420,44 +625,55 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 		p = sp.Popen(['make','bleach_all'], cwd=flowDir)
 		p.wait()
 	
-	#--- generate verilog file ---
-	rvfile=open(formatDir+'/form_pdpll.v','r')
-	nm1=txt_mds.netmap()
-	if outbuff_div==1:
-		nm1.get_net('IO','INCLUDE_OUTBUFF_DIV',None,None,None)
-	else:
-		nm1.get_net('IO','EXCLUDE_OUTBUFF_DIV',None,None,None)
-	nm1.get_net('iN',pll_name,None,None,None)
-	nm1.get_net('nM',None,nstg,nstg,1)
-	nm1.get_net('nD',None,ndrv,ndrv,1)
-	nm1.get_net('nF',None,nfc,nfc,1)
-	nm1.get_net('nC',None,ncc,ncc,1)
-	nm1.get_net('dN',dcoName+'',None,None,None)
-	for bcnt in range (1,7):
-		nm1.get_net('b%d'%(bcnt),buf_small,None,None,None)
-	nm1.get_net('B1',buf_big,None,None,None)
-	nm1.get_net('df',tdc_dff,None,None,None)
-	with open(flowDir+'src/'+pll_name+'.v','w') as wvfile:
-		lines_const=list(rvfile.readlines())
-		for line in lines_const:
-			nm1.printline(line,wvfile)
+	#--- generate verilog file : need to clean it up to be technology agnostic 
+	if platform=='tsmc65lp':
+		rvfile=open(formatDir+'/form_pdpll.v','r')
+		nm1=txt_mds.netmap()
+		if outbuff_div==1:
+			nm1.get_net('IO','INCLUDE_OUTBUFF_DIV',None,None,None)
+		else:
+			nm1.get_net('IO','EXCLUDE_OUTBUFF_DIV',None,None,None)
+		nm1.get_net('iN',pll_name,None,None,None)
+		nm1.get_net('nM',None,nstg,nstg,1)
+		nm1.get_net('nD',None,ndrv,ndrv,1)
+		nm1.get_net('nF',None,nfc,nfc,1)
+		nm1.get_net('nC',None,ncc,ncc,1)
+		nm1.get_net('dN',dcoName+'',None,None,None)
+		for bcnt in range (1,7):
+			nm1.get_net('b%d'%(bcnt),buf_small,None,None,None)
+		nm1.get_net('B1',buf_big,None,None,None)
+		nm1.get_net('df',tdc_dff,None,None,None)
+		with open(flowDir+'src/'+pll_name+'.v','w') as wvfile:
+			lines_const=list(rvfile.readlines())
+			for line in lines_const:
+				nm1.printline(line,wvfile)
+	elif platform=='gf12lp':
+		shutil.copyfile(outputDir+'/'+pll_name+'.sv',flowDir+'/src/'+pll_name+'.sv')	
+		shutil.copyfile(outputDir+'/tdc_counter.sv',flowDir+'/src/tdc_counter.sv')
+	
 	#--- generate dc.filelist.tcl
-	rflfile=open(formatDir+'/form_pdpll_dc.filelist.tcl','r')
+	rflfile=open(formatDir+'/form_'+platform+'_pdpll_dc.filelist.tcl','r')
 	nm1=txt_mds.netmap()
-	nm1.get_net('iN',pll_name+'.v',None,None,None)
+	nm1.get_net('iN',pll_name,None,None,None)
 	with open(flowDir+'/scripts/dc/dc.filelist.tcl','w') as wflfile:
 		lines_const=list(rflfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wflfile)
 	#--- generate constraints.tcl
-	rcfile=open(formatDir+'/form_pdpll_constraints.tcl','r')
+	rcfile=open(formatDir+'/form_'+platform+'_pdpll_constraints.tcl','r')
 	nm1=txt_mds.netmap()
-	nm1.get_net('NS',None,2*nstg-1,2*nstg-1,1)
-	nm1.get_net('nS',None,2*nstg-1,2*nstg-1,1)
+	if platform=='tsmc65lp':
+		nm1.get_net('NS',None,2*nstg-1,2*nstg-1,1)
+		nm1.get_net('nS',None,2*nstg-1,2*nstg-1,1)
+	elif platform=='gf12lp':
+		nm1.get_net('vp',None,vco_per*1e3,vco_per*1e3,1)
+		nm1.get_net('db',None,FCW,FCW,1)
+
 	with open(flowDir+'/scripts/dc/constraints.tcl','w') as wcfile:
 		lines_const=list(rcfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wcfile)
+
 	#--- get dco size ---
 	dco_lef=open(flowDir+'/blocks/'+dcoName+'/export/'+dcoName+'.lef','r')
 	lines_dco=list(dco_lef.readlines())
@@ -998,8 +1214,8 @@ def dco_custom_place_v2(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfine_
 			netmap1.get_net('LY',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
 			if cntf==nfine_h-1:
 				xfl_end=xcor+fine_w
-				print("xfl_end=%.3e"%(xfl_end))
-			print("%.2e, %d"%(xcor,skip))
+				#print("xfl_end=%.3e"%(xfl_end))
+			#print("%.2e, %d"%(xcor,skip))
 			
 		#---------------------------------------------
 		# place driver cells
@@ -1016,12 +1232,12 @@ def dco_custom_place_v2(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfine_
 				xtry=xcor+crs_w
 			netmap1.get_net('nd',None,cntd,cntd,1) # driver cell 
 			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
-			print("%.2e, %d"%(xcor,skip))
+			#print("%.2e, %d"%(xcor,skip))
 			netmap1.get_net('lx',None, xcor, xcor, 1) # X coordinate 
 			netmap1.get_net('ly',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
 			if cntd==ndrv-1:
 				xd_end=xcor+crs_w 
-				print("xd_end=%.3e"%(xd_end))
+				#print("xd_end=%.3e"%(xd_end))
 		#---------------------------------------------
 		# place coarse cells
 		#---------------------------------------------
@@ -1036,12 +1252,12 @@ def dco_custom_place_v2(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfine_
 				xtry=xcor+crs_w
 			netmap1.get_net('nc',None,cntc,cntc,1) # coarse cell 
 			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
-			print("%.2e, %d"%(xcor,skip))
+			#print("%.2e, %d"%(xcor,skip))
 			netmap1.get_net('Lx',None, xcor, xcor, 1) # X coordinate 
 			netmap1.get_net('Ly',None,yoff+ig*crs_h,yoff+ig*crs_h,1) # Y coordinate
 			if cntc==ncrs-1:
 				xc_end=xcor+crs_w 
-				print("xc_end=%.3e"%(xc_end))
+				#print("xc_end=%.3e"%(xc_end))
 		#---------------------------------------------
 		# place right fine cells
 		#---------------------------------------------
@@ -1116,7 +1332,7 @@ def dco_custom_place_v2p5(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfin
 				netmap1.get_net('DY',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
 				if cntd==int(ND/4)-1:
 					xdc_end=xcor+crs_w
-					print("xdc_end=%.3e"%(xdc_end))
+					#print("xdc_end=%.3e"%(xdc_end))
 #				print("%.2e, %d"%(xcor,skip))
 		#---------------------------------------------
 		# place left fine cells
@@ -1135,7 +1351,7 @@ def dco_custom_place_v2p5(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfin
 					xtry=xoff
 				elif ND>0:
 					xtry=xdc_end+fine_w*nspace
-					print("ND is greater than 0. fine cells starting from %.3e"%(xtry))
+					#print("ND is greater than 0. fine cells starting from %.3e"%(xtry))
 			else:
 				xtry=xcor+fine_w
 			xcor,skip=xcorCal_skipwt(xtry, fine_w, welltap_w, welltap_xc, fine_w)
@@ -1145,8 +1361,8 @@ def dco_custom_place_v2p5(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfin
 			netmap1.get_net('LY',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
 			if cntf==nfine_h_h-1:
 				xfl_end=xcor+fine_w
-				print("xfl_end=%.3e"%(xfl_end))
-			print("%.2e, %d"%(xcor,skip))
+				#print("xfl_end=%.3e"%(xfl_end))
+			#print("%.2e, %d"%(xcor,skip))
 			
 		#---------------------------------------------
 		# place driver cells
@@ -1271,14 +1487,14 @@ def xcorCal_skipwt ( cell_xc, cell_w, welltap_w, welltap_xc, xoff):
 
 
 
-def editPin_gen_se(Ndrv,Ncc,Nfc,Nstg,formatDir,wfile_name):
+def editPin_gen_se(Ndrv,Ncc,Nfc,Nstg,formatDir,wfile_name,platform):
 	nCC=Ncc*Nstg
 	nFC=Nfc*Nstg
 	nPout=Nstg*2
 	
 	#rfile=open(formatDir+'/form_floorplan_test.tcl','r')
 	#rfile=open('ignore_form_floorplan.tcl','r')
-	rfile=open(formatDir+'/form_dco_pre_place_se.tcl','r')
+	rfile=open(formatDir+'/form_'+platform+'_dco_pre_place_se.tcl','r')
 	wfile=open(wfile_name,'w')
 	
 	#========================================================================
@@ -1293,19 +1509,31 @@ def editPin_gen_se(Ndrv,Ncc,Nfc,Nstg,formatDir,wfile_name):
 	nm2=txt_mds.netmap()
 	
 	#--- distribute PH_P_OUT, PH_N_OUT ---
-	nm2.get_net('po',None,0,Nstg//2,1)
-	nm2.get_net('Po',None,Nstg//2+1,Nstg-1,1)
-	
+	if platform=='tsmc65lp':
+		nm2.get_net('po',None,0,Nstg//2,1)
+		nm2.get_net('Po',None,Nstg//2+1,Nstg-1,1)
+	elif platform=='gf12lp':
+		nm2.get_net('po',None,0,Nstg-1,1)
+
+	Nfc_h = int(Nstg*Nfc/2)
+	Nfc_rem = Nstg*Nfc - Nfc_h	
+	Ncc_h = int(Nstg*Ncc/2)	
+	Ncc_rem = Nstg*Ncc - Ncc_h	
 	lines=list(rfile.readlines())
-	istg=0
+	iline=0
 	for line in lines:
-		if line[0:2]=='@E': 
+		if line[0:2]=='@E':
 			nm1=txt_mds.netmap()
-			nm1.get_net('f1','FC[',istg,istg+Nstg*(Nfc-1),Nstg)
-			nm1.get_net('fb','FCB[',istg,istg+Nstg*(Nfc-1),Nstg)
-			nm1.get_net('c1','CC[',istg,istg+Nstg*(Ncc-1),Nstg)
+			if iline==0: 
+				nm1.get_net('f1','FC[',iline*Nfc_h,iline*Nfc_h+(Nfc_h-1),1)
+				nm1.get_net('fb','FCB[',iline*Nfc_h,iline*Nfc_h+(Nfc_h-1),1)
+				nm1.get_net('c1','CC[',iline*Ncc_h,iline*Ncc_h+(Ncc_h-1),1)
+			else: 
+				nm1.get_net('f1','FC[',iline*Nfc_h,Nstg*Nfc-1,1)
+				nm1.get_net('fb','FCB[',iline*Nfc_h,Nstg*Nfc-1,1)
+				nm1.get_net('c1','CC[',iline*Ncc_h,Nstg*Ncc-1,1)
 			nm1.printline(line,wfile)
-			istg=istg+1
+			iline=iline+1
 		else:
 			nm2.printline(line,wfile)
 

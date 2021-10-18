@@ -70,7 +70,10 @@ def config_parse(outMode,configFile,platform):
 			print('Error: calibre rules directory is not properly read')
 			sys.exit(1)	
 
-	mFile = platformConfig['model_lib'] + '/pll_model.json'
+	if platform=='tsmc65lp':
+		mFile = platformConfig['model_lib'] + '/pll_model.json'
+	elif platform=='gf12lp':
+		mFile = platformConfig['model_lib'] + '/pll_pex_model_gf12lp_FCv2.json'
 
 
 	return aLib,mFile,calibreRulesDir,hspiceModel
@@ -260,7 +263,11 @@ def gen_subDirs (subDirs):
 				print('unable to create '+Dir)
 				sys.exit(1)
 
-def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform):
+def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform, vsimDir):
+	# verilog sim
+	vsimDirs_list = [vsimDir, vsimDir+'/verilog',vsimDir+'/aprVerilog']
+	gen_subDirs(vsimDirs_list)
+
 	if outMode=="macro" or outMode=="full":
 		gen_subDirs([absPvtDir_plat])
 

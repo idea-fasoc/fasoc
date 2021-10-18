@@ -2,6 +2,7 @@ import math
 import run_pre_sim
 import run_pex_sim
 import txt_mds
+import sys
 
 #===============================================================================================
 # pass_flag, spec_range added
@@ -77,9 +78,9 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 					# and filter the ones that satisfy input spec in the order in 
 					# spec_priority
 					#===============================================================
-					print ("#=================================================================================")
-					print ('INFO: model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, pwr_mdl=%.2e, FCR=%.2f'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl,freqCoverRatio))
-					print ('INFO: model design: ndrv=%d, ncrs=%d, nfine=%d, nstg=%d'%(Nd,Nc,Nf,M))
+					#print ("#=================================================================================")
+					#print ('INFO: model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, pwr_mdl=%.2e, FCR=%.2f'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl,freqCoverRatio))
+					#print ('INFO: model design: ndrv=%d, ncrs=%d, nfine=%d, nstg=%d'%(Nd,Nc,Nf,M))
 					if modelVersion=='Beta':
 						specDic={"Fnom":Fnom_mdl,"Fmax":Fmax_mdl,"Fmin":Fmin_mdl,"Fres":Fres_mdl,"FCR":freqCoverRatio,"dco_PWR":Pwr_mdl,"IB_PN":IB_PN_mdl}
 					elif modelVersion=='Alpha' or modelVersion=='Alpha_pex':
@@ -144,6 +145,7 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 				spec_min=min(specRangeDic[spec])	
 				spec_max=max(specRangeDic[spec])	
 				specRangeDic[spec]=[spec_min,spec_max]
+		#sys.exit(1)
 	if fst_pass==[]:
 		print('!!! first spec failed !!!')
 		print('first spec range: %e ~ %e' %(min(fst_fail),max(fst_fail)))

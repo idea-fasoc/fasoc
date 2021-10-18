@@ -49,6 +49,7 @@ specIn=open('/afs/eecs.umich.edu/wics/users/kmkwon/IDEA/fasoc/fasoc/generators/p
 #------------------------------------------------------------------------------
 formatDir=absGenDir + '/formats/'
 pvtFormatDir=absPvtDir + '/formats/'
+vsimDir=absGenDir + 'verilog_sim/'
 
 absPvtDir_plat=absPvtDir+platform+'/'
 #hspiceDir=absPvtDir_plat +  '/HSPICE/'
@@ -163,7 +164,7 @@ num_core=4
 hspice=1
 finesim=0
 
-preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform)
+preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform,vsimDir)
 dco_CC_name,dco_FC_name=preparations.aux_copy_export(dco_flowDir,dco_CC_lib,dco_FC_lib)
 
 #---------------------------------------------------------------------------------------

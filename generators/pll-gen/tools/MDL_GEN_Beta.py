@@ -46,6 +46,7 @@ aLib,mFile,calibreRulesDir,hspiceModel=preparations.config_parse(outMode,configF
 #------------------------------------------------------------------------------
 formatDir=absGenDir + '/formats/'
 pvtFormatDir=absPvtDir + '/formats/'
+vsimDir=absGenDir + 'verilog_sim/'
 
 absPvtDir_plat=absPvtDir+platform+'/'
 #hspiceDir=absPvtDir_plat +  '/HSPICE/'
@@ -175,7 +176,7 @@ num_core=4
 hspice=1
 finesim=0
 
-preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform)
+preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform,vsimDir)
 
 dco_CC_name,dco_FC_name=preparations.aux_copy_export(dco_flowDir,dco_CC_lib,dco_FC_lib)
 
@@ -292,9 +293,9 @@ gen_model=1
 
 tapeout_mode=0
 bleach=0
-synth=1
-apr=1
-pex=1
+synth=0
+apr=0
+pex=0
 tb_netlist=1
 lvs=0
 ninterp=2
@@ -331,6 +332,8 @@ if run_flow==1:
 	run_pex_sim.gen_mkfile_pex(pvtFormatDir,hspiceDir,pex_resDir,pex_tbDir,num_core,dcoNames,tech_node,finesim)
 
 # Run spice sim manually
+p=sp.Popen(['make','pex_finesim12'])
+p.wait()
 
 if gen_model==1:
 	#------------------------------------------------------------------------------

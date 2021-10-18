@@ -1,0 +1,31 @@
+#!/bin/bash
+irun    -64bit      \
+        -elaborate  \
+        -sv         \
+        -sem2009    \
+        -sysv_ext +.vh \
+        -access +rwc    \
+        -timescale 1ps/1fs \
+        -f ./flist_beh.f   \
+        -l irun_comp.log
+
+	#-define BEH  \
+	#-tfile embtdc_dis.tfile \
+	#-notimingcheck	\
+	#-define TDC_APR  \
+	#-define APR \
+	#-define SYN  \
+
+irun    -64bit      \
+        -R          \
+        -sv         \
+        -sem2009    \
+        -access +rwc    \
+        -input dump_irun.tcl \
++delay_mode_unit \
+        -timescale 1ps/1fs \
+        -l irun_run.log
+
+
+
+#diff goldenbrick/gb_out_mult_add_res_reuse.txt ./testbench_mult_add_res_reuse.txt | tee ./diff_functional_mult_add_res_reuse.txt #5

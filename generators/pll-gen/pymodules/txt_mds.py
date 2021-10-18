@@ -142,9 +142,12 @@ class netmap:
 		try:  #incase it's already in the netmap => same as add_val
 			varidx=self.flag.index(flag)
 			if start!=None:
-				nval=abs(int((end-start+step/10)//step+1))
-				for i in range(1,nval+1):
-					self.map[varidx].append(start+step*(i-1))
+				try:
+					nval=abs(int((end-start+step/10)//step+1))
+					for i in range(1,nval+1):
+						self.map[varidx].append(start+step*(i-1))
+				except:
+					self.map[varidx].append(start)
 			else:
 				for i in range(1,step+1):
 					self.map[varidx].append(end)
@@ -167,10 +170,14 @@ class netmap:
 				self.name[self.nn]=1
 			self.map[self.nn]=list([netname])
 			self.flag[self.nn]=(flag)
-			if start!=None and start!='d2o' and start!='d2oi':    #normal n1 n2 n3 ... 
-				self.nnet[self.nn]=int((end-start+step/10)//step+1)
-				for i in range(1,self.nnet[self.nn]+1):
-					self.map[self.nn].append(start+step*(i-1))
+			if start!=None and start!='d2o' and start!='d2oi':    #normal n1 n2 n3 ...
+				try: 
+					self.nnet[self.nn]=int((end-start+step/10)//step+1)
+					for i in range(1,self.nnet[self.nn]+1):
+						self.map[self.nn].append(start+step*(i-1))
+				except:
+					self.map[self.nn].append(start)
+					
 			elif start=='d2o':                    #decimal to binary
 				for i in range(0,end):
 					if step-i>0:

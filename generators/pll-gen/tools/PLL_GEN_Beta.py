@@ -50,7 +50,7 @@ aLib,mFile,calibreRulesDir,hspiceModel=preparations.config_parse(outMode,configF
 #========================================================
 #	public directories
 #--------------------------------------------------------
-verilogSimDir=absGenDir + 'verilog_sim/'
+vsimDir=absGenDir + 'verilog_sim/'
 verilogSrcDir=absGenDir + 'verilogs/'
 formatDir=absGenDir + 'formats/'
 
@@ -69,6 +69,7 @@ finesimDir = absPvtDir_plat + 'FINESIM/'
 pll_flowDir = absPvtDir_plat + 'flow_pdpll/'
 dco_flowDir = absPvtDir_plat + 'flow_dco/'
 outbuff_div_flowDir = absPvtDir_plat + 'flow_outbuff_div/'
+
 #outbuff_div_flowDir = pvtFormatDir +platform+ '_flow_outbuff_div/'
 
 if platform=='tsmc65lp':
@@ -118,6 +119,9 @@ elif platform=='gf12lp':
 	edge_sel=0
 	buf_small='BUFH_X2N_A10P5PP84TR_C14'
 	buf_big='BUFH_X8N_A10P5PP84TR_C14'
+	buf1_name='BUFH_X8N_A10P5PP84TR_C14'
+	buf2_name='BUFH_X10N_A10P5PP84TR_C14'
+	buf3_name='BUFH_X10N_A10P5PP84TR_C14'
 	bufz='placeHolder'
 	min_p_rng_l= 4
 	min_p_str_l= 5
@@ -131,14 +135,16 @@ elif platform=='gf12lp':
 	tdc_dff='DFFRPQL_X1N_A10P5PP84TR_C14'
 	H_stdc=0.672
 	custom_lvs=0
-	cust_place=0
-	single_ended=0
-	FC_half=0
-	CC_stack=2
+	cust_place=1
+	single_ended=1
+	FC_half=1
+	CC_stack=3
 	pex_spectre=0
 	vdd=[0.8]
-	dead_CC=0
+	dead_CC=8
 	cp_version=2 # custom_place version
+	dco_CC_name = 'dco_CC_se_3st'
+	dco_FC_name = 'dco_FC_se2_half'
 	welltap_dim=[0.924, 0.672]
 	welltap_xc=[50,95]
 if single_ended==0:
@@ -152,14 +158,14 @@ else:
 	if FC_half==0:
 		dco_FC_lib=aLib+'/dco_FC_se/latest/'
 	elif FC_half==1:
-		dco_FC_lib=aLib+'/dco_FC_se_half/latest/'
+		dco_FC_lib=aLib+'/dco_FC_se2_half/latest/'
 #========================================================
 # generate directory tree 
 #========================================================
 print ('#======================================================================')
 print ('# check directory tree and generate missing directories')
 print ('#======================================================================')
-preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform)
+preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform,vsimDir)
 
 #--------------------------------------------------------
 # check for private directory 
@@ -195,6 +201,7 @@ if jsonSpec['generator'] != 'pll-gen':
 
 try:
 	designName = jsonSpec['module_name']
+	Fref = float(jsonSpec['specifications']['frequency']['reference']) # 10/12/21
 	Fnom_min = float(jsonSpec['specifications']['frequency']['nom_min'])
 	Fnom_max = float(jsonSpec['specifications']['frequency']['nom_max'])
 	Fmax = float(jsonSpec['specifications']['frequency']['max'])
@@ -207,7 +214,8 @@ try:
 		spec_priority={"Fnom":"dummy","IB_PN":"lo","Fmax":"hi","Fmin":"lo","Fres":"lo","FCR":"hi","dco_PWR":"lo"}					
 	except:
 		IB_PN=-200 # in case not specified: use dummy value 
-		spec_priority={"Fnom":"dummy","Fmax":"hi","Fmin":"lo","Fres":"lo","FCR":"hi","dco_PWR":"lo"}					
+		#spec_priority={"Fnom":"dummy","Fmax":"hi","Fmin":"lo","Fres":"lo","FCR":"hi","dco_PWR":"lo"}					
+		spec_priority={"FCR":"hi","Fnom":"dummy","Fmax":"hi","Fmin":"lo","Fres":"lo","dco_PWR":"lo"}					
 except:
 	print('Error: wrong categories in spec.json, refer to provided example')
 	sys.exit(1)	
@@ -272,10 +280,15 @@ print ('#======================================================================'
 
 # design space definition: [start,end,step]
 Ndrv_range=[2,42,2]
-Nfc_range=[10,40,2]
+Nfc_range=[10,60,2]
 Ncc_range=[10,40,2]
-Nstg_range=[4,32,2]
-ND=0
+
+if single_ended==1:
+	Nstg_range=[5,39,2]
+else:
+	Nstg_range=[4,28,2]
+
+ND=dead_CC
 temp=[25]
 
 pass_flag,passed_designs,passed_specs,specRangeDic=modeling.design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN,dco_PWR,CF,Cf,Cc,mult_Con,mult_Coff,Iavg_const,PN_const,vdd,Ndrv_range,Nfc_range,Ncc_range,Nstg_range,A_CC,A_FC,modelVersion, FC_half, dead_CC, ND)
@@ -314,7 +327,7 @@ if pass_flag==1:
 	#------------------------------------------------------------------------------
 	# write output json file 
 	#------------------------------------------------------------------------------
-	jsonSpec['results']={'platform': 'tsmc65lp'}			
+	jsonSpec['results']={'platform': platform}			
 	jsonSpec['results']['frequency']={'nom': Fnom_mdl}			
 #	jsonSpec['results']['frequency'].update({'nom':Fnom_mdl})	
 	jsonSpec['results']['frequency'].update({'max':Fmax_mdl})	
@@ -331,7 +344,7 @@ if pass_flag==1:
 
 elif pass_flag==0:
 	print("writing failed result.json")
-	jsonSpec['results']={'platform': 'tsmc65lp'}			
+	jsonSpec['results']={'platform': platform}			
 	for spec in specRangeDic:
 		if specRangeDic[spec]==[]: # passed
 			jsonSpec['results'].update({spec:"passed"})	
@@ -342,19 +355,24 @@ elif pass_flag==0:
 	with open(outputDir+'/pll_spec_out.json','w') as resultSpecfile:
 		json.dump(jsonSpec, resultSpecfile, indent=True)
 
+	sys.exit(1)
 #--------------------------------------------------------
 # set default values (Alpha version)
 # derive vco period, FCW
 #--------------------------------------------------------
-Fref=10e6
-Kp_o_Ki=100
+#Fref=10e6
+#Kp_o_Ki=100
+Kp_o_Ki=16
 relBW=0.1
 FCW=np.floor(Fnom_mdl/Fref)+1
 FCW=int(FCW)
+Fcenter = FCW*Fref
 print('FCW=%d'%(FCW))
 Fbase=Fmin_mdl # this should be the Fmin_mdl
 dFf=Fres_mdl
 dFc=dFf*Ndrv*Nfc/FCR_mdl
+Kp = 2*3.14*relBW*Fref/Fres_mdl/2 # 2 is for fractional bit mismatch in the controller 
+Ki = Kp/Kp_o_Ki
 
 vco_per=1/(Fref*FCW)/1e-9 # unit: ns
 max_per=vco_per*3.125 #??
@@ -366,21 +384,34 @@ max_per=vco_per*3.125 #??
 pll_name=designName
 dcoName=pll_name+'_dco'
 bufName='outbuff_div'
-run_digital_flow.pll_verilog_gen(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform)
+# verilog-sim
+simOptions = ['BEH_SIM','SHORT_SIM','DCO_FC_HALF']
+tdc_width = int(np.floor(np.log2(Nstg*2)) + 2)
+
+
+if platform=='tsmc65lp':
+	run_digital_flow.pll_verilog_gen(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform)
+else:
+	run_digital_flow.pll_verilog_gen_v2(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform,ND,dco_CC_name,dco_FC_name,buf1_name,buf2_name,buf3_name,tdc_width,Fcenter,Fbase,dFc,dFf)
+	run_pre_sim.run_pre_vsim(formatDir, vsimDir, FCW, Nstg, Ncc, Nfc, simOptions,tdc_width,dcoName, designName, Fref, Kp,outputDir)
+
+sys.exit(1)
 tapeout_mode=0
+
+
 
 if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	# generate Feed Forward DCO 
 	#--------------------------------------------------------
-	dco_bleach=1 # test switch
+	dco_bleach=0 # test switch
 	dco_synth=1
 	dco_apr=1
-	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name,cp_version,welltap_dim,welltap_xc,ND)
+	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name,cp_version,welltap_dim,welltap_xc,ND,outputDir)
 	#--------------------------------------------------------
 	# generate output buffer, divider 
 	#--------------------------------------------------------
-	buf_bleach=1
+	buf_bleach=0
 	buf_design=1
 	buf_lvs=0
 	if outbuff_div==1:
@@ -393,8 +424,9 @@ if outMode=='macro' or outMode=='full':
 	pdpll_bleach=1
 	pdpll_synth=1 # test switch
 	pdpll_apr=1
-	W_dco,H_dco,W_pll,H_pll=run_digital_flow.pdpll_flow(pvtFormatDir,pll_flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,pdpll_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,pdpll_synth,pdpll_apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,pll_max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc)
+	W_dco,H_dco,W_pll,H_pll=run_digital_flow.pdpll_flow(pvtFormatDir,pll_flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,pdpll_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,pdpll_synth,pdpll_apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,pll_max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc,FCW,vco_per,outputDir)
 	A_core=W_pll*H_pll	
+	sys.exit(1)
 	#--------------------------------------------------------
 	# run independent lvs 
 	#--------------------------------------------------------

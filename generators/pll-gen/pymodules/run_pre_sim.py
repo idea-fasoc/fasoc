@@ -1,5 +1,17 @@
-import txt_mds
+import sys
+import getopt
+import math
+import subprocess as sp
+import fileinput
+import re
+import os
+import shutil
 import numpy as np
+import argparse
+import json
+import glob
+
+import txt_mds
 
 #====================================================================================
 # DCO netlist generation
@@ -1042,3 +1054,89 @@ def gen_mkfile_v2(format_dir,hspiceDir,ncell,ndrv,nfc,nstg,rf_ready,num_core,res
 					line=line[3:len(line)]
 			netmap1.printline(line,w_file)	
 	print(hspiceDir+'hspicesim.mk ready')
+
+
+def run_pre_vsim(formatDir, vsimDir, FCW, nstg, ncc, nfc, simOptions,tdc_width,dcoName, designName, Fref, Kp, outDir):
+	shutil.copyfile(outDir+'/FUNCTIONS.v',vsimDir+'/verilog/functions.v')	
+	shutil.copyfile(outDir+'/ssc_generator.v',vsimDir+'/verilog/ssc_generator.v')	
+	shutil.copyfile(outDir+'/pll_controller.sv',vsimDir+'/verilog/pll_controller.sv')	
+	shutil.copyfile(outDir+'/tdc_counter.sv',vsimDir+'/verilog/tdc_counter.sv')
+	shutil.copyfile(outDir+'/'+designName+'.sv',vsimDir+'/verilog/'+designName+'.sv')
+	# dump_irun.tcl
+	shutil.copyfile(formatDir+'/form_dump_irun.tcl',vsimDir+'/dump_irun.tcl')
+	shutil.copyfile(formatDir+'/form_dco_model_noise.v',vsimDir+'/verilog/dco_model_noise.v')
+	shutil.copy(formatDir+'/:run',vsimDir)
+
+	#-------------------------------------------------------------------------
+	# write analog_core.v 
+	#-------------------------------------------------------------------------
+	r_file=open(formatDir+"/form_analog_core.v","r")
+	lines=list(r_file.readlines())
+	netmap1=txt_mds.netmap()
+	netmap1.get_net('DN',None,dcoName,dcoName,1)   
+	with open(vsimDir+"/verilog/analog_core.v","w") as w_file:
+		for line in lines:
+			netmap1.printline(line,w_file)
+
+	#-------------------------------------------------------------------------
+	# write flist_beh.f 
+	#-------------------------------------------------------------------------
+	r_file=open(formatDir+"/form_flist_beh.f","r")
+	lines=list(r_file.readlines())
+	netmap1=txt_mds.netmap()
+	netmap1.get_net('dn',None,designName,designName,1)   
+	with open(vsimDir+"/flist_beh.f","w") as w_file:
+		for line in lines:
+			netmap1.printline(line,w_file)
+
+	#-------------------------------------------------------------------------
+	# write :run 
+	#-------------------------------------------------------------------------
+	#r_file=open(formatDir+"/form_run","r")
+	#lines=list(r_file.readlines())
+	#netmap1=txt_mds.netmap()
+	#netmap1.get_net('fl','flist_beh',None,None,1)   
+	#with open(vsimDir+"/:run","w") as w_file:
+	#	for line in lines:
+	#		netmap1.printline(line,w_file)
+
+	#-------------------------------------------------------------------------
+	# write tb_pll_top.sv
+	#-------------------------------------------------------------------------
+	r_file=open(formatDir+"/form_tb_pll_top.sv","r")
+	lines=list(r_file.readlines())
+	#w_file=open("./Makefile","w")
+
+	#print (result_exist)
+	netmap1=txt_mds.netmap()
+	for option in simOptions:
+		netmap1.get_net('vo',None,option,None,1)
+	netmap1.get_net('rf',None,Fref,Fref,1)   
+	netmap1.get_net('kp',None,Kp,Kp,1)   
+	netmap1.get_net('fc',None,FCW,FCW,1)   
+	netmap1.get_net('ns',None,nstg,nstg,1) 
+	netmap1.get_net('nc',None,ncc,ncc,1)   
+	netmap1.get_net('nf',None,nfc,nfc,1)   
+	netmap1.get_net('ew',None,tdc_width,tdc_width,1)   
+	netmap1.get_net('pn',designName,None,None,1)   
+
+	# EMBTDC_LUT
+	max_val = 2**tdc_width
+	lsb_real = max_val/(2*nstg)
+	for idx in range(2*nstg):
+		lut_val=int(round(lsb_real*idx))
+		netmap1.get_net('ei',None,idx,idx,1)   
+		netmap1.get_net('ev',None,lut_val,lut_val,1)   
+
+	fine_lock_th = int(lsb_real*2) 
+	freq_lock_th = int(lsb_real*4*nstg) 
+	netmap1.get_net('fT',None,fine_lock_th,fine_lock_th,1)   
+	netmap1.get_net('FT',None,freq_lock_th,freq_lock_th,1)   
+		
+	with open(vsimDir+"/verilog/tb_pll_top.sv","w") as w_file:
+		for line in lines:
+			netmap1.printline(line,w_file)
+
+	# print message
+	print('INFO: verilog simulation ready in '+vsimDir)
+	 

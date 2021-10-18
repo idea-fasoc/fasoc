@@ -413,13 +413,23 @@ def gen_tb_wrapped(hspiceModel,tb_dir,format_dir,ncell,ndrv,nfc,nstg,vdd,temp,fc
 				var_list[i-1][6]=[N_ctrl_cc,0,vm2.comblist[0][i],vm2.comblist[1][i]]
 		elif FC_half==1:
 			for i in range(1,len(vm2.comblist[0])):
-				var_list[i-1][0]=[0,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
-				var_list[i-1][1]=[0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
-				var_list[i-1][2]=[1,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
-				var_list[i-1][3]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
-				var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
-				var_list[i-1][5]=[N_ctrl_cc//2,N_ctrl_fc//2+1,vm2.comblist[0][i],vm2.comblist[1][i]]
-				var_list[i-1][6]=[N_ctrl_cc,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				#var_list[i-1][0]=[0,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				#var_list[i-1][1]=[0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				#var_list[i-1][2]=[1,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				#var_list[i-1][3]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				#var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				#var_list[i-1][5]=[N_ctrl_cc//2,N_ctrl_fc//2+1,vm2.comblist[0][i],vm2.comblist[1][i]]
+				#var_list[i-1][6]=[N_ctrl_cc,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][0]=[0,N_ctrl_fc,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][1]=[0,0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][2]=[1,N_ctrl_fc,N_ctrl_fc,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][3]=[N_ctrl_cc//2,N_ctrl_fc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][4]=[N_ctrl_cc//2,N_ctrl_fc//2,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][5]=[N_ctrl_cc//2,N_ctrl_fc//2+1,N_ctrl_fc//2,vm2.comblist[0][i],vm2.comblist[1][i]]
+				var_list[i-1][6]=[N_ctrl_cc,0,0,vm2.comblist[0][i],vm2.comblist[1][i]]
+
+
+				var_list[i-1][0]=[N_ctrl_cc//2,N_ctrl_fc//5,N_ctrl_fc//5,vm2.comblist[0][i],vm2.comblist[1][i]]
 	if tapeout_mode==1: # customized testing points for tapeout
 		if fc_en_type==1:
 			for i in range(1,len(vm2.comblist[0])):

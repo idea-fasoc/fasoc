@@ -78,15 +78,16 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 					# and filter the ones that satisfy input spec in the order in 
 					# spec_priority
 					#===============================================================
-					#print ("#=================================================================================")
-					#print ('INFO: model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, pwr_mdl=%.2e, FCR=%.2f'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl,freqCoverRatio))
-					#print ('INFO: model design: ndrv=%d, ncrs=%d, nfine=%d, nstg=%d'%(Nd,Nc,Nf,M))
+					print ("#=================================================================================")
+					print ('INFO: model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, pwr_mdl=%.2e, FCR=%.2f'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,Pwr_mdl,freqCoverRatio))
+					print ('INFO: model design: ndrv=%d, ncrs=%d, nfine=%d, nstg=%d'%(Nd,Nc,Nf,M))
 					if modelVersion=='Beta':
 						specDic={"Fnom":Fnom_mdl,"Fmax":Fmax_mdl,"Fmin":Fmin_mdl,"Fres":Fres_mdl,"FCR":freqCoverRatio,"dco_PWR":Pwr_mdl,"IB_PN":IB_PN_mdl}
 					elif modelVersion=='Alpha' or modelVersion=='Alpha_pex':
 						specDic={"Fnom":Fnom_mdl,"Fmax":Fmax_mdl,"Fmin":Fmin_mdl,"Fres":Fres_mdl,"FCR":freqCoverRatio,"dco_PWR":Pwr_mdl}
 					spec_depth=0
 					for spec in spec_priority:
+						#print("checking for spec:%s" %(spec))
 						if spec=="Fnom":
 							if Fnom_mdl < Fnom_max and Fnom_mdl > Fnom_min:
 								#specRangeDic["Fnom"].append("passed")
@@ -99,7 +100,7 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 								fst_fail.append(Fnom_mdl)
 								#print ('!!model specs: Fnom=%.2e, Fmax=%.2e, Fmin=%.2e, Fres=%.2e, FCR=%.2e, IB_PN=%.2f, dco_PWR=%.2e'%(Fnom_mdl,Fmax_mdl,Fmin_mdl,Fres_mdl,freqCoverRatio,IB_PN_mdl,Pwr_mdl))
 								#specRangeDic[spec].append(Fnom_mdl)
-								max_spec_depth, specRangeDic = depth_check(spec_depth,max_spec_depth,specDic,specRangeDic,empty_specRangeDic,spec)
+								#max_spec_depth, specRangeDic = depth_check(spec_depth,max_spec_depth,specDic,specRangeDic,empty_specRangeDic,spec)
 						elif fst_spec_flag==1 and itr_pass_flag==1:   # record only the first failed spec's value to specRangeDic
 							if spec_priority[spec]=="lo":
 								if specDic[spec] < inSpecDic[spec]:
@@ -109,7 +110,7 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 								else:
 									itr_pass_flag=0 
 									#specRangeDic[spec].append(specDic[spec])
-									max_spec_depth, specRangeDic = depth_check(spec_depth,max_spec_depth,specDic,specRangeDic,empty_specRangeDic,spec)
+									max_spec_depth, specRangeDic = depth_check(spec_depth,max_spec_depth,specDic,specRangeDic,empty_specRangeDic,spec,spec_priority)
 							elif spec_priority[spec]=="hi": 
 								if specDic[spec] > inSpecDic[spec]:
 									#specRangeDic[spec].append("passed")
@@ -118,7 +119,7 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 								else:
 									itr_pass_flag=0 
 									#specRangeDic[spec].append(specDic[spec])
-									max_spec_depth, specRangeDic = depth_check(spec_depth,max_spec_depth,specDic,specRangeDic,empty_specRangeDic,spec)
+									max_spec_depth, specRangeDic = depth_check(spec_depth,max_spec_depth,specDic,specRangeDic,empty_specRangeDic,spec,spec_priority)
 						else:
 							itr_pass_flag=0
 						spec_depth=spec_depth+1
@@ -149,16 +150,26 @@ def design_solution(spec_priority,Fmax,Fmin,Fres,Fnom_min,Fnom_max,FCR_min,IB_PN
 	if fst_pass==[]:
 		print('!!! first spec failed !!!')
 		print('first spec range: %e ~ %e' %(min(fst_fail),max(fst_fail)))
+		sys.exit(1)
 
 
 	return pass_flag, passed_designs, passed_specs, specRangeDic
 
-def depth_check (spec_depth,max_spec_depth,specDic,specRangeDic,empty_specRangeDic,spec):
+# =======================================================================================
+# update the max_spec_depth => empty the specRangeDic
+# append/create specRangeDic for the certain spec 
+
+def depth_check (spec_depth,max_spec_depth,specDic,specRangeDic,empty_specRangeDic,spec,spec_priority):
 	if max_spec_depth <= spec_depth:
-		if max_spec_depth < spec_depth:
+		if max_spec_depth < spec_depth: # new max depth
 			max_spec_depth=spec_depth
-			specRangeDic=empty_specRangeDic
+			#specRangeDic=empty_specRangeDic
+			for spec in spec_priority:
+				specRangeDic[spec]=[]
 		specRangeDic[spec].append(specDic[spec])
+	#print('failed: max_spec_depth=%d'%(max_spec_depth))
+	#print('specRangeDic=')
+	#print(specRangeDic)
 	return max_spec_depth, specRangeDic 			
 
 def spec_cal_freq(Nd,Nc,Nf,M,Cc,Cf,CF):

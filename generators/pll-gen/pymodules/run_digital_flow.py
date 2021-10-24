@@ -563,8 +563,8 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 					if words[1]=='H2':
 						print('INFO: H2 layer found in OBS')
 						OBS_H2_flag=1
-						#delete_line =1
-						delete_line =0
+						delete_line =1
+						#delete_line =0
 				elif END_flag==1:
 					delete_line =0
 			# append lines except when delete_line==1 

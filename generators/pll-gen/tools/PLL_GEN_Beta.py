@@ -288,6 +288,13 @@ if single_ended==1:
 else:
 	Nstg_range=[4,28,2]
 
+
+# test for desig searcher
+#Ndrv_range=[30,40,2]
+#Nfc_range=[22,24,2]
+#Ncc_range=[24,26,2]
+#Nstg_range=[5,9,2]
+
 ND=dead_CC
 temp=[25]
 
@@ -342,20 +349,24 @@ if pass_flag==1:
 	with open(outputDir+'/pll_spec_out.json','w') as resultSpecfile:
 		json.dump(jsonSpec, resultSpecfile, indent=True)
 
+
 elif pass_flag==0:
+	fail_wrote=0
 	print("writing failed result.json")
 	jsonSpec['results']={'platform': platform}			
-	for spec in specRangeDic:
-		if specRangeDic[spec]==[]: # passed
+	#for spec in specRangeDic:
+	for spec in spec_priority:
+		#if specRangeDic[spec]==[]: # passed
+		if specRangeDic[spec]==[] and fail_wrote==0: # passed
 			jsonSpec['results'].update({spec:"passed"})	
-		else:
+		elif fail_wrote==0:
 			jsonSpec['results'].update({"failed "+spec+" min":specRangeDic[spec][0]})	
-			jsonSpec['results'].update({"failed "+spec+" max":specRangeDic[spec][1]})	
+			jsonSpec['results'].update({"failed "+spec+" max":specRangeDic[spec][1]})
+			fail_wrote=1	
 			print("failed: model predicted specs generated on "+outputDir+'/pll_spec_out.json')
 	with open(outputDir+'/pll_spec_out.json','w') as resultSpecfile:
 		json.dump(jsonSpec, resultSpecfile, indent=True)
 
-	sys.exit(1)
 #--------------------------------------------------------
 # set default values (Alpha version)
 # derive vco period, FCW
@@ -368,9 +379,13 @@ FCW=np.floor(Fnom_mdl/Fref)+1
 FCW=int(FCW)
 Fcenter = FCW*Fref
 print('FCW=%d'%(FCW))
-Fbase=Fmin_mdl # this should be the Fmin_mdl
+#Fbase=Fmin_mdl # this should be the Fmin_mdl
 dFf=Fres_mdl
-dFc=dFf*Ndrv*Nfc/FCR_mdl
+if FC_half==1:
+	dFc=dFf*Nstg*Nfc*2/FCR_mdl
+else:
+	dFc=dFf*Nstg*Nfc/FCR_mdl
+Fbase=Fcenter - dFc*Ncc*Nstg/2 # this should be the Fmin_mdl
 Kp = 2*3.14*relBW*Fref/Fres_mdl/2 # 2 is for fractional bit mismatch in the controller 
 Ki = Kp/Kp_o_Ki
 

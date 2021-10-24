@@ -280,11 +280,11 @@ print ('#======================================================================'
 
 # design space definition: [start,end,step]
 Ndrv_range=[2,42,2]
-Nfc_range=[10,60,2]
-Ncc_range=[10,40,2]
+Nfc_range=[10,80,2]
+Ncc_range=[10,80,2]
 
 if single_ended==1:
-	Nstg_range=[5,39,2]
+	Nstg_range=[3,39,2]
 else:
 	Nstg_range=[4,28,2]
 
@@ -411,8 +411,6 @@ else:
 	run_pre_sim.run_pre_vsim(formatDir, vsimDir, FCW, Nstg, Ncc, Nfc, simOptions,tdc_width,dcoName, designName, Fref, Kp,outputDir)
 
 tapeout_mode=0
-
-
 
 if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------

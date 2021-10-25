@@ -294,7 +294,7 @@ module tdc_encoder (
 		parameter EMBTDC_WIDTH = 5;
 
 	// Local Paramters
-		localparam DCO_NUM_PH = 5;
+		parameter DCO_NUM_PH = 5;
 		localparam TDC_WIDTH = EMBTDC_WIDTH;
 
 	// Ports

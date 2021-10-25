@@ -112,7 +112,9 @@ module tdc_counter(
 	`endif
 
 
-	tdc_encoder	#(.EMBTDC_WIDTH	(EMBTDC_WIDTH		))
+	tdc_encoder	#(
+			.EMBTDC_WIDTH	(EMBTDC_WIDTH		),
+			.DCO_NUM_PH	(DCO_NUM_PH		))
 	 u_tdc_encoder(
 		.DCO_OUTP		(dco_outp		), //-km
 		.RST			(RST			),

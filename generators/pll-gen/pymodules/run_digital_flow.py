@@ -201,7 +201,7 @@ def pll_verilog_gen_v2(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,n
 #------------------------------------------------------------------------------
 # generates ff_dco
 #------------------------------------------------------------------------------
-def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name, dcocp_version, welltap_dim, welltap_xc,ND,outputDir):
+def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name, dcocp_version, welltap_dim, welltap_xc,ND,outputDir,synthTool,track):
 	print ('#======================================================================')
 	print('# setting up flow directory for dco')
 	print ('#======================================================================')
@@ -222,15 +222,26 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 	shutil.copyfile(formatDir+'dco_floorplan.tcl',flowDir+'/scripts/innovus/floorplan.tcl')	
 	shutil.copyfile(formatDir+'pdpll_pre_init.tcl',flowDir+'/scripts/innovus/pre_init.tcl')	
 	shutil.copyfile(formatDir+'dco_power_intent.cpf',flowDir+'/scripts/innovus/power_intent.cpf')	
-	shutil.copyfile(formatDir+platform+'_dco_post_init.tcl',flowDir+'/scripts/innovus/post_init.tcl')	
+	shutil.copyfile(formatDir+platform+'_dco_post_init.tcl',flowDir+'/scripts/innovus/post_init.tcl')
+	if platform=='gf12lp' and track==9:
+		shutil.copyfile(formatDir+platform+'_dco_post_init_9tr.tcl',flowDir+'/scripts/innovus/post_init.tcl')
 	shutil.copyfile(formatDir+'dco_pre_route.tcl',flowDir+'/scripts/innovus/pre_route.tcl')	
 	shutil.copyfile(formatDir+'dco_post_postroute.tcl',flowDir+'/scripts/innovus/post_postroute.tcl')	
 	shutil.copyfile(formatDir+'dco_post_signoff.tcl',flowDir+'/scripts/innovus/post_signoff.tcl')	
 	shutil.copyfile(formatDir+'pre_signoff.tcl',flowDir+'/scripts/innovus/pre_signoff.tcl')	
 	shutil.copyfile(formatDir+'dcoPowerPlanGf14.tcl',flowDir+'/scripts/innovus/dcoPowerPlanGf14.tcl')	
 	shutil.copyfile(formatDir+'cadre_Makefile',flowDir+'/Makefile')	
+	if synthTool=='genus': # overwrite few files if synth-tool is genus
+		shutil.copyfile(formatDir+'cadre_Makefile_genus',flowDir+'/Makefile')	
+		shutil.copyfile(formatDir+'form_dco_genus.constraints.tcl', flowDir+'/scripts/genus/constraints.tcl')
+	#	shutil.copyfile(formatDir+'form_dco_genus.filelist.tcl', flowDir+'/scripts/genus/genus.filelist.tcl')
+		shutil.copyfile(formatDir+'form_dco_genus.read_design.tcl', flowDir+'/scripts/genus/genus.read_design.tcl')
+
+
 	#--- generate  include.mk file ---
 	rmkfile=open(formatDir+'/form_include.mk','r')
+	if synthTool=='genus':
+		rmkfile=open(formatDir+'/form_include_genus.mk','r')
 	nm1=txt_mds.netmap()
 	nm1.get_net('iN',dcoName,None,None,None)
 	nm1.get_net('pf',platform,None,None,None)
@@ -238,6 +249,18 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 		lines_const=list(rmkfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wmkfile)
+
+	#--- generate genus.filelist.tcl
+	rflfile=open(formatDir+'/form_dco_genus.filelist.tcl','r')
+	nm1=txt_mds.netmap()
+	nm1.get_net('iN',dcoName+'.v',None,None,None)
+	nm1.get_net('Nc',dco_CC_name,None,None,None)
+	nm1.get_net('Nf',dco_FC_name,None,None,None)
+	with open(flowDir+'scripts/genus/genus.filelist.tcl','w') as wflfile:
+		lines_const=list(rflfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wflfile)
+
 	#--- generate verilog file ---
 	nm1=txt_mds.netmap()
 	if platform=='gf12lp':
@@ -309,6 +332,7 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 		lines_const=list(rflfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wflfile)
+
 	#--- generate constraints.tcl
 	rflfile=open(formatDir+'/form_dco_constraints.tcl','r')
 	nm1=txt_mds.netmap()
@@ -348,7 +372,7 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 			dco_custom_place(formatDir,flowDir+'scripts/innovus/',[W_CC, H_CC],[W_FC, H_FC],ncc,int(nfc/2),nstg,ndrv,nspace,nxoff,nyoff)
 		elif dcocp_version==2:
 		#	dco_custom_place_v2(formatDir,flowDir+'scripts/innovus/',[W_CC, H_CC],[W_FC, H_FC],ncc,int(nfc/2),nstg,ndrv,nspace,nxoff,nyoff,welltap_dim,welltap_xc)
-			dco_custom_place_v2p5(formatDir,flowDir+'scripts/innovus/',[W_CC, H_CC],[W_FC, H_FC],ncc,int(nfc/2),nstg,ndrv,nspace,nxoff,nyoff,welltap_dim,welltap_xc,ND)
+			dco_custom_place_v2p5(formatDir,flowDir+'scripts/innovus/',[W_CC, H_CC],[W_FC, H_FC],ncc,int(nfc/2),nstg,ndrv,nspace,nxoff,nyoff,welltap_dim,welltap_xc,ND,synthTool)
 	#--- generate setup.tcl
 	rsufile=open(formatDir+'/form_setup.tcl','r')
 	nm1=txt_mds.netmap()
@@ -1281,11 +1305,14 @@ def dco_custom_place_v2(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfine_
 			netmap1.printline(line,w_tcl)
 
 # 2 stack per stage. the number of cells per xtage have to be even!!!
-def dco_custom_place_v2p5(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfine_h,nstg,ndrv,nspace,nxoff,nyoff, welltap_dim, welltap_xc, ND):
+def dco_custom_place_v2p5(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfine_h,nstg,ndrv,nspace,nxoff,nyoff, welltap_dim, welltap_xc, ND, synthTool):
 	if ND==0:
 		r_c = open(formatDir+"form_dco_custom_place.tcl","r")
 	else:
 		r_c = open(formatDir+"form_dco_custom_place_dCC.tcl","r") # dead CC
+		if synthTool=='genus':
+			r_c = open(formatDir+"form_dco_custom_place_dCC_genus.tcl","r") # dead CC
+
 	lines=list(r_c.readlines())
 
 	welltap_w=welltap_dim[0]
@@ -1382,14 +1409,14 @@ def dco_custom_place_v2p5(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfin
 			netmap1.get_net('nd',None,2*cntd,2*cntd,1) # driver cell 
 			netmap1.get_net('nd',None,2*cntd+1,2*cntd+1,1) # driver cell 
 			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
-			print("%.2e, %d"%(xcor,skip))
+			#print("%.2e, %d"%(xcor,skip))
 			netmap1.get_net('lx',None, xcor, xcor, 1) # X coordinate 
 			netmap1.get_net('lx',None, xcor, xcor, 1) # X coordinate 
 			netmap1.get_net('ly',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
 			netmap1.get_net('ly',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
 			if cntd==ndrv_h-1:
 				xd_end=xcor+crs_w 
-				print("xd_end=%.3e"%(xd_end))
+				#print("xd_end=%.3e"%(xd_end))
 		#---------------------------------------------
 		# place coarse cells
 		#---------------------------------------------
@@ -1407,14 +1434,14 @@ def dco_custom_place_v2p5(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfin
 			netmap1.get_net('nc',None,2*cntc,2*cntc,1) # coarse cell 
 			netmap1.get_net('nc',None,2*cntc+1,2*cntc+1,1) # coarse cell 
 			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
-			print("%.2e, %d"%(xcor,skip))
+			#print("%.2e, %d"%(xcor,skip))
 			netmap1.get_net('Lx',None, xcor, xcor, 1) # X coordinate 
 			netmap1.get_net('Lx',None, xcor, xcor, 1) # X coordinate 
 			netmap1.get_net('Ly',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
 			netmap1.get_net('Ly',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
 			if cntc==ncrs_h-1:
 				xc_end=xcor+crs_w 
-				print("xc_end=%.3e"%(xc_end))
+				#print("xc_end=%.3e"%(xc_end))
 		#---------------------------------------------
 		# place right fine cells
 		#---------------------------------------------
@@ -1711,6 +1738,43 @@ def dco_inv_flow_genus(formatDir,flowDir,dcoName,bleach,ndrv,nstg,platform,INV_n
 	nm1.get_net('CN',INV_name,None,None,None)
 
 	with open(flowDir+'src/'+dcoName+'.v','w') as wvfile:
+		lines_const=list(rvfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wvfile)
+
+def dco_verilog_gen(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,nfc,nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform,ncc_dead,dco_CC_name,dco_FC_name,buf1_name,buf2_name,buf3_name):
+
+	#--- generate verilog file: DCO ---
+	rvfile=open(formatDir+'/form_dco_v2.v','r')
+	nm1=txt_mds.netmap()
+	if edge_sel==1:
+		nm1.get_net('IE','INCLUDE_EDGE_SEL',None,None,None)
+	else:
+		nm1.get_net('IE','EXCLUDE_EDGE_SEL',None,None,None)
+	# design params
+	nm1.get_net('iN',dcoName,None,None,None)
+	nm1.get_net('nM',None,nstg,nstg,1)
+	nm1.get_net('nD',None,ndrv,ndrv,1)
+	nm1.get_net('nC',None,ncc,ncc,1)
+	nm1.get_net('nF',None,nfc,nfc,1)
+	nm1.get_net('ND',None,ncc_dead,ncc_dead,1)
+	
+	# cell names
+	nm1.get_net('cN',dco_CC_name,None,None,None)
+	nm1.get_net('Cn',dco_CC_name,None,None,None)
+	nm1.get_net('CN',dco_CC_name,None,None,None)
+	nm1.get_net('fN',dco_FC_name,None,None,None)
+	nm1.get_net('b1',buf1_name,None,None,None)
+	nm1.get_net('dn',dco_CC_name,None,None,None)
+	nm1.get_net('Dn',dco_CC_name,None,None,None)
+	nm1.get_net('dN',dco_CC_name,None,None,None)
+	nm1.get_net('DN',dco_CC_name,None,None,None)
+	nm1.get_net('FN',dco_FC_name,None,None,None)
+	nm1.get_net('b2',buf1_name,None,None,None)
+	nm1.get_net('b3',buf1_name,None,None,None)
+	nm1.get_net('b4',buf2_name,None,None,None)
+	nm1.get_net('b5',buf3_name,None,None,None)
+	with open(outDir+'/'+dcoName+'.v','w') as wvfile:
 		lines_const=list(rvfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wvfile)

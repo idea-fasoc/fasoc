@@ -39,8 +39,8 @@ configFile=absGenDir + './../../config/platform_config.json'
 #========================================================
 # parse the command & config.json
 #========================================================
-parseList=[1,1,1,1,1,1]  #[specfile,platform,outputDir,pex_verify,run_vsim,mode]
-specfile,platform,outputDir,pexVerify,runVsim,outMode=preparations.command_parse(parseList)
+parseList=[1,1,1,1,1,1,1,1]  #[specfile,platform,outputDir,pex_verify,run_vsim,mode,synth_tool,track]
+specfile,platform,outputDir,pexVerify,runVsim,outMode,synthTool,track=preparations.command_parse(parseList)
 specIn=open(specfile,'r')
 
 aLib,mFile,calibreRulesDir,hspiceModel=preparations.config_parse(outMode,configFile,platform)
@@ -67,15 +67,19 @@ tbrfDir=hspiceDir+'TBrf/'
 extDir = absPvtDir_plat + 'extraction/'
 finesimDir = absPvtDir_plat + 'FINESIM/'
 pll_flowDir = absPvtDir_plat + 'flow_pdpll/'
-dco_flowDir = absPvtDir_plat + 'flow_dco/'
 outbuff_div_flowDir = absPvtDir_plat + 'flow_outbuff_div/'
+dco_flowDir = absPvtDir_plat + 'flow_dco/'
+
+if synthTool=='genus':
+	dco_flowDir = absPvtDir_plat + 'flow_dco_genus/'
+	pll_flowDir = absPvtDir_plat + 'flow_pdpll_genus/'
+	print('INFO: genus is selected for synth-tool. _genus will be tailed after flow directories')
 
 #outbuff_div_flowDir = pvtFormatDir +platform+ '_flow_outbuff_div/'
 
 if platform=='tsmc65lp':
 	fc_en_type = 1 # dco_FC en => increase frequency
 	modelVersion='Beta' 
-	dco_flowDir = absPvtDir_plat + 'flow_dco/'
 	fc_en_type = 1 # dco_FC en => increase frequency
 	sim_time = 40e-9
 	corner_lib='tt_lib'
@@ -110,18 +114,26 @@ if platform=='tsmc65lp':
 elif platform=='gf12lp':
 	fc_en_type = 2 # dco_FC en => decrease frequency
 	modelVersion='Alpha_pex' 
-	dco_flowDir = absPvtDir_plat + 'flow_dco/'
 	fc_en_type = 2 # dco_FC en => decrease frequency
 	sim_time = 20e-9
 	corner_lib='TT' 
 	tech_node='12' 
 	wellpin=1 
 	edge_sel=0
-	buf_small='BUFH_X2N_A10P5PP84TR_C14'
-	buf_big='BUFH_X8N_A10P5PP84TR_C14'
-	buf1_name='BUFH_X8N_A10P5PP84TR_C14'
-	buf2_name='BUFH_X10N_A10P5PP84TR_C14'
-	buf3_name='BUFH_X10N_A10P5PP84TR_C14'
+	if track==9:
+		buf_small='BUFH_X2N_A9PP84TR_C14'
+		buf_big='BUFH_X8N_A9PP84TR_C14'
+		buf1_name='BUFH_X8N_A9PP84TR_C14'
+		buf2_name='BUFH_X10N_A9PP84TR_C14'
+		buf3_name='BUFH_X10N_A9PP84TR_C14'
+		tdc_dff='DFFRPQL_X1N_A9PP84TR_C14'
+	else:
+		buf_small='BUFH_X2N_A10P5PP84TR_C14'
+		buf_big='BUFH_X8N_A10P5PP84TR_C14'
+		buf1_name='BUFH_X8N_A10P5PP84TR_C14'
+		buf2_name='BUFH_X10N_A10P5PP84TR_C14'
+		buf3_name='BUFH_X10N_A10P5PP84TR_C14'
+		tdc_dff='DFFRPQL_X1N_A10P5PP84TR_C14'
 	bufz='placeHolder'
 	min_p_rng_l= 4
 	min_p_str_l= 5
@@ -132,7 +144,6 @@ elif platform=='gf12lp':
 	max_r_l=5
 	pll_max_r_l=8
 	outbuff_div=0
-	tdc_dff='DFFRPQL_X1N_A10P5PP84TR_C14'
 	H_stdc=0.672
 	custom_lvs=0
 	cust_place=1
@@ -419,7 +430,7 @@ if outMode=='macro' or outMode=='full':
 	dco_bleach=1 # test switch
 	dco_synth=1
 	dco_apr=1
-	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name,cp_version,welltap_dim,welltap_xc,ND,outputDir)
+	W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,dco_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,dco_synth,dco_apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name,cp_version,welltap_dim,welltap_xc,ND,outputDir,synthTool,track)
 	#--------------------------------------------------------
 	# generate output buffer, divider 
 	#--------------------------------------------------------

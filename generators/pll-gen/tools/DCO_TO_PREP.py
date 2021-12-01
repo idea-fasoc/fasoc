@@ -36,8 +36,8 @@ import pvt_run_pre_sim
 #--------------------------------------------------------
 # parse the command
 #--------------------------------------------------------
-parseList=[0,1,0,0,0,1]  #[specfile,platform,outputDir,pex_verify,runVsim,mode]
-specfile,platform,outputDir,pexVerify,runVsim,outMode=preparations.command_parse(parseList)
+parseList=[0,1,0,0,0,1,1,1]  #[specfile,platform,outputDir,pex_verify,runVsim,mode,synthTool,track]
+specfile,platform,outputDir,pexVerify,runVsim,outMode,synthTool,track=preparations.command_parse(parseList)
 
 configFile=absGenDir + './../../config/platform_config.json'
 aLib,mFile,calibreRulesDir,hspiceModel=preparations.config_parse(outMode,configFile,platform)

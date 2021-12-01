@@ -81,7 +81,7 @@ def config_parse(outMode,configFile,platform):
 
 
 def command_parse(parseList):
-	[specFile,platForm,outDir,pexVerify,runVsim,mode]=parseList
+	[specFile,platForm,outDir,pexVerify,runVsim,mode,synth_tool,track]=parseList
 	print ('#----------------------------------------------------------------------')
 	print ('# Parsing command line arguments...')
 	print ('#----------------------------------------------------------------------')
@@ -107,6 +107,12 @@ def command_parse(parseList):
 	if mode==1:
 		parser.add_argument('--mode', required=False, default=False,
 		                    help='output level: verilog/macro/full')
+	if synth_tool==1:
+		parser.add_argument('--synth_tool', required=False, default=False,
+		                    help='supported synth tool: dc or genus')
+	if track==1:
+		parser.add_argument('--track', required=False, default=False,
+		                    help='gf12lp: 9 or 10.5, tsmc65lp: 9')
 	args = parser.parse_args()
 
 
@@ -116,6 +122,8 @@ def command_parse(parseList):
 	pex_verify=0
 	run_vsim=0
 	outMode=0
+	synthTool='dc'
+	Track=0
 	if specFile==1:
 		if not os.path.isfile(args.specfile):
 			print ('Error: specfile does not exist')
@@ -136,8 +144,12 @@ def command_parse(parseList):
 	#---determine the output level: verilog/macro/full---
 	if mode==1:
 		outMode=args.mode
+	if synth_tool==1:
+		synthTool=args.synth_tool
+	if track==1:
+		Track=float(args.track)
 
-	return specfile,platform,outputDir,pex_verify,run_vsim,outMode
+	return specfile,platform,outputDir,pex_verify,run_vsim,outMode,synthTool,Track
 
 
 def aux_copy_spice (dco_CC_lib, dco_FC_lib, targetDir):
@@ -300,14 +312,14 @@ def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,f
 		p.wait()
 		p=sp.Popen(['cp',calibreRulesDir+'/calibre.rcx',extDir+'/run/'])
 		p.wait()
-		
-		dco_flowDirs=[dco_flowDir,dco_flowDir+'/src',dco_flowDir+'/scripts',dco_flowDir+'/scripts/innovus',dco_flowDir+'/scripts/dc']
+	
+		dco_flowDirs=[dco_flowDir,dco_flowDir+'/src',dco_flowDir+'/scripts',dco_flowDir+'/scripts/innovus',dco_flowDir+'/scripts/dc',dco_flowDir+'/scripts/genus']
 		gen_subDirs(dco_flowDirs)
 	
 		outbuff_div_flowDirs=[outbuff_div_flowDir]
 		gen_subDirs(outbuff_div_flowDirs)
 
-		pll_flowDirs=[pll_flowDir,pll_flowDir+'/src',pll_flowDir+'/scripts',pll_flowDir+'/scripts/innovus',pll_flowDir+'/scripts/dc']
+		pll_flowDirs=[pll_flowDir,pll_flowDir+'/src',pll_flowDir+'/scripts',pll_flowDir+'/scripts/innovus',pll_flowDir+'/scripts/dc',pll_flowDir+'/scripts/dc/genus']
 		gen_subDirs(pll_flowDirs)
 
 	if outputDir!=0:

@@ -7,6 +7,9 @@ gen_12lp_macro:
 gen_12lp_full:
 	./tools/scpa_gen.py --specfile test.json --output ./work --platform gf12lp --mode full
 
+gen_12lp_pex:
+	./tools/scpa_gen_pex.py --specfile test.json --output ./work --platform gf12lp --mode pex
+
 model_12lp:
 	./tools/scpa_model.py --platform gf12lp
 

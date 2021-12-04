@@ -78,7 +78,8 @@ if os.path.isdir(pvtGenDir):
    import cfg_digital_flow  as cfg
    import run_digital_flow  as rdf
    import run_pex_flow      as pex
-#   import run_sim_flow      as sim
+   import pex_revise        as pex_revise
+   import run_sim_flow      as sim
 
 # Load json supported inputs file
 # DELETE
@@ -345,15 +346,16 @@ if args.mode == 'full':
    pex.gen_post_pex_netlist(args.platform, designName, flowDir, extDir, \
                             calibreRulesDir)
    print('# SCPA - Post PEX netlist Generated')
-   
+   pex_revise.pex_revise(designName, extDir)
+   print('# SCPA - Post PEX netlist revised')   
    #---------------------------------------------------------------------------
    # Run Hspice Sims
    #---------------------------------------------------------------------------
-#   iMaxOut = sim.run_post_pex_ldo_imax_worst(args.platform, \
-#                                             platformConfig['hspiceModels'], \
-#                                             designName, extDir, simDir, \
-#                                             simTool, vin, imax)
-#   print('# LDO - Hspice Sim Completed')
+   sim.run_post_pex_scpa(args.platform, \
+                         platformConfig['hspiceModels'], \
+                         designName, extDir, simDir, \
+                         simTool)
+   print('# SCPA - Hspice Sim Completed')
 
 #------------------------------------------------------------------------------
 # Write the Outputs

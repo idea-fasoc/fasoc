@@ -40,12 +40,12 @@ Ensure that your machine has all of the required tools setup and have access to 
     __aux_lib__
     - Folder path containing the "SCPA_MIMCAP_new" auxiliary cell folder. Auxiliary Cell Folder structure should be as given below:
     ```bash
-        aux_lib/PT_UNIT_CELL
-        |--- cdl/PT_UNIT_CELL.cdl
-        |--- db/PT_UNIT_CELL.db
-        |--- gds/PT_UNIT_CELL.gds
-        |--- lef/PT_UNIT_CELL.lef
-        |--- lib/PT_UNIT_CELL.lib
+        aux_lib/SCPA_MIMCAP_new
+        |--- cdl/SCPA_MIMCAP_new.cdl
+        |--- db/SCPA_MIMCAP_new.db
+        |--- gds/SCPA_MIMCAP_new.gds
+        |--- lef/SCPA_MIMCAP_new.lef
+        |--- lib/SCPA_MIMCAP_new.lib
     ```
     
     __model_lib__

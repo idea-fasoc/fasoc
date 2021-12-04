@@ -12,6 +12,7 @@ import fileinput
 import re
 import os
 import shutil
+import numpy as np
 
 absGenDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),"../")
 absPvtDir = os.path.join(absGenDir,"../../private/generators/pll-gen/")
@@ -35,8 +36,8 @@ import pvt_run_pre_sim
 #--------------------------------------------------------
 # parse the command
 #--------------------------------------------------------
-parseList=[0,1,0,0,0,1]  #[specfile,platform,outputDir,pex_verify,runVsim,mode]
-specfile,platform,outputDir,pexVerify,runVsim,outMode=preparations.command_parse(parseList)
+parseList=[0,1,1,0,0,1,1,1]  #[specfile,platform,outputDir,pex_verify,runVsim,mode,synthTool,track]
+specfile,platform,outputDir,pexVerify,runVsim,outMode,synthTool,track=preparations.command_parse(parseList)
 
 configFile=absGenDir + './../../config/platform_config.json'
 aLib,mFile,calibreRulesDir,hspiceModel=preparations.config_parse(outMode,configFile,platform)
@@ -116,6 +117,9 @@ elif platform=='gf12lp':
 	edge_sel=0
 	buf_small='BUFH_X2N_A10P5PP84TR_C14'
 	buf_big='BUFH_X8N_A10P5PP84TR_C14'
+	buf1_name='BUFH_X8N_A10P5PP84TR_C14'
+	buf2_name='BUFH_X10N_A10P5PP84TR_C14'
+	buf3_name='BUFH_X10N_A10P5PP84TR_C14'
 	bufz='placeHolder'
 	min_p_rng_l= 4
 	min_p_str_l= 5
@@ -292,10 +296,10 @@ run_dig_flow=1
 gen_model=1
 
 tapeout_mode=0
-bleach=0
-synth=0
-apr=0
-pex=0
+bleach=1
+synth=1
+apr=1
+pex=1
 tb_netlist=1
 lvs=0
 ninterp=2
@@ -308,6 +312,7 @@ else:
 dcoNames=[]
 finesim=1
 
+
 if run_flow==1:
 	for i in range(1,len(vm1.comblist[0])):
 		Ncc=vm1.comblist[0][i]
@@ -318,8 +323,13 @@ if run_flow==1:
 		dcoNames.append(dcoName)
 		print(dcoName)
 		print(dcoNames)
+		# verilog gen: - 2021/11/28
+		if platform=='tsmc65lp':
+			run_digital_flow.pll_verilog_gen(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform)
+		else:
+			run_digital_flow.dco_verilog_gen(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform,ND,dco_CC_name,dco_FC_name,buf1_name,buf2_name,buf3_name)
 		if run_dig_flow==1:
-			W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name,cp_version,welltap_dim,welltap_xc,ND)
+			W_dco,H_dco=run_digital_flow.dco_flow(pvtFormatDir,dco_flowDir,dcoName,bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name,cp_version,welltap_dim,welltap_xc,ND,outputDir,synthTool,track)
 		if lvs==1:
 			run_digital_flow.buf_custom_lvs(calibreRulesDir,dco_flowDir,extDir,dcoName,pvtFormatDir,platform)
 		if pex==1:

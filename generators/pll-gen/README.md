@@ -74,7 +74,7 @@ Date    : May 27, 2020
 1. Running the PLL generator. 
    To run the latest PLL generator, execute the below command from any location. Hierarchical layout with separate power domains for DCO and buffer will be generated. Silicon performance measured in tsmc65lp.
     ```bash
-    .{Path_to_Generator_Folder}/tsmc65lp/tools/PLL_GEN_Beta.py --specfile {Input_Spec_File.json} --output {Output_Folder} --platform {Technology_Node} [--mode {Run_Mode}] [--run_vsim {Verilog_sim}]
+    .{Path_to_Generator_Folder}/tsmc65lp/tools/PLL_GEN_Beta.py --specfile {Input_Spec_File.json} --output {Output_Folder} --platform {Technology_Node} [--mode {Run_Mode}] [--run_vsim {Verilog_sim}] [--synth_tool {Synth_Tool}] [--track {Matal_Track}]
     ```
    All the options specified in square brackets [] are optional. When `--clean` option is provided, the tool exits after a cleanup of the workspace. Each of the command line variables are described below in detail.
    
@@ -97,6 +97,14 @@ Date    : May 27, 2020
    - This must be either "0", "1" 
      - "0" mode do not run the verilog simulation (default) 
      - "1" mode runs the verilog simulation with dco  behavioral model 
+
+   __{Synth_Tool}__
+   - Optional variable for synthesis tool
+     - dc (default) 
+     - genus 
+
+   __{Metal_Track}__
+   - Optional variable for metal track 
 
 
 1. Run the test script from `pll-gen` folder to ensure the generator tool and the model tool are correctly setup

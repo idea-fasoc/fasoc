@@ -79,7 +79,7 @@ def pll_verilog_gen(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,
 			for line in lines_const:
 				nm1.printline(line,wvfile)
 
-def pll_verilog_gen_v2(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,nfc,nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform,ncc_dead,dco_CC_name,dco_FC_name,buf1_name,buf2_name,buf3_name,tdc_width,Fcenter,Fbase,dFc,dFf):
+def pll_verilog_gen_v2(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,nfc,nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform,ncc_dead,dco_CC_name,dco_FC_name,buf1_name,buf2_name,buf3_name,tdc_width,Fcenter,Fbase,dFc,dFf,tdc_dff):
 
 	shutil.copyfile(verilogSrcDir+'FUNCTIONS.v',outDir+'/FUNCTIONS.v')	
 	shutil.copyfile(verilogSrcDir+'ssc_generator.v',outDir+'/ssc_generator.v')	
@@ -103,6 +103,11 @@ def pll_verilog_gen_v2(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,n
 	r_tdc_v = open(formatDir+'/form_tdc_counter_v2.sv','r')
 	nm1=txt_mds.netmap()
 	nm1.get_net('ns',None,nstg,nstg,1)	
+	nm1.get_net('bs',None,buf_small,buf_small,1)	
+	nm1.get_net('bb',None,buf_big,buf_big,1)	
+	nm1.get_net('s1',None,buf_small,buf_small,1)	
+	nm1.get_net('s2',None,buf_small,buf_small,1)	
+	nm1.get_net('df',None,tdc_dff,tdc_dff,1)	
 	#nm1.get_net('ew',None,tdc_width,tdc_width,1)
 	# EMBTDC decoding 'case'
 	nm1.get_net('Ns',None,None,nstg,nstg*2)
@@ -223,14 +228,14 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 	shutil.copyfile(formatDir+'pdpll_pre_init.tcl',flowDir+'/scripts/innovus/pre_init.tcl')	
 	shutil.copyfile(formatDir+'dco_power_intent.cpf',flowDir+'/scripts/innovus/power_intent.cpf')	
 	shutil.copyfile(formatDir+platform+'_dco_post_init.tcl',flowDir+'/scripts/innovus/post_init.tcl')
-	if platform=='gf12lp' and track==9:
-		shutil.copyfile(formatDir+platform+'_dco_post_init_9tr.tcl',flowDir+'/scripts/innovus/post_init.tcl')
 	shutil.copyfile(formatDir+'dco_pre_route.tcl',flowDir+'/scripts/innovus/pre_route.tcl')	
 	shutil.copyfile(formatDir+'dco_post_postroute.tcl',flowDir+'/scripts/innovus/post_postroute.tcl')	
 	shutil.copyfile(formatDir+'dco_post_signoff.tcl',flowDir+'/scripts/innovus/post_signoff.tcl')	
 	shutil.copyfile(formatDir+'pre_signoff.tcl',flowDir+'/scripts/innovus/pre_signoff.tcl')	
 	shutil.copyfile(formatDir+'dcoPowerPlanGf14.tcl',flowDir+'/scripts/innovus/dcoPowerPlanGf14.tcl')	
 	shutil.copyfile(formatDir+'cadre_Makefile',flowDir+'/Makefile')	
+	if platform=='gf12lp' and track==9:
+		shutil.copyfile(formatDir+platform+'_dco_post_init_9tr.tcl',flowDir+'/scripts/innovus/post_init.tcl')
 	if synthTool=='genus': # overwrite few files if synth-tool is genus
 		shutil.copyfile(formatDir+'cadre_Makefile_genus',flowDir+'/Makefile')	
 		shutil.copyfile(formatDir+'form_dco_genus.constraints.tcl', flowDir+'/scripts/genus/constraints.tcl')
@@ -417,6 +422,8 @@ def dco_flow(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H
 	if bleach==1:
 		p = sp.Popen(['make','bleach_all'], cwd=flowDir)
 		p.wait()
+		p = sp.Popen(['rm','vpath/synth'], cwd=flowDir)
+		p.wait()
 	
 	if synth==1:
 		#-------------------------------------------
@@ -508,7 +515,7 @@ def outbuff_div_flow(formatDir,flowDir,bufName,platform,bleach,design):
 		p = sp.Popen(['cp','results/innovus/'+'outbuff_div_cutObs.lef','export/outbuff_div.lef'], cwd=flowDir)
 		p.wait()
 
-def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc,FCW,vco_per,outputDir):
+def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc,FCW,vco_per,outputDir,synthTool,track):
 	print ('#======================================================================')
 	print ('# setting up flow directory for pdpll')
 	print ('#======================================================================')
@@ -530,6 +537,14 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 	shutil.copyfile(formatDir+'pre_signoff.tcl',flowDir+'/scripts/innovus/pre_signoff.tcl')	
 	shutil.copyfile(formatDir+'pdpll_post_signoff.tcl',flowDir+'/scripts/innovus/post_signoff.tcl')	
 	shutil.copyfile(formatDir+'cadre_Makefile',flowDir+'/Makefile')	
+
+	if platform=='gf12lp' and track==9:
+		shutil.copyfile(formatDir+platform+'_dco_post_init_9tr.tcl',flowDir+'/scripts/innovus/post_init.tcl')
+	if synthTool=='genus': # overwrite few files if synth-tool is genus
+		shutil.copyfile(formatDir+'cadre_Makefile_genus',flowDir+'/Makefile')	
+		shutil.copyfile(formatDir+'form_pdpll_genus.read_design.tcl', flowDir+'/scripts/genus/genus.read_design.tcl')
+
+
 	#--- copy exports from dco ---
 	spfiles=glob.iglob(os.path.join(dco_flowDir+'results/calibre/lvs/','*.sp'))
 	for spfile in spfiles:
@@ -545,6 +560,7 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 	dco_ex_list=['.cdl','.lef','.gds','_typ.lib']	
 	if os.path.isdir(flowDir+'blocks/'+dcoName+'/export')==0:
 		shutil.copytree(dco_flowDir+'export',flowDir+'blocks/'+dcoName+'/export')
+		shutil.copyfile(flowDir+'blocks/'+dcoName+'/export/'+dcoName+'.lib',flowDir+'blocks/'+dcoName+'/export/'+dcoName+'_typ.lib')	
 
 	#--- get DCO pin location
 	if platform=='gf12lp':
@@ -640,6 +656,8 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 
 	#--- generate  include.mk file ---
 	rmkfile=open(formatDir+'/form_include.mk','r')
+	if synthTool=='genus':
+		rmkfile=open(formatDir+'/form_include_genus.mk','r')
 	nm1=txt_mds.netmap()
 	nm1.get_net('iN',pll_name,None,None,None)
 	nm1.get_net('pf',platform,None,None,None)
@@ -686,7 +704,17 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 		lines_const=list(rflfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wflfile)
-	#--- generate constraints.tcl
+
+	if synthTool=='genus':
+		rflfile=open(formatDir+'/form_'+platform+'_pdpll_genus.filelist.tcl','r')
+		nm1=txt_mds.netmap()
+		nm1.get_net('iN',pll_name,None,None,None)
+		with open(flowDir+'/scripts/genus/genus.filelist.tcl','w') as wflfile:
+			lines_const=list(rflfile.readlines())
+			for line in lines_const:
+				nm1.printline(line,wflfile)
+
+	#--- generate constraints.tcl for dc & genus
 	rcfile=open(formatDir+'/form_'+platform+'_pdpll_constraints.tcl','r')
 	nm1=txt_mds.netmap()
 	if platform=='tsmc65lp':
@@ -697,6 +725,20 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 		nm1.get_net('db',None,FCW,FCW,1)
 
 	with open(flowDir+'/scripts/dc/constraints.tcl','w') as wcfile:
+		lines_const=list(rcfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wcfile)
+
+	rcfile=open(formatDir+'/form_'+platform+'_pdpll_genus_constraints.tcl','r')
+	nm1=txt_mds.netmap()
+	if platform=='tsmc65lp':
+		nm1.get_net('NS',None,2*nstg-1,2*nstg-1,1)
+		nm1.get_net('nS',None,2*nstg-1,2*nstg-1,1)
+	elif platform=='gf12lp':
+		nm1.get_net('vp',None,vco_per*1e3,vco_per*1e3,1)
+		nm1.get_net('db',None,FCW,FCW,1)
+
+	with open(flowDir+'/scripts/genus/constraints.tcl','w') as wcfile:
 		lines_const=list(rcfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wcfile)
@@ -741,15 +783,25 @@ def pdpll_flow(formatDir,flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoNam
 		#-------------------------------------------
 		p = sp.Popen(['make','synth'], cwd=flowDir)
 		p.wait()
-		with open(flowDir + '/reports/dc/' + pll_name + '.mapped.area.rpt', \
-			  'r')as file:
-		   filedata = file.read()
-		m = re.search('Total cell area: *([0-9.]*)', filedata)
-		if m:
-		   A_cont = float(m.group(1))
-		   print('estimated area after synthesis is: %e'%(A_cont))
-		else:
-		   print ('Synthesis Failed')
+		if synthTool!='genus':
+			with open(flowDir + '/reports/dc/' + pll_name + '.mapped.area.rpt', \
+				  'r')as file:
+				filedata = file.read()
+			m = re.search('Total cell area: *([0-9.]*)', filedata)
+			if m:
+				A_cont = float(m.group(1))
+				print('estimated area after synthesis is: %e'%(A_cont))
+			else:
+				print ('Synthesis Failed')
+		elif synthTool=='genus':
+			rarfile=open(flowDir + '/reports/genus/area.rpt','r')
+			lines_ar=list(rarfile.readlines())
+			for line in lines_ar:
+				words =line.split()
+				if len(words)>0:
+					if words[0]==pll_name:
+						A_cont = float(words[4])
+						print('estimated area after synthesis is: %e'%(A_cont))
 	#--- calculate area of the PDpll ---
 	A_dco=W_dco*H_dco
 	A_buf=W_buf*H_buf

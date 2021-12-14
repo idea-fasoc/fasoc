@@ -132,7 +132,8 @@
 	input						RST;
 
 	// user values
-	input [DCO_NUM_PH*2-1:0][TDC_WIDTH-1:0] 	EMBTDC_LUT;  
+	//input [DCO_NUM_PH*2-1:0][TDC_WIDTH-1:0] 	EMBTDC_LUT;  
+	input	[DCO_NUM_PH*2*TDC_WIDTH-1:0] 		EMBTDC_LUT;
 
 	// pll_controller
 	input 		[FCW_INT_WIDTH-1:0] 		FCW_INT;
@@ -216,7 +217,8 @@
 	logic 						CLKREF_IN;
 	logic 						RST;	
 	logic	[DCO_NUM_PH-1:0]			DCO_RAW_PH;
-	logic	[DCO_NUM_PH*2*TDC_WIDTH-1:0] 			embtdc_lut_2d;
+	//logic	[DCO_NUM_PH*2*TDC_WIDTH-1:0] 			embtdc_lut_2d;
+	logic [DCO_NUM_PH*2-1:0][TDC_WIDTH-1:0] 	embtdc_lut_2d;  
 	// outputs
 	logic  						CLKREF_RETIMED_OUT; 
 	logic 	[TDC_WIDTH-1:0] 			EMBTDC_BIN_OUT;
@@ -317,7 +319,8 @@
 	// map the luts
 	generate
 		for (i=0; i<DCO_NUM_PH*2; i=i+1) begin
-			assign embtdc_lut_2d[TDC_WIDTH*(i+1)-1:TDC_WIDTH*i] = EMBTDC_LUT[i];
+			//assign embtdc_lut_2d[TDC_WIDTH*(i+1)-1:TDC_WIDTH*i] = EMBTDC_LUT[i];
+			assign embtdc_lut_2d[i] = EMBTDC_LUT[TDC_WIDTH*(i+1)-1:TDC_WIDTH*i];
 		end
 	endgenerate
 
@@ -416,11 +419,7 @@ assign dco_fcbw_g = (DCO_FCW_OV)? DCO_FCBW_OV_VAL_therm_p : dco_fcbw; // 060221 
 			.CLKREF_RETIMED_OUT	(clkref_retimed		),
 			.DCO_CLK_DIV4		(dco_clk_div4		), 
 			.EMBTDC_BIN_OUT		(EMBTDC_BIN_OUT		),
-			`ifndef TDC_APR
-				.EMBTDC_LUT	(EMBTDC_LUT	),
-			`else
-				.EMBTDC_LUT	(embtdc_lut_2d		),
-			`endif
+			.EMBTDC_LUT		(embtdc_lut_2d		),
 			.retime_lag		(retime_lag		), // test
 			.retime_edge_sel	(retime_edge_sel	), // test
 			.embtdc_bin_tmp		(embtdc_bin_tmp		), // test

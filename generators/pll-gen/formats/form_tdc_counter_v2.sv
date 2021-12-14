@@ -83,10 +83,15 @@ module tdc_counter(
 
 	
 	`ifndef BEH_SIM	
-		BUFH_X4N_A10P5PP84TR_C14 clkref_buf1 (.Y(CLKREF_IN_buf0), .A(CLKREF_IN)); // 050921 
-		BUFH_X8N_A10P5PP84TR_C14 clkref_buf2 (.Y(CLKREF_IN_buf), .A(CLKREF_IN_buf0)); // 050921 
-		BUFH_X2N_A10P5PP84TR_C14 clkref_buf_3 (.Y(CLKREF_IN_buf_sync),.A(CLKREF_IN_buf)); // 053121	
-		BUFH_X2N_A10P5PP84TR_C14 clkref_buf_4 (.Y(CLKREF_IN_buf_sync),.A(CLKREF_IN_buf));
+		//BUFH_X4N_A10P5PP84TR_C14 clkref_buf1 (.Y(CLKREF_IN_buf0), .A(CLKREF_IN)); // 050921 
+		//BUFH_X8N_A10P5PP84TR_C14 clkref_buf2 (.Y(CLKREF_IN_buf), .A(CLKREF_IN_buf0)); // 050921 
+		//BUFH_X2N_A10P5PP84TR_C14 clkref_buf_3 (.Y(CLKREF_IN_buf_sync),.A(CLKREF_IN_buf)); // 053121	
+		//BUFH_X2N_A10P5PP84TR_C14 clkref_buf_4 (.Y(CLKREF_IN_buf_sync),.A(CLKREF_IN_buf));
+
+@@			@bs clkref_buf1 (.Y(CLKREF_IN_buf0), .A(CLKREF_IN)); // 050921 
+@@			@bb clkref_buf2 (.Y(CLKREF_IN_buf), .A(CLKREF_IN_buf0)); // 050921 
+@@			@s1 clkref_buf_3 (.Y(CLKREF_IN_buf_sync),.A(CLKREF_IN_buf)); // 053121	
+@@			@s2 clkref_buf_4 (.Y(CLKREF_IN_buf_sync),.A(CLKREF_IN_buf));
 	`else
 		assign CLKREF_IN_buf0 = CLKREF_IN;
 		assign CLKREF_IN_buf = CLKREF_IN_buf0;
@@ -101,7 +106,8 @@ module tdc_counter(
 			//Loop across first N-1 Stages
 			for (i=0; i<DCO_NUM_PH ; i=i+1)
 			begin:stg_emb
-				DFFQ_X1N_A10P5PP84TR_C14 embtdc_dff (.Q(embtdc_raw_out[i]), .CK(CLKREF_IN_buf), .D(DCO_RAW_PH[i]));
+				//DFFQ_X1N_A10P5PP84TR_C14 embtdc_dff (.Q(embtdc_raw_out[i]), .CK(CLKREF_IN_buf), .D(DCO_RAW_PH[i]));
+@@					@df embtdc_dff (.Q(embtdc_raw_out[i]), .CK(CLKREF_IN_buf), .D(DCO_RAW_PH[i]));
 	  			//XNOR2_X0P6N_A10P5PP84TR_C14 xnor_edge_sel ( .A(embtdc_out[i%DCO_NUM_PH]), .B(embtdc_out[(i+1)%DCO_NUM_PH]), .Y(edge_sel_tmp[i]) );
 			end
 		endgenerate

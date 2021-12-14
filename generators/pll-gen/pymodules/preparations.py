@@ -319,7 +319,7 @@ def dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,f
 		outbuff_div_flowDirs=[outbuff_div_flowDir]
 		gen_subDirs(outbuff_div_flowDirs)
 
-		pll_flowDirs=[pll_flowDir,pll_flowDir+'/src',pll_flowDir+'/scripts',pll_flowDir+'/scripts/innovus',pll_flowDir+'/scripts/dc',pll_flowDir+'/scripts/dc/genus']
+		pll_flowDirs=[pll_flowDir,pll_flowDir+'/src',pll_flowDir+'/scripts',pll_flowDir+'/scripts/innovus',pll_flowDir+'/scripts/dc',pll_flowDir+'/scripts/genus']
 		gen_subDirs(pll_flowDirs)
 
 	if outputDir!=0:

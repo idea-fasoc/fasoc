@@ -126,14 +126,16 @@ elif platform=='gf12lp':
 		buf1_name='BUFH_X8N_A9PP84TR_C14'
 		buf2_name='BUFH_X10N_A9PP84TR_C14'
 		buf3_name='BUFH_X10N_A9PP84TR_C14'
-		tdc_dff='DFFRPQL_X1N_A9PP84TR_C14'
+		#tdc_dff='DFFRPQL_X1N_A9PP84TR_C14'
+		tdc_dff='DFFQ_X1N_A9PP84TR_C14'
 	else:
 		buf_small='BUFH_X2N_A10P5PP84TR_C14'
 		buf_big='BUFH_X8N_A10P5PP84TR_C14'
 		buf1_name='BUFH_X8N_A10P5PP84TR_C14'
 		buf2_name='BUFH_X10N_A10P5PP84TR_C14'
 		buf3_name='BUFH_X10N_A10P5PP84TR_C14'
-		tdc_dff='DFFRPQL_X1N_A10P5PP84TR_C14'
+		#tdc_dff='DFFRPQL_X1N_A10P5PP84TR_C14'
+		tdc_dff='DFFQ_X1N_A10P5PP84TR_C14'
 	bufz='placeHolder'
 	min_p_rng_l= 4
 	min_p_str_l= 5
@@ -418,7 +420,7 @@ tdc_width = int(np.floor(np.log2(Nstg*2)) + 2)
 if platform=='tsmc65lp':
 	run_digital_flow.pll_verilog_gen(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform)
 else:
-	run_digital_flow.pll_verilog_gen_v2(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform,ND,dco_CC_name,dco_FC_name,buf1_name,buf2_name,buf3_name,tdc_width,Fcenter,Fbase,dFc,dFf)
+	run_digital_flow.pll_verilog_gen_v2(outMode,designName,absGenDir,outputDir,formatDir,pll_flowDir,Ndrv,Ncc,Nfc,Nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform,ND,dco_CC_name,dco_FC_name,buf1_name,buf2_name,buf3_name,tdc_width,Fcenter,Fbase,dFc,dFf,tdc_dff)
 	run_pre_sim.run_pre_vsim(formatDir, vsimDir, FCW, Nstg, Ncc, Nfc, simOptions,tdc_width,dcoName, designName, Fref, Kp,outputDir)
 
 tapeout_mode=0
@@ -434,7 +436,7 @@ if outMode=='macro' or outMode=='full':
 	#--------------------------------------------------------
 	# generate output buffer, divider 
 	#--------------------------------------------------------
-	buf_bleach=0
+	buf_bleach=1
 	buf_design=1
 	buf_lvs=0
 	if outbuff_div==1:
@@ -447,8 +449,9 @@ if outMode=='macro' or outMode=='full':
 	pdpll_bleach=1
 	pdpll_synth=1 # test switch
 	pdpll_apr=1
-	W_dco,H_dco,W_pll,H_pll=run_digital_flow.pdpll_flow(pvtFormatDir,pll_flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,pdpll_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,pdpll_synth,pdpll_apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,pll_max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc,FCW,vco_per,outputDir)
-	A_core=W_pll*H_pll	
+	W_dco,H_dco,W_pll,H_pll=run_digital_flow.pdpll_flow(pvtFormatDir,pll_flowDir,dco_flowDir,outbuff_div_flowDir,pll_name,dcoName,pdpll_bleach,Ndrv,Ncc,Nfc,Nstg,W_CC,H_CC,W_FC,H_FC,pdpll_synth,pdpll_apr,verilogSrcDir,outbuff_div,tdc_dff,buf_small,buf_big,platform,pll_max_r_l,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,H_stdc,FCW,vco_per,outputDir,synthTool,track)
+	A_core=W_pll*H_pll
+
 	#--------------------------------------------------------
 	# run independent lvs 
 	#--------------------------------------------------------

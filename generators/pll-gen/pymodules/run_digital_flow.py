@@ -2114,8 +2114,15 @@ def dco_custom_place_v2p5_genus(formatDir,outputDir,crscell_dim,finecell_dim,ncr
 # BLE generators from here
 #=======================================================================================================
 
-def dco_flow_decap_pwr2(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name, dcocp_version, welltap_dim, welltap_xc,ND, decap_dim):
+def dco_flow_decap_pwr2(formatDir,flowDir,dcoName,bleach,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name, dcocp_version, welltap_dim, welltap_xc,decap_dim,dco_design_params):
+	# copy script files
+	shutil.rmtree(flowDir+'/scripts')
+	shutil.copytree(formatDir+'/BLE/ble_dco/scripts',flowDir+'/scripts')
+	shutil.copy(formatDir+'/BLE/ble_dco/Makefile', flowDir+'Makefile')
+	shutil.copy(formatDir+'/BLE/ble_dco/include.mk', flowDir+'include.mk')
+
 	#--- calculate area ---
+	[nstg,ndrv,ncc,nfc,ND] = dco_design_params
 	NCtotal=nstg*(ncc+ndrv)
 	NFtotal=nstg*(nfc)
 	A_dco=NCtotal*W_CC*H_CC+NFtotal*W_FC*H_FC
@@ -2599,6 +2606,13 @@ def editPin_gen_se_pwr2(Ndrv,Ncc,Nfc,Nstg,formatDir,wfile_name):
 			nm2.printline(line,wfile)
 
 def ble_verilog_gen(outMode,outDir,formatDir,dp_json):
+	# copy files that doesn't change with design params
+	shutil.copy(formatDir+'/ble_pll_top/FUNCTIONS.v',outDir+'/FUNCTIONS.v')
+	shutil.copy(formatDir+'/ble_pll_top/dltdc_lut_lib.sv',outDir+'/dltdc_lut_lib.sv')
+	shutil.copy(formatDir+'/ble_pll_top/ssc_generator.v',outDir+'/ssc_generator.v')
+	shutil.copy(formatDir+'/tstdc_counter/lpdtc_v2.sv',outDir+'/lpdtc_v2.sv')
+
+
 	print ('#----------------------------------------------------------------------')
 	print ('# Loading ' +dp_json+ ' design parameter file...')
 	print ('#----------------------------------------------------------------------')
@@ -2628,6 +2642,7 @@ def ble_verilog_gen(outMode,outDir,formatDir,dp_json):
 	ncc     =jsonParam["dco_design_params"]["ncc"]
 	nfc     =jsonParam["dco_design_params"]["nfc"]
 	ncc_dead=jsonParam["dco_design_params"]["ncc_dead"]
+	
 
 	pre_ls_ref_nstg_cc_tune =jsonParam["tstdc_counter_design_params"]["pre_ls_ref_nstg_cc_tune"]
 	pre_ls_ref_ncc_tune     =jsonParam["tstdc_counter_design_params"]["pre_ls_ref_ncc_tune"]
@@ -2651,6 +2666,8 @@ def ble_verilog_gen(outMode,outDir,formatDir,dp_json):
 	post_es_fb_nstg_cc_tune =jsonParam["tstdc_counter_design_params"]["post_es_fb_nstg_cc_tune"]
 	post_es_fb_ncc_tune     =jsonParam["tstdc_counter_design_params"]["post_es_fb_ncc_tune"]
 
+	dco_design_params=[nstg,ndrv,ncc,nfc,ncc_dead]
+	tstdc_counter_design_params=[pre_ls_ref_nstg_cc_tune,pre_ls_ref_ncc_tune,pre_ls_ref_nfc,dltdc_num_ph,dltdc_nfc,dltdc_ndrv,dltdc_ncc,pre_nstg_ref_ls,pre_nstg_ref,pre_nstg_fb,ppath_nstg,pre_ls_ref_nstg,post_ls_ref_nstg,post_ls_ref_nstg_cc_tune,post_ls_ref_ncc_tune,pre_es_fb_nstg,pre_es_fb_nstg_cc_tune,pre_es_fb_ncc_tune,post_es_fb_nstg,post_es_fb_nstg_cc_tune,post_es_fb_ncc_tune] 
 	#--- generate verilog file: BLE_DCO ---
 	rvfile=open(formatDir+'/ble_dco/form_ble_dco.v','r')
 	nm1=txt_mds.netmap()
@@ -2791,7 +2808,7 @@ def ble_verilog_gen(outMode,outDir,formatDir,dp_json):
 	nm1.get_net('nF',None,nfc,nfc,1)
 	nm1.get_net('nM',None,nstg,nstg,1)
 	
-	with open(outDir+'/pll_controller.v','w') as wvfile:
+	with open(outDir+'/pll_controller.sv','w') as wvfile:
 		lines_const=list(rvfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wvfile)
@@ -2812,7 +2829,7 @@ def ble_verilog_gen(outMode,outDir,formatDir,dp_json):
 	nm1.get_net('rc',None,dltdc_ncc,dltdc_ncc,1)
 	nm1.get_net('nM',None,nstg,nstg,1)
 	
-	with open(outDir+'/tstdc_controller.v','w') as wvfile:
+	with open(outDir+'/tstdc_controller.sv','w') as wvfile:
 		lines_const=list(rvfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wvfile)
@@ -2835,7 +2852,32 @@ def ble_verilog_gen(outMode,outDir,formatDir,dp_json):
 	nm1.get_net('rC',None,pre_ls_ref_ncc_tune,pre_ls_ref_ncc_tune,1)
 	nm1.get_net('rF',None,pre_ls_ref_nfc,pre_ls_ref_nfc,1)
 	
-	with open(outDir+'/ble_pll_top.v','w') as wvfile:
+	with open(outDir+'/ble_pll_top.sv','w') as wvfile:
 		lines_const=list(rvfile.readlines())
 		for line in lines_const:
 			nm1.printline(line,wvfile)
+	return dco_design_params,tstdc_counter_design_params
+
+def ble_tstdc_flow(formatDir,flowDir,bleach,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,tstdc_counter_design_params):
+	[pre_ls_ref_nstg_cc_tune,pre_ls_ref_ncc_tune,pre_ls_ref_nfc,dltdc_num_ph,dltdc_nfc,dltdc_ndrv,dltdc_ncc,pre_nstg_ref_ls,pre_nstg_ref,pre_nstg_fb,ppath_nstg,pre_ls_ref_nstg,post_ls_ref_nstg,post_ls_ref_nstg_cc_tune,post_ls_ref_ncc_tune,pre_es_fb_nstg,pre_es_fb_nstg_cc_tune,pre_es_fb_ncc_tune,post_es_fb_nstg,post_es_fb_nstg_cc_tune,post_es_fb_ncc_tune] = tstdc_counter_design_params
+	# copy script files
+	shutil.rmtree(flowDir+'/scripts')
+	shutil.copytree(formatDir+'/BLE/tstdc_counter/scripts',flowDir+'/scripts')
+	shutil.copy(formatDir+'/BLE/tstdc_counter/Makefile', flowDir+'Makefile')
+	shutil.copy(formatDir+'/BLE/tstdc_counter/include.mk', flowDir+'include.mk')
+	shutil.copy(verilogSrcDir+'/tstdc_counter.v', flowDir+'/src/tstdc_counter.v')
+	shutil.copy(verilogSrcDir+'/dltdc_v3.v', flowDir+'/src/dltdc_v3.v')
+	shutil.copy(verilogSrcDir+'/lpdtc_v2.sv', flowDir+'/src/lpdtc_v2.sv')
+
+def ble_pll_top_flow(formatDir,flowDir,bleach,synth,apr,verilogSrcDir):
+	# copy script files
+	shutil.rmtree(flowDir+'/scripts')
+	shutil.copytree(formatDir+'/BLE/ble_pll_top/scripts',flowDir+'/scripts')
+	shutil.copy(formatDir+'/BLE/ble_pll_top/Makefile', flowDir+'Makefile')
+	shutil.copy(formatDir+'/BLE/ble_pll_top/include.mk', flowDir+'include.mk')
+	shutil.copy(verilogSrcDir+'/ble_pll_top.sv', flowDir+'/src/ble_pll_top.sv')
+	shutil.copy(verilogSrcDir+'/pll_controller.sv', flowDir+'/src/pll_controller.sv')
+	shutil.copy(verilogSrcDir+'/tstdc_controller.sv', flowDir+'/src/tstdc_controller.sv')
+	shutil.copy(verilogSrcDir+'/FUNCTIONS.v',flowDir+'/src/FUNCTIONS.v')
+	shutil.copy(verilogSrcDir+'/dltdc_lut_lib.sv',flowDir+'/src/dltdc_lut_lib.sv')
+	shutil.copy(verilogSrcDir+'/ssc_generator.v',flowDir+'/src/ssc_generator.v')

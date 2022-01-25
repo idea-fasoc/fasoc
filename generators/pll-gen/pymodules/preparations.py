@@ -334,3 +334,113 @@ def dir_tree_genus(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspic
 
 	if outputDir!=0:
 		gen_subDirs([outputDir])
+
+def read_ble_params(dp_json):
+	print ('#----------------------------------------------------------------------')
+	print ('# Loading ' +dp_json+ ' design parameter file...')
+	print ('#----------------------------------------------------------------------')
+	try:
+	  with open(dp_json) as file:
+	    jsonParam = json.load(file)
+	except ValueError as e:
+	  print ('Error occurred opening or loading json file.')
+	  sys.exit(1)
+
+	# Get the config variable from platfom config file
+	buf8x_name    = jsonParam["std_cell_names"]["buf8x_name"]
+	buf2x_name    = jsonParam["std_cell_names"]["buf2x_name"]
+	buf4x_name    = jsonParam["std_cell_names"]["buf4x_name"]
+	buf10x_name   = jsonParam["std_cell_names"]["buf10x_name"]
+	dff_name      = jsonParam["std_cell_names"]["dff_name"]
+	inv0p6x_name  = jsonParam["std_cell_names"]["inv0p6x_name"]
+	buf16x_name   = jsonParam["std_cell_names"]["buf16x_name"]
+	buf14x_name   = jsonParam["std_cell_names"]["buf14x_name"]
+	embtdc_dff_name=jsonParam["std_cell_names"]["embtdc_dff_name"]
+	xnor2_0p6_name =jsonParam["std_cell_names"]["xnor2_0p6_name"]
+	dffrpq_3x_name =jsonParam["std_cell_names"]["dffrpq_3x_name"]
+
+	nstg    =jsonParam["dco_design_params"]["nstg"]
+	ndrv    =jsonParam["dco_design_params"]["ndrv"]
+	ncc     =jsonParam["dco_design_params"]["ncc"]
+	nfc     =jsonParam["dco_design_params"]["nfc"]
+	ncc_dead=jsonParam["dco_design_params"]["ncc_dead"]
+
+	pre_ls_ref_nstg_cc_tune =jsonParam["tstdc_counter_design_params"]["pre_ls_ref_nstg_cc_tune"]
+	pre_ls_ref_ncc_tune     =jsonParam["tstdc_counter_design_params"]["pre_ls_ref_ncc_tune"]
+	pre_ls_ref_nfc          =jsonParam["tstdc_counter_design_params"]["pre_ls_ref_nfc"]
+	dltdc_num_ph            =jsonParam["tstdc_counter_design_params"]["dltdc_num_ph"]
+	dltdc_nfc               =jsonParam["tstdc_counter_design_params"]["dltdc_nfc"]
+	dltdc_ndrv              =jsonParam["tstdc_counter_design_params"]["dltdc_ndrv"]
+	dltdc_ncc               =jsonParam["tstdc_counter_design_params"]["dltdc_ncc"]
+	pre_nstg_ref_ls         =jsonParam["tstdc_counter_design_params"]["pre_nstg_ref_ls"]
+	pre_nstg_ref            =jsonParam["tstdc_counter_design_params"]["pre_nstg_ref"]
+	pre_nstg_fb             =jsonParam["tstdc_counter_design_params"]["pre_nstg_fb"]
+	ppath_nstg              =jsonParam["tstdc_counter_design_params"]["ppath_nstg"]
+	pre_ls_ref_nstg         =jsonParam["tstdc_counter_design_params"]["pre_ls_ref_nstg"]
+	post_ls_ref_nstg        =jsonParam["tstdc_counter_design_params"]["post_ls_ref_nstg"]
+	post_ls_ref_nstg_cc_tune=jsonParam["tstdc_counter_design_params"]["post_ls_ref_nstg_cc_tune"]
+	post_ls_ref_ncc_tune    =jsonParam["tstdc_counter_design_params"]["post_ls_ref_ncc_tune"]
+	pre_es_fb_nstg          =jsonParam["tstdc_counter_design_params"]["pre_es_fb_nstg"]
+	pre_es_fb_nstg_cc_tune  =jsonParam["tstdc_counter_design_params"]["pre_es_fb_nstg_cc_tune"]
+	pre_es_fb_ncc_tune      =jsonParam["tstdc_counter_design_params"]["pre_es_fb_ncc_tune"]
+	post_es_fb_nstg         =jsonParam["tstdc_counter_design_params"]["post_es_fb_nstg"]
+	post_es_fb_nstg_cc_tune =jsonParam["tstdc_counter_design_params"]["post_es_fb_nstg_cc_tune"]
+	post_es_fb_ncc_tune     =jsonParam["tstdc_counter_design_params"]["post_es_fb_ncc_tune"]
+
+
+	std_cell_names=[buf8x_name,buf2x_name,buf4x_name,buf10x_name,dff_name,inv0p6x_name,buf16x_name,buf14x_name,embtdc_dff_name,xnor2_0p6_name,dffrpq_3x_name]
+	dco_design_params = [nstg,ndrv,ncc,nfc,ncc_dead]
+	tstdc_counter_design_params=[pre_ls_ref_nstg_cc_tune,pre_ls_ref_ncc_tune,pre_ls_ref_nfc,dltdc_num_ph,dltdc_nfc,dltdc_ndrv,dltdc_ncc,pre_nstg_ref_ls,pre_nstg_ref,pre_nstg_fb,ppath_nstg,pre_ls_ref_nstg,post_ls_ref_nstg,post_ls_ref_nstg_cc_tune,post_ls_ref_ncc_tune,pre_es_fb_nstg,pre_es_fb_nstg_cc_tune,pre_ds_fb_ncc_tune,post_es_fb_nstg,post_es_fb_nstg_cc_tune,post_es_fb_ncc_tune] 
+
+def ble_dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform, vsimDir,tdc_flowDir):
+	# verilog sim
+	vsimDirs_list = [vsimDir, vsimDir+'/verilog',vsimDir+'/aprVerilog']
+	gen_subDirs(vsimDirs_list)
+
+	if outMode=="macro" or outMode=="full":
+		gen_subDirs([absPvtDir_plat])
+
+		hspiceDirs_split = hspiceDir.split("/")
+
+		hspiceDirs_pol = hspiceDirs_split[1:len(hspiceDirs_split)-1]
+
+		hspiceDirs_pol2 = []
+		Dir_accum = hspiceDirs_pol[0] 
+		for cnt in range(len(hspiceDirs_pol)):
+			if cnt==0:
+				Dir_accum = '/'+hspiceDirs_pol[0] 
+			else:	
+				Dir_accum = Dir_accum + "/" + hspiceDirs_pol[cnt] 
+			hspiceDirs_pol2.append(Dir_accum) 
+
+		print(hspiceDirs_pol2)
+		gen_subDirs(hspiceDirs_pol2)
+
+		hspiceDirs=[hspiceDir,hspiceDir+'/NETLIST',hspiceDir+'/TB',hspiceDir+'/DUMP_result',hspiceDir+'/TBrf',hspiceDir+'/DUMPrf_result',hspiceDir+'/pex_NETLIST',hspiceDir+'/pex_TB',hspiceDir+'/pex_DUMP_result',hspiceDir+'/pex_NETLIST_scs',hspiceDir+'/pex_TB_scs',hspiceDir+'/pex_DUMP_result_scs']
+		gen_subDirs(hspiceDirs)
+
+		finesimDirs=[finesimDir,finesimDir+'/NETLIST',finesimDir+'/TB',finesimDir+'/DUMP_result',finesimDir+'/TBrf',finesimDir+'/DUMPrf_result',finesimDir+'/pex_NETLIST',finesimDir+'/pex_TB',finesimDir+'/pex_DUMP_result']
+		gen_subDirs(finesimDirs)
+
+		extDirs=[extDir,extDir+'/run',extDir+'/run_scs',extDir+'/sch',extDir+'/layout',extDir+'/runsets']
+		gen_subDirs(extDirs)
+
+		p=sp.Popen(['cp',calibreRulesDir+'/calibre.lvs',extDir+'/run/'])
+		p.wait()
+		p=sp.Popen(['cp',calibreRulesDir+'/calibre.rcx',extDir+'/run/'])
+		p.wait()
+	
+		dco_flowDirs=[dco_flowDir,dco_flowDir+'/src',dco_flowDir+'/scripts',dco_flowDir+'/scripts/innovus',dco_flowDir+'/scripts/dc',dco_flowDir+'/scripts/genus']
+		gen_subDirs(dco_flowDirs)
+	
+		outbuff_div_flowDirs=[outbuff_div_flowDir]
+		gen_subDirs(outbuff_div_flowDirs)
+
+		pll_flowDirs=[pll_flowDir,pll_flowDir+'/src',pll_flowDir+'/scripts',pll_flowDir+'/scripts/innovus',pll_flowDir+'/scripts/dc',pll_flowDir+'/scripts/genus']
+		gen_subDirs(pll_flowDirs)
+
+		tdc_flowDirs=[tdc_flowDir,tdc_flowDir+'/src',tdc_flowDir+'/scripts',tdc_flowDir+'/scripts/innovus',tdc_flowDir+'/scripts/dc',tdc_flowDir+'/scripts/genus']
+		gen_subDirs(tdc_flowDirs)
+
+	if outputDir!=0:
+		gen_subDirs([outputDir])

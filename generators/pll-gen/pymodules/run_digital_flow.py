@@ -1795,6 +1795,7 @@ def dco_inv_flow_genus(formatDir,flowDir,dcoName,bleach,ndrv,nstg,platform,INV_n
 		for line in lines_const:
 			nm1.printline(line,wvfile)
 
+
 def dco_verilog_gen(outMode,designName,genDir,outDir,formatDir,flowDir,ndrv,ncc,nfc,nstg,verilogSrcDir,buf_small,bufz,buf_big,edge_sel,dcoName,platform,ncc_dead,dco_CC_name,dco_FC_name,buf1_name,buf2_name,buf3_name):
 
 	#--- generate verilog file: DCO ---
@@ -2108,3 +2109,733 @@ def dco_custom_place_v2p5_genus(formatDir,outputDir,crscell_dim,finecell_dim,ncr
 	with open(outputDir+"custom_place.tcl","w") as w_tcl:
 		for line in lines:
 			netmap1.printline(line,w_tcl)
+
+#=======================================================================================================
+# BLE generators from here
+#=======================================================================================================
+
+def dco_flow_decap_pwr2(formatDir,flowDir,dcoName,bleach,ndrv,ncc,nfc,nstg,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name, dcocp_version, welltap_dim, welltap_xc,ND, decap_dim):
+	#--- calculate area ---
+	NCtotal=nstg*(ncc+ndrv)
+	NFtotal=nstg*(nfc)
+	A_dco=NCtotal*W_CC*H_CC+NFtotal*W_FC*H_FC
+
+	W_decap = decap_dim[0]
+	H_decap = decap_dim[1]
+	nspace=1
+	#nxoff=4
+	#nxoff=14
+	nxoff=6
+	nyoff=6
+	W_dco=math.ceil((W_CC*ncc+W_FC*nfc+nxoff*W_FC*2+W_CC*ND + W_decap*3)/2)*2
+	H_dco=math.ceil((H_CC*nstg+H_CC*nyoff + H_decap*8)/2)*2
+	print("W/H of DCO: %.3f, %.3f"%(W_dco, H_dco))
+	dco_custom_place_v3_pwr2(formatDir,flowDir+'scripts/innovus/',[W_CC, H_CC],[W_FC, H_FC],ncc,int(nfc/2),nstg,ndrv,nspace,nxoff,nyoff,welltap_dim,welltap_xc,ND,decap_dim)
+	#--- generate pre_place.tcl with editPin_gen ---	
+	version=2
+	wfile_name=flowDir+'scripts/innovus/pre_place.tcl'
+	editPin_gen_se_pwr2(ndrv,ncc,nfc,nstg,formatDir,wfile_name)
+	print ('#======================================================================')
+	print('# ready for synth & apr')
+	print ('#======================================================================')
+	#--- bleach ---
+	if bleach==1:
+		p = sp.Popen(['make','bleach_all'], cwd=flowDir)
+		p.wait()
+	
+	if synth==1:
+		#-------------------------------------------
+		# run CADRE flow 
+		#-------------------------------------------
+		p = sp.Popen(['make','synth'], cwd=flowDir)
+		p.wait()
+		# read total estimated area of controller (it doesn't include the aux-cells)
+		with open(flowDir + '/reports/dc/' + dcoName + '.mapped.area.rpt', \
+			  'r')as file:
+		   filedata = file.read()
+		m = re.search('Total cell area: *([0-9.]*)', filedata)
+		if m:
+		   coreCellArea = float(m.group(1))
+		   print('estimated area after synthesis is: %e'%(coreCellArea))
+		else:
+		   print ('Synthesis Failed')
+
+	if apr==1:
+		p = sp.Popen(['make','design'], cwd=flowDir)
+		p.wait()
+		
+		p = sp.Popen(['make','lvs'], cwd=flowDir)
+		p.wait()
+		
+		p = sp.Popen(['make','drc'], cwd=flowDir)
+		p.wait()
+		
+		p = sp.Popen(['make','export'], cwd=flowDir)
+		p.wait()
+
+		p = sp.Popen(['cp',dcoName+'_cutObs.lef','export/'+dcoName+'.lef'], cwd=flowDir)
+		p.wait()
+	return W_dco, H_dco	
+
+def dco_custom_place_v3_pwr2(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,nfine_h,nstg,ndrv,nspace,nxoff,nyoff, welltap_dim, welltap_xc, ND, decap_dim):
+	buf_x2_dim = [0.42, 0.672]
+	buf_x4_dim = [0.588, 0.672]
+	buf_x8_dim = [1.176, 0.672]
+	buf_x10_dim = [1.428, 0.672]
+	buf_x14_dim = [1.932, 0.672]
+	buf_x16_dim = [2.268, 0.672]
+
+	r_c = open(formatDir+"form_dco_custom_place_dCC_decap_pwr2.tcl","r") # dead CC
+	lines=list(r_c.readlines())
+
+	welltap_w=welltap_dim[0]
+	crs_w=crscell_dim[0]
+	crs_h=crscell_dim[1]
+	fine_w=finecell_dim[0]
+	fine_h=finecell_dim[1]
+	buf_x2_w = buf_x2_dim[0] 
+	buf_x4_w = buf_x4_dim[0] 
+	buf_x8_w =buf_x8_dim[0] 
+	buf_x10_w =buf_x10_dim[0] 
+	buf_x16_w =buf_x16_dim[0]
+	#xoff=nxoff*fine_w	
+	xoff=nxoff*fine_w+buf_x2_w	
+	#yoff=nyoff*fine_h
+	decap_w = decap_dim[0]
+	decap_h = decap_dim[1]
+
+	nfine_h_h=int(nfine_h/2)
+	ndrv_h=int(ndrv/2)
+	ncrs_h=int(ncrs/2)
+
+	#yoff_decap = nyoff*fine_h
+	yoff_decap = (nyoff+3)*fine_h
+	yoff = yoff_decap + nyoff*fine_h + decap_h*2
+
+	netmap1=txt_mds.netmap()
+	skip=0
+	for ig in range(nstg): # for each stage
+		if ND>0:
+			#---------------------------------------------
+			# place left off-coarse cells
+			#---------------------------------------------
+			for cntd in range(int(ND/4)):
+				if ig!=nstg-1:	
+					netmap1.get_net('nS',None,ig,ig,1) # stg
+					netmap1.get_net('nS',None,ig,ig,1) # stg
+				else:
+					netmap1.get_net('nS',None,None,'last',1) # stg
+					netmap1.get_net('nS',None,None,'last',1) # stg
+				netmap1.get_net('nD',None,2*cntd,2*cntd,1) # fine cell idx
+				netmap1.get_net('nD',None,2*cntd+1,2*cntd+1,1) # fine cell idx2
+				if cntd==0:
+					xtry=xoff
+				else:
+					xtry=xcor+crs_w
+				xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+				netmap1.get_net('DX', None, xcor, xcor, 1) # X coordinate 
+				netmap1.get_net('DX', None, xcor, xcor, 1) # X coordinate 
+				netmap1.get_net('DY',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
+				netmap1.get_net('DY',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+				if cntd==int(ND/4)-1:
+					xdc_end=xcor+crs_w
+					print("xdc_end=%.3e"%(xdc_end))
+#				print("%.2e, %d"%(xcor,skip))
+		#---------------------------------------------
+		# place left fine cells
+		#---------------------------------------------
+		for cntf in range(nfine_h_h):
+			if ig!=nstg-1:	
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('NS',None,None,'last',1) # stg
+				netmap1.get_net('NS',None,None,'last',1) # stg
+			netmap1.get_net('nf',None,2*cntf,2*cntf,1) # fine cell idx
+			netmap1.get_net('nf',None,2*cntf+1,2*cntf+1,1) # fine cell idx2
+			if cntf==0:
+				if ND==0:
+					xtry=xoff
+				elif ND>0:
+					xtry=xdc_end+fine_w*nspace
+					print("ND is greater than 0. fine cells starting from %.3e"%(xtry))
+			else:
+				xtry=xcor+fine_w
+			xcor,skip=xcorCal_skipwt(xtry, fine_w, welltap_w, welltap_xc, fine_w)
+			netmap1.get_net('LX', None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('LX', None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('LY',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
+			netmap1.get_net('LY',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+			if cntf==nfine_h_h-1:
+				xfl_end=xcor+fine_w
+				print("xfl_end=%.3e"%(xfl_end))
+			print("%.2e, %d"%(xcor,skip))
+			
+		#---------------------------------------------
+		# place driver cells
+		#---------------------------------------------
+		xd_start=xfl_end+nspace*fine_w
+		for cntd in range(ndrv_h):
+			if ig!=nstg-1:	
+				netmap1.get_net('ns',None,ig,ig,1) # stg
+				netmap1.get_net('ns',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('ns',None,None,'last',1) # stg
+				netmap1.get_net('ns',None,None,'last',1) # stg
+			if cntd==0:
+				xtry=xd_start
+			else:
+				xtry=xcor+crs_w
+			netmap1.get_net('nd',None,2*cntd,2*cntd,1) # driver cell 
+			netmap1.get_net('nd',None,2*cntd+1,2*cntd+1,1) # driver cell 
+			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+			print("%.2e, %d"%(xcor,skip))
+			netmap1.get_net('lx',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('lx',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('ly',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
+			netmap1.get_net('ly',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+			if cntd==ndrv_h-1:
+				xd_end=xcor+crs_w 
+				print("xd_end=%.3e"%(xd_end))
+		#---------------------------------------------
+		# place coarse cells
+		#---------------------------------------------
+		for cntc in range(ncrs_h):
+			if ig!=nstg-1:	
+				netmap1.get_net('Ns',None,ig,ig,1) # stg
+				netmap1.get_net('Ns',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('Ns',None,None,'last',1) # stg
+				netmap1.get_net('Ns',None,None,'last',1) # stg
+			if cntc==0:
+				xtry=xd_end
+			else:
+				xtry=xcor+crs_w
+			netmap1.get_net('nc',None,2*cntc,2*cntc,1) # coarse cell 
+			netmap1.get_net('nc',None,2*cntc+1,2*cntc+1,1) # coarse cell 
+			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+			print("%.2e, %d"%(xcor,skip))
+			netmap1.get_net('Lx',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('Lx',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('Ly',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
+			netmap1.get_net('Ly',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+			if cntc==ncrs_h-1:
+				xc_end=xcor+crs_w 
+				print("xc_end=%.3e"%(xc_end))
+		#---------------------------------------------
+		# place right fine cells
+		#---------------------------------------------
+		xfr_start=xc_end+nspace*fine_w
+		for cntf in range(nfine_h_h):
+			if ig!=nstg-1:	
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+				netmap1.get_net('NS',None,ig,ig,1) # stg
+			else:
+				netmap1.get_net('NS',None,None,'last',1) # stg
+				netmap1.get_net('NS',None,None,'last',1) # stg
+			if cntf==0:
+				xtry=xfr_start
+			else:
+				xtry=xcor+fine_w
+			netmap1.get_net('nf',None,2*cntf+nfine_h,2*cntf+nfine_h,1) # fine cell
+			netmap1.get_net('nf',None,2*cntf+nfine_h+1,2*cntf+nfine_h+1,1) # fine cell
+			xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+			netmap1.get_net('LX',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('LX',None, xcor, xcor, 1) # X coordinate 
+			netmap1.get_net('LY',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate 
+			netmap1.get_net('LY',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate 
+			if cntf==nfine_h_h-1:
+				xfr_end=xcor+fine_w
+		if ND>0:
+			#---------------------------------------------
+			# place left off-coarse cells
+			#---------------------------------------------
+			for cntd in range(int(ND/4),int(ND/2)):
+				if ig!=nstg-1:	
+					netmap1.get_net('nS',None,ig,ig,1) # stg
+					netmap1.get_net('nS',None,ig,ig,1) # stg
+				else:
+					netmap1.get_net('nS',None,None,'last',1) # stg
+					netmap1.get_net('nS',None,None,'last',1) # stg
+				netmap1.get_net('nD',None,2*cntd,2*cntd,1) # fine cell idx
+				netmap1.get_net('nD',None,2*cntd+1,2*cntd+1,1) # fine cell idx2
+				if cntd==0:
+					xtry=xfr_end
+				else:
+					xtry=xcor+crs_w
+				xcor,skip=xcorCal_skipwt(xtry, crs_w, welltap_w, welltap_xc, fine_w)
+				netmap1.get_net('DX', None, xcor, xcor, 1) # X coordinate 
+				netmap1.get_net('DX', None, xcor, xcor, 1) # X coordinate 
+				netmap1.get_net('DY',None,yoff+2*ig*crs_h,yoff+2*ig*crs_h,1) # Y coordinate
+				netmap1.get_net('DY',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+				if cntd==int(ND/2)-1:
+					xdc_end=xcor+crs_w
+	#---------------------------------------------
+	# place decaps - 1 : for dco
+	# decap0~25 
+	#---------------------------------------------
+
+	#h_decap_x_start = 6.508 
+	h_decap_x_start = 6.468  
+	v_decap_x_start = h_decap_x_start + 4*decap_w 
+	h2_decap_y_start = yoff_decap + 3*decap_h 
+	# top/bottom horizontal 4 lines
+	for ic in range(4):
+		xcor = h_decap_x_start + decap_w*ic
+		netmap1.get_net('dc', None, 2*ic, 2*ic, 1) # name 
+		netmap1.get_net('dc', None, 2*ic+1, 2*ic+1, 1) # name 
+		netmap1.get_net('cx', None, xcor, xcor, 1) # X coordinate 
+		netmap1.get_net('cx', None, xcor, xcor, 1) # X coordinate 
+		netmap1.get_net('cy',None,h2_decap_y_start, h2_decap_y_start,1) # Y coordinate
+		netmap1.get_net('cy',None,h2_decap_y_start + decap_h, h2_decap_y_start + decap_h,1) # Y coordinate
+		netmap1.get_net('DH', None, 2*ic, 2*ic, 1) # name 
+		netmap1.get_net('DH', None, 2*ic+1, 2*ic+1, 1) # name 
+	for ic in range(4):
+		xcor = h_decap_x_start + decap_w*ic
+		netmap1.get_net('dc', None, 2*ic+8, 2*ic+8, 1) # name 
+		netmap1.get_net('dc', None, 2*ic+9, 2*ic+9, 1) # name 
+		netmap1.get_net('cx', None, xcor, xcor, 1) # X coordinate 
+		netmap1.get_net('cx', None, xcor, xcor, 1) # X coordinate 
+		netmap1.get_net('cy',None,yoff_decap, yoff_decap,1) # Y coordinate
+		netmap1.get_net('cy',None,yoff_decap + decap_h,yoff_decap + decap_h,1) # Y coordinate
+		netmap1.get_net('DH', None, 2*ic+8, 2*ic+8, 1) # name 
+		netmap1.get_net('DH', None, 2*ic+9, 2*ic+9, 1) # name 
+	
+	# right vertical 2 lines
+	for ic in range(5):
+		xcor = v_decap_x_start
+		netmap1.get_net('dc', None, ic+16, ic+16, 1) # name 
+		netmap1.get_net('dc', None, ic+21, ic+21, 1) # name 
+		netmap1.get_net('cx', None, xcor, xcor, 1) # X coordinate 
+		netmap1.get_net('cx', None, xcor+decap_w, xcor+decap_w, 1) # X coordinate 
+		netmap1.get_net('cy',None,yoff_decap + ic*decap_h, yoff_decap + ic*decap_h,1) # Y coordinate
+		netmap1.get_net('cy',None,yoff_decap + ic*decap_h, yoff_decap + ic*decap_h,1) # Y coordinate
+		netmap1.get_net('DH', None, ic+16, ic+16, 1) # name 
+		netmap1.get_net('DH', None, ic+21, ic+21, 1) # name 
+
+	#---------------------------------------------
+	# place decaps - 2: for buffers/dividers
+	# 6 on top, 6 on bottom
+	# decap26~37 
+	#---------------------------------------------
+
+	#h_decap_x_start = 6.508 
+	h_decap_x_start2 = v_decap_x_start + 3*decap_w
+	# top/bottom horizontal 4 lines
+	for ic in range(2):
+		xcor = h_decap_x_start2 + decap_w*ic
+		netmap1.get_net('DC', None, 2*ic, 2*ic, 1) # name 
+		netmap1.get_net('DC', None, 2*ic+1, 2*ic+1, 1) # name 
+		netmap1.get_net('CX', None, xcor, xcor, 1) # X coordinate 
+		netmap1.get_net('CX', None, xcor, xcor, 1) # X coordinate 
+		netmap1.get_net('CY',None,h2_decap_y_start, h2_decap_y_start,1) # Y coordinate
+		netmap1.get_net('CY',None,h2_decap_y_start + decap_h, h2_decap_y_start + decap_h,1) # Y coordinate
+		netmap1.get_net('dH', None, 2*ic, 2*ic, 1) # name 
+		netmap1.get_net('dH', None, 2*ic+1, 2*ic+1, 1) # name 
+	for ic in range(2,4):
+		xcor = h_decap_x_start2 + decap_w*(ic-2)
+		netmap1.get_net('DC', None, 2*ic, 2*ic, 1) # name 
+		netmap1.get_net('DC', None, 2*ic+1, 2*ic+1, 1) # name 
+		netmap1.get_net('CX', None, xcor, xcor, 1) # X coordinate 
+		netmap1.get_net('CX', None, xcor, xcor, 1) # X coordinate 
+		netmap1.get_net('CY',None,yoff_decap, yoff_decap,1) # Y coordinate
+		netmap1.get_net('CY',None,yoff_decap + decap_h,yoff_decap + decap_h,1) # Y coordinate
+		netmap1.get_net('dH', None, 2*ic, 2*ic, 1) # name 
+		netmap1.get_net('dH', None, 2*ic+1, 2*ic+1, 1) # name 
+
+	#---------------------------------------------
+	# place buffers & dividers 
+	#---------------------------------------------
+	v_decap_x_end = v_decap_x_start + 2*decap_w
+	bufpwr_x_start = v_decap_x_end + 8
+	direct_out_x_start = bufpwr_x_start
+	buf_crs_w = 1.008	
+	div_dff_w = 1.932
+	inv_min_w = 0.168
+
+	# tdc buffer
+	tdc_buf_x = xoff - buf_x8_w
+	for ig in range(nstg): # for each stage
+		if ig!=nstg-1:	
+			netmap1.get_net('tb',None,ig,ig,1) # stg
+		else:
+			netmap1.get_net('tb',None,None,'last',1) # stg
+		netmap1.get_net('tx', None, tdc_buf_x, tdc_buf_x, 1) # X coordinate 
+		netmap1.get_net('ty',None,yoff+(2*ig+1)*crs_h,yoff+(2*ig+1)*crs_h,1) # Y coordinate
+
+	# direct outbuf
+	for ib in range(4):
+		netmap1.get_net('do', None, ib, ib, 1)
+		netmap1.get_net('dx', None, bufpwr_x_start + ib//2*buf_crs_w,  bufpwr_x_start + ib//2*buf_crs_w, 1) # X coordinate 
+		netmap1.get_net('dy',None,yoff + ib%2*crs_h,yoff + ib%2*crs_h,1) # Y coordinate
+
+	# divider dffs + invs + CCs
+	for ib in range(8):
+		# dffs
+		netmap1.get_net('ds', None, ib, ib, 1)
+		netmap1.get_net('vx', None, direct_out_x_start + inv_min_w,  direct_out_x_start + inv_min_w, 1) # X coordinate 
+		#netmap1.get_net('vy',None,yoff + 2*(ib+1)*crs_h,yoff + 2*(ib+1)*crs_h,1) # Y coordinate
+		netmap1.get_net('vy',None,yoff + (ib+2)*crs_h,yoff + (ib+2)*crs_h,1) # Y coordinate
+		# invs
+		netmap1.get_net('di', None, ib, ib, 1)
+		netmap1.get_net('ix', None, direct_out_x_start,  direct_out_x_start, 1) # X coordinate 
+		#netmap1.get_net('iy',None,yoff + 2*(ib+1)*crs_h,yoff + 2*(ib+1)*crs_h,1) # Y coordinate
+		netmap1.get_net('iy',None,yoff + (ib+2)*crs_h,yoff + (ib+2)*crs_h,1) # Y coordinate
+		# CCs
+		for ibb in range(4):
+			netmap1.get_net('Db', None, ib, ib, 1)
+			netmap1.get_net('db', None, ibb, ibb, 1)
+			netmap1.get_net('Vx', None, direct_out_x_start + inv_min_w + div_dff_w + ibb*buf_crs_w,  direct_out_x_start + inv_min_w + div_dff_w + ibb*buf_crs_w, 1) # X coordinate 
+			#netmap1.get_net('Vy',None,yoff + 2*(ib+1)*crs_h,yoff + 2*(ib+1)*crs_h,1) # Y coordinate
+			netmap1.get_net('Vy',None,yoff + (ib+2)*crs_h,yoff + (ib+2)*crs_h,1) # Y coordinate
+
+	# scpa buffer
+	scpa_buf_ystart = yoff + (2*3+1)*crs_h
+	scpa_buf_xstart_left = xdc_end + 4*fine_w
+	scpa_buf_xstart_right =  direct_out_x_start + div_dff_w + 5*buf_crs_w 
+	for ib in range(9):
+		if (ib<3): # left of decap vertical line
+			netmap1.get_net('PB', None, ib, ib, 1)
+			netmap1.get_net('PX', None, scpa_buf_xstart_left, scpa_buf_xstart_left, 1) # X coordinate 
+			#netmap1.get_net('py',None,yoff+(ib+1)*crs_h,yoff+(ib+1)*crs_h,1) # Y coordinate
+			netmap1.get_net('PY',None,scpa_buf_ystart+ib*crs_h,scpa_buf_ystart+ib*crs_h,1) # Y coordinate
+		elif (ib<5): # right of decap vertical line
+			netmap1.get_net('pb', None, ib, ib, 1)
+			netmap1.get_net('px', None, scpa_buf_xstart_right, scpa_buf_xstart_right, 1) # X coordinate 
+			netmap1.get_net('py',None,scpa_buf_ystart+(ib-3)*crs_h,scpa_buf_ystart+(ib-3)*crs_h,1) # Y coordinate
+		else: # right of decap vertical line
+			netmap1.get_net('pb', None, ib, ib, 1)
+			netmap1.get_net('px', None, scpa_buf_xstart_right + buf_x16_w, scpa_buf_xstart_right + buf_x16_w, 1) # X coordinate 
+			netmap1.get_net('py',None,scpa_buf_ystart+(ib-5)*crs_h,scpa_buf_ystart+(ib-5)*crs_h,1) # Y coordinate
+
+	# clkout buffer
+	clkout_buf_xstart =  direct_out_x_start + div_dff_w + 4*buf_crs_w
+	for ib in range(11):
+		if (ib<3): # left of decap vertical line
+			netmap1.get_net('CB', None, ib, ib, 1)
+			netmap1.get_net('BX', None, scpa_buf_xstart_left, scpa_buf_xstart_left, 1) # X coordinate 
+			netmap1.get_net('BY',None,yoff+(ib-3)*crs_h,yoff+(ib-3)*crs_h,1) # Y coordinate
+		elif (ib<5): # bottom of decap horizontal line 
+			netmap1.get_net('cb', None, ib, ib, 1)
+			netmap1.get_net('bx', None, clkout_buf_xstart, clkout_buf_xstart, 1) # X coordinate 
+			netmap1.get_net('by',None,yoff + (ib-3)*crs_h,yoff + (ib-3)*crs_h,1) # Y coordinate
+		else: # bottom of decap horizontal line 
+			netmap1.get_net('cb', None, ib, ib, 1)
+			netmap1.get_net('bx', None, clkout_buf_xstart + buf_x16_w, clkout_buf_xstart + buf_x16_w, 1) # X coordinate 
+			netmap1.get_net('by',None,yoff + (ib-5)*crs_h,yoff + (ib-5)*crs_h,1) # Y coordinate
+
+	# cutRow
+	endcap_w = 1.008
+	cutRow_w = 1.4	
+	area1_llxy = [v_decap_x_end+endcap_w*3, yoff_decap - fine_h*4 - cutRow_w]
+	area1_urxy = [area1_llxy[0]+cutRow_w, yoff_decap + 5*decap_h + fine_h*4 + cutRow_w]
+
+	area2_llxy = [area1_urxy[0], area1_urxy[1]-cutRow_w]
+	area2_urxy = [h_decap_x_start2 + 2*decap_w + endcap_w*3 + cutRow_w, area2_llxy[1]+cutRow_w]
+
+	area3_llxy = [area2_urxy[0]-cutRow_w, area1_llxy[1]]
+	area3_urxy = [area3_llxy[0], area2_urxy[1]]
+
+	area4_llxy = [area1_llxy[0], area1_llxy[1]-cutRow_w]
+	area4_urxy = [area3_llxy[0]+cutRow_w, area1_llxy[1]+cutRow_w]
+
+	netmap1.get_net('c1', None,area1_llxy[0],area1_llxy[0], 1) # X coordinate 
+#	netmap1.get_net('c2', None,area1_llxy[1],area1_llxy[1], 1) # X coordinate 
+	netmap1.get_net('c3', None,area1_urxy[0],area1_urxy[0], 1) # X coordinate 
+#	netmap1.get_net('c4', None,area1_urxy[1],area1_urxy[1], 1) # X coordinate 
+	#netmap1.get_net('c1', None,area2_llxy[0],area2_llxy[0], 1) # X coordinate 
+	#netmap1.get_net('c2', None,area2_llxy[1],area2_llxy[1], 1) # X coordinate 
+	#netmap1.get_net('c3', None,area2_urxy[0],area2_urxy[0], 1) # X coordinate 
+	#netmap1.get_net('c4', None,area2_urxy[1],area2_urxy[1], 1) # X coordinate 
+	#netmap1.get_net('c1', None,area3_llxy[0],area3_llxy[0], 1) # X coordinate 
+	#netmap1.get_net('c2', None,area3_llxy[1],area3_llxy[1], 1) # X coordinate 
+	#netmap1.get_net('c3', None,area3_urxy[0],area3_urxy[0], 1) # X coordinate 
+	#netmap1.get_net('c4', None,area3_urxy[1],area3_urxy[1], 1) # X coordinate 
+	#netmap1.get_net('c1', None,area4_llxy[0],area4_llxy[0], 1) # X coordinate 
+	#netmap1.get_net('c2', None,area4_llxy[1],area4_llxy[1], 1) # X coordinate 
+	#netmap1.get_net('c3', None,area4_urxy[0],area4_urxy[0], 1) # X coordinate 
+	#netmap1.get_net('c4', None,area4_urxy[1],area4_urxy[1], 1) # X coordinate 
+
+	with open(outputDir+"custom_place.tcl","w") as w_tcl:
+		for line in lines:
+			netmap1.printline(line,w_tcl)
+
+def editPin_gen_se_pwr2(Ndrv,Ncc,Nfc,Nstg,formatDir,wfile_name):
+	nCC=Ncc*Nstg
+	nFC=Nfc*Nstg
+	nPout=Nstg*2
+	
+	#rfile=open(formatDir+'/form_floorplan_test.tcl','r')
+	#rfile=open('ignore_form_floorplan.tcl','r')
+	rfile=open(formatDir+'/form_dco_pre_place_se_pwr2.tcl','r')
+	wfile=open(wfile_name,'w')
+	
+	#========================================================================
+	# Version 2
+	#	for floor plan.tcl: spreading out the pin
+	# 	this is the 2nd version, with all the edge selection spread out,
+	#	PH_P/N_out*, CLK_OUT are only concentrated in the bottom,
+	#	all other pins are spread 4-side to reduce the delay mismatch between cells
+	#========================================================================
+	Nedge_start=Nstg*2
+	eps=int(Nstg/2) # edge_per_side per either N or P
+	nm2=txt_mds.netmap()
+	
+	#--- distribute PH_P_OUT, PH_N_OUT ---
+	nm2.get_net('po',None,0,Nstg//2,1)
+	nm2.get_net('Po',None,Nstg//2+1,Nstg-1,1)
+	
+	lines=list(rfile.readlines())
+	istg=0
+	for line in lines:
+		if line[0:2]=='@E': 
+			nm1=txt_mds.netmap()
+			nm1.get_net('f1','FC[',istg,istg+Nstg*(Nfc-1),Nstg)
+			nm1.get_net('fb','FCB[',istg,istg+Nstg*(Nfc-1),Nstg)
+			nm1.get_net('c1','CC[',istg,istg+Nstg*(Ncc-1),Nstg)
+			nm1.printline(line,wfile)
+			istg=istg+1
+		else:
+			nm2.printline(line,wfile)
+
+def ble_verilog_gen(outMode,outDir,formatDir,dp_json):
+	print ('#----------------------------------------------------------------------')
+	print ('# Loading ' +dp_json+ ' design parameter file...')
+	print ('#----------------------------------------------------------------------')
+	try:
+	  with open(dp_json) as file:
+	    jsonParam = json.load(file)
+	except ValueError as e:
+	  print ('Error occurred opening or loading json file.')
+	  sys.exit(1)
+
+	# Get the config variable from platfom config file
+	buf8x_name    = jsonParam["std_cell_names"]["buf8x_name"]
+	buf2x_name    = jsonParam["std_cell_names"]["buf2x_name"]
+	buf4x_name    = jsonParam["std_cell_names"]["buf4x_name"]
+	buf10x_name   = jsonParam["std_cell_names"]["buf10x_name"]
+	dff_name      = jsonParam["std_cell_names"]["dff_name"]
+	inv0p6x_name  = jsonParam["std_cell_names"]["inv0p6x_name"]
+	buf16x_name   = jsonParam["std_cell_names"]["buf16x_name"]
+	buf14x_name   = jsonParam["std_cell_names"]["buf14x_name"]
+	embtdc_dff_name=jsonParam["std_cell_names"]["embtdc_dff_name"]
+	xnor2_0p6_name =jsonParam["std_cell_names"]["xnor2_0p6_name"]
+	dffrpq_3x_name =jsonParam["std_cell_names"]["dffrpq_3x_name"]
+	dffq_name =jsonParam["std_cell_names"]["dffq_name"]
+
+	nstg    =jsonParam["dco_design_params"]["nstg"]
+	ndrv    =jsonParam["dco_design_params"]["ndrv"]
+	ncc     =jsonParam["dco_design_params"]["ncc"]
+	nfc     =jsonParam["dco_design_params"]["nfc"]
+	ncc_dead=jsonParam["dco_design_params"]["ncc_dead"]
+
+	pre_ls_ref_nstg_cc_tune =jsonParam["tstdc_counter_design_params"]["pre_ls_ref_nstg_cc_tune"]
+	pre_ls_ref_ncc_tune     =jsonParam["tstdc_counter_design_params"]["pre_ls_ref_ncc_tune"]
+	pre_ls_ref_nfc          =jsonParam["tstdc_counter_design_params"]["pre_ls_ref_nfc"]
+	dltdc_num_ph            =jsonParam["tstdc_counter_design_params"]["dltdc_num_ph"]
+	dltdc_nfc               =jsonParam["tstdc_counter_design_params"]["dltdc_nfc"]
+	dltdc_ndrv              =jsonParam["tstdc_counter_design_params"]["dltdc_ndrv"]
+	dltdc_ncc               =jsonParam["tstdc_counter_design_params"]["dltdc_ncc"]
+	pre_nstg_ref_ls         =jsonParam["tstdc_counter_design_params"]["pre_nstg_ref_ls"]
+	pre_nstg_ref            =jsonParam["tstdc_counter_design_params"]["pre_nstg_ref"]
+	pre_nstg_fb             =jsonParam["tstdc_counter_design_params"]["pre_nstg_fb"]
+	ppath_nstg              =jsonParam["tstdc_counter_design_params"]["ppath_nstg"]
+	pre_ls_ref_nstg         =jsonParam["tstdc_counter_design_params"]["pre_ls_ref_nstg"]
+	post_ls_ref_nstg        =jsonParam["tstdc_counter_design_params"]["post_ls_ref_nstg"]
+	post_ls_ref_nstg_cc_tune=jsonParam["tstdc_counter_design_params"]["post_ls_ref_nstg_cc_tune"]
+	post_ls_ref_ncc_tune    =jsonParam["tstdc_counter_design_params"]["post_ls_ref_ncc_tune"]
+	pre_es_fb_nstg          =jsonParam["tstdc_counter_design_params"]["pre_es_fb_nstg"]
+	pre_es_fb_nstg_cc_tune  =jsonParam["tstdc_counter_design_params"]["pre_es_fb_nstg_cc_tune"]
+	pre_es_fb_ncc_tune      =jsonParam["tstdc_counter_design_params"]["pre_es_fb_ncc_tune"]
+	post_es_fb_nstg         =jsonParam["tstdc_counter_design_params"]["post_es_fb_nstg"]
+	post_es_fb_nstg_cc_tune =jsonParam["tstdc_counter_design_params"]["post_es_fb_nstg_cc_tune"]
+	post_es_fb_ncc_tune     =jsonParam["tstdc_counter_design_params"]["post_es_fb_ncc_tune"]
+
+	#--- generate verilog file: BLE_DCO ---
+	rvfile=open(formatDir+'/ble_dco/form_ble_dco.v','r')
+	nm1=txt_mds.netmap()
+	# design params
+	nm1.get_net('nM',None,nstg,nstg,1)
+	nm1.get_net('nD',None,ndrv,ndrv,1)
+	nm1.get_net('nC',None,ncc,ncc,1)
+	nm1.get_net('nF',None,nfc,nfc,1)
+	nm1.get_net('ND',None,ncc_dead,ncc_dead,1)
+	
+	# cell names
+	nm1.get_net('b8',buf8x_name,None,None,None)
+	nm1.get_net('B8',buf8x_name,None,None,None)
+	nm1.get_net('b2',buf2x_name,None,None,None)
+	nm1.get_net('b4',buf4x_name,None,None,None)
+	nm1.get_net('bt',buf10x_name,None,None,None)
+	nm1.get_net('B2',buf2x_name,None,None,None)
+	nm1.get_net('B4',buf4x_name,None,None,None)
+	nm1.get_net('BT',buf10x_name,None,None,None)
+	nm1.get_net('bT',buf10x_name,None,None,None)
+	nm1.get_net('df',dff_name,None,None,None)
+	nm1.get_net('i6',inv0p6x_name,None,None,None)
+	nm1.get_net('Bt',buf10x_name,None,None,None)
+	nm1.get_net('BB',buf16x_name,None,None,None)
+	nm1.get_net('Bb',buf16x_name,None,None,None)
+	nm1.get_net('bf',buf14x_name,None,None,None)
+	nm1.get_net('bF',buf14x_name,None,None,None)
+	nm1.get_net('Bf',buf14x_name,None,None,None)
+	nm1.get_net('BF',buf14x_name,None,None,None)
+	nm1.get_net('bn',buf14x_name,None,None,None)
+	nm1.get_net('Bn',buf14x_name,None,None,None)
+
+	with open(outDir+'/ble_dco.v','w') as wvfile:
+		lines_const=list(rvfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wvfile)
+
+	#--- generate verilog file: tstdc_counter ---
+	rvfile=open(formatDir+'/tstdc_counter/form_tstdc_counter.sv','r')
+	nm1=txt_mds.netmap()
+	# design params
+	nm1.get_net('rM',None,pre_ls_ref_nstg_cc_tune,pre_ls_ref_nstg_cc_tune,1)
+	nm1.get_net('rC',None,pre_ls_ref_ncc_tune,pre_ls_ref_ncc_tune,1)
+	nm1.get_net('rF',None,pre_ls_ref_nfc,pre_ls_ref_nfc,1)
+	nm1.get_net('nF',None,nfc,nfc,1)
+	nm1.get_net('dM',None,dltdc_num_ph,dltdc_num_ph,1)
+	nm1.get_net('ff',None,dltdc_nfc,dltdc_nfc,1)
+	nm1.get_net('fr',None,dltdc_nfc,dltdc_nfc,1)
+	nm1.get_net('df',None,dltdc_ndrv,dltdc_ndrv,1)
+	nm1.get_net('dr',None,dltdc_ndrv,dltdc_ndrv,1)
+	nm1.get_net('cf',None,dltdc_ncc,dltdc_ncc,1)
+	nm1.get_net('cr',None,dltdc_ncc,dltdc_ncc,1)
+	nm1.get_net('pl',None,pre_nstg_ref_ls,pre_nstg_ref_ls,1)
+	nm1.get_net('pr',None,pre_nstg_ref,pre_nstg_ref,1)
+	nm1.get_net('pf',None,pre_nstg_fb,pre_nstg_fb,1)
+	nm1.get_net('pp',None,ppath_nstg,ppath_nstg,1)
+	nm1.get_net('b4',buf4x_name,None,None,None)
+	nm1.get_net('b8',buf8x_name,None,None,None)
+	nm1.get_net('b2',buf2x_name,None,None,None)
+	nm1.get_net('B2',buf2x_name,None,None,None)
+
+	with open(outDir+'/tstdc_counter.v','w') as wvfile:
+		lines_const=list(rvfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wvfile)
+
+	#--- generate verilog file: dltdc_v3 ---
+	rvfile=open(formatDir+'/tstdc_counter/form_dltdc_v3.sv','r')
+	nm1=txt_mds.netmap()
+	# design params
+	nm1.get_net('pl',None,pre_ls_ref_nstg,pre_ls_ref_nstg,1)
+	nm1.get_net('rM',None,pre_ls_ref_nstg_cc_tune,pre_ls_ref_nstg_cc_tune,1)
+	nm1.get_net('rC',None,pre_ls_ref_ncc_tune,pre_ls_ref_ncc_tune,1)
+	nm1.get_net('rF',None,pre_ls_ref_nfc,pre_ls_ref_nfc,1)
+	nm1.get_net('Pl',None,post_ls_ref_nstg,post_ls_ref_nstg,1)
+	nm1.get_net('RM',None,post_ls_ref_nstg_cc_tune,post_ls_ref_nstg_cc_tune,1)
+	nm1.get_net('RC',None,post_ls_ref_ncc_tune,post_ls_ref_ncc_tune,1)
+	nm1.get_net('fN',None,pre_es_fb_nstg,pre_es_fb_nstg,1)
+	nm1.get_net('ft',None,pre_es_fb_nstg_cc_tune,pre_es_fb_nstg_cc_tune,1)
+	nm1.get_net('fC',None,pre_es_fb_ncc_tune,pre_es_fb_ncc_tune,1)
+	nm1.get_net('FN',None,post_es_fb_nstg,post_es_fb_nstg,1)
+	nm1.get_net('FT',None,post_es_fb_nstg_cc_tune,post_es_fb_nstg_cc_tune,1)
+	nm1.get_net('FC',None,post_es_fb_ncc_tune, post_es_fb_ncc_tune,1)
+	nm1.get_net('dM',None,dltdc_num_ph,dltdc_num_ph,1)
+	nm1.get_net('ff',None,dltdc_nfc,dltdc_nfc,1)
+	nm1.get_net('fr',None,dltdc_nfc,dltdc_nfc,1)
+	nm1.get_net('df',None,dltdc_ndrv,dltdc_ndrv,1)
+	nm1.get_net('dr',None,dltdc_ndrv,dltdc_ndrv,1)
+	nm1.get_net('cf',None,dltdc_ncc,dltdc_ncc,1)
+	nm1.get_net('cr',None,dltdc_ncc,dltdc_ncc,1)
+	nm1.get_net('X2',buf2x_name,None,None,None)
+	nm1.get_net('Xt',buf2x_name,None,None,None)
+	nm1.get_net('xt',buf2x_name,None,None,None)
+	nm1.get_net('Df',embtdc_dff_name,None,None,None)
+	nm1.get_net('xn',xnor2_0p6_name,None,None,None)
+	nm1.get_net('DF',embtdc_dff_name,None,None,None)
+	nm1.get_net('Xn',xnor2_0p6_name,None,None,None)
+	nm1.get_net('rp',dffrpq_3x_name,None,None,None)
+	nm1.get_net('rP',dffrpq_3x_name,None,None,None)
+	nm1.get_net('Rp',dffrpq_3x_name,None,None,None)
+	nm1.get_net('RP',dffrpq_3x_name,None,None,None)
+	nm1.get_net('pq',dffrpq_3x_name,None,None,None)
+	nm1.get_net('pQ',dffrpq_3x_name,None,None,None)
+	nm1.get_net('Pq',dffrpq_3x_name,None,None,None)
+	nm1.get_net('PQ',dffrpq_3x_name,None,None,None)
+	nm1.get_net('rq',dffrpq_3x_name,None,None,None)
+	nm1.get_net('Rq',dffrpq_3x_name,None,None,None)
+	nm1.get_net('b2',buf2x_name,None,None,None)
+	nm1.get_net('B2',buf2x_name,None,None,None)
+	nm1.get_net('2b',buf2x_name,None,None,None)
+	nm1.get_net('2B',buf2x_name,None,None,None)
+	nm1.get_net('be',buf2x_name,None,None,None)
+	nm1.get_net('bE',buf2x_name,None,None,None)
+	nm1.get_net('Be',buf2x_name,None,None,None)
+	nm1.get_net('BE',buf2x_name,None,None,None)
+	nm1.get_net('bt',buf2x_name,None,None,None)
+	nm1.get_net('bT',buf2x_name,None,None,None)
+	nm1.get_net('Bt',buf2x_name,None,None,None)
+	nm1.get_net('BT',buf2x_name,None,None,None)
+	nm1.get_net('Bd',buf2x_name,None,None,None)
+	nm1.get_net('BD',buf2x_name,None,None,None)
+	nm1.get_net('bd',buf2x_name,None,None,None)
+	nm1.get_net('bD',buf2x_name,None,None,None)
+	nm1.get_net('Db',buf2x_name,None,None,None)
+	nm1.get_net('x2',buf2x_name,None,None,None)
+	nm1.get_net('fq',dffq_name,None,None,None)
+
+	with open(outDir+'/dltdc_v3.v','w') as wvfile:
+		lines_const=list(rvfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wvfile)
+
+	#--- generate verilog file: pll_controller ---
+	rvfile=open(formatDir+'/ble_pll_top/form_pll_controller.sv','r')
+	nm1=txt_mds.netmap()
+	# design params
+	nm1.get_net('nC',None,ncc,ncc,1)
+	nm1.get_net('nF',None,nfc,nfc,1)
+	nm1.get_net('nM',None,nstg,nstg,1)
+	
+	with open(outDir+'/pll_controller.v','w') as wvfile:
+		lines_const=list(rvfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wvfile)
+
+	#--- generate verilog file: tstdc_controller ---
+	rvfile=open(formatDir+'/ble_pll_top/form_tstdc_controller.sv','r')
+	nm1=txt_mds.netmap()
+	# design params
+	nm1.get_net('rM',None,pre_ls_ref_nstg_cc_tune,pre_ls_ref_nstg_cc_tune,1)
+	nm1.get_net('rC',None,pre_ls_ref_ncc_tune,pre_ls_ref_ncc_tune,1)
+	nm1.get_net('rF',None,pre_ls_ref_nfc,pre_ls_ref_nfc,1)
+	nm1.get_net('dM',None,dltdc_num_ph,dltdc_num_ph,1)
+	nm1.get_net('ff',None,dltdc_nfc,dltdc_nfc,1)
+	nm1.get_net('rf',None,dltdc_nfc,dltdc_nfc,1)
+	nm1.get_net('fd',None,dltdc_ndrv,dltdc_ndrv,1)
+	nm1.get_net('rd',None,dltdc_ndrv,dltdc_ndrv,1)
+	nm1.get_net('fc',None,dltdc_ncc,dltdc_ncc,1)
+	nm1.get_net('rc',None,dltdc_ncc,dltdc_ncc,1)
+	nm1.get_net('nM',None,nstg,nstg,1)
+	
+	with open(outDir+'/tstdc_controller.v','w') as wvfile:
+		lines_const=list(rvfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wvfile)
+
+	#--- generate verilog file: ble_pll_top ---
+	rvfile=open(formatDir+'/ble_pll_top/form_ble_pll_top.sv','r')
+	nm1=txt_mds.netmap()
+	# design params
+	nm1.get_net('nM',None,nstg,nstg,1)
+	nm1.get_net('nC',None,ncc,ncc,1)
+	nm1.get_net('nF',None,nfc,nfc,1)
+	nm1.get_net('dM',None,dltdc_num_ph,dltdc_num_ph,1)
+	nm1.get_net('ff',None,dltdc_nfc,dltdc_nfc,1)
+	nm1.get_net('rf',None,dltdc_nfc,dltdc_nfc,1)
+	nm1.get_net('fd',None,dltdc_ndrv,dltdc_ndrv,1)
+	nm1.get_net('rd',None,dltdc_ndrv,dltdc_ndrv,1)
+	nm1.get_net('fc',None,dltdc_ncc,dltdc_ncc,1)
+	nm1.get_net('rc',None,dltdc_ncc,dltdc_ncc,1)
+	nm1.get_net('rM',None,pre_ls_ref_nstg_cc_tune,pre_ls_ref_nstg_cc_tune,1)
+	nm1.get_net('rC',None,pre_ls_ref_ncc_tune,pre_ls_ref_ncc_tune,1)
+	nm1.get_net('rF',None,pre_ls_ref_nfc,pre_ls_ref_nfc,1)
+	
+	with open(outDir+'/ble_pll_top.v','w') as wvfile:
+		lines_const=list(rvfile.readlines())
+		for line in lines_const:
+			nm1.printline(line,wvfile)

@@ -1,0 +1,49 @@
+{
+"std_cell_names":
+	{
+"buf8x_name":"BUFH_X8N_PlaceHolder",
+"buf2x_name":"BUFH_X2N_PlaceHolder",
+"buf4x_name":"BUFH_X4N_PlaceHolder",
+"buf10x_name":"BUFH_X10N_PlaceHolder",
+"dff_name":"DFFRPQ_X3N_PlaceHolder",
+"inv0p6x_name":"INV_X0P6N_PlaceHolder" ,
+"buf16x_name":"BUFH_X16N_PlaceHolder",
+"buf14x_name":"BUFH_X14N_PlaceHolder",
+"embtdc_dff_name":"DFFQ_X1N_PlaceHolder" ,
+"xnor2_0p6_name":"XNOR2_X0P6N_PlaceHolder",
+"dffrpq_3x_name":"DFFRPQ_X3N_PlaceHolder",
+"dffq_name":"DFFQ_X1N_PlaceHolder" 
+	},
+"dco_design_params":
+	{
+"nstg":5,
+"ndrv":24,
+"ncc":20,
+"nfc":24,
+"ncc_dead":4
+	},
+"tstdc_counter_design_params":
+	{
+"pre_ls_ref_nstg_cc_tune":2,
+"pre_ls_ref_ncc_tune":2,
+"pre_ls_ref_nfc":63,
+"dltdc_num_ph":10,
+"dltdc_nfc":4,
+"dltdc_ndrv":2,
+"dltdc_ncc":2,
+"pre_nstg_ref_ls":18,
+"pre_nstg_ref":30,
+"pre_nstg_fb":12,
+"ppath_nstg":3,
+"pre_ls_ref_nstg":18,
+"post_ls_ref_nstg":6,
+"post_ls_ref_nstg_cc_tune":2,
+"post_ls_ref_ncc_tune":2,
+"pre_es_fb_nstg":8,
+"pre_es_fb_nstg_cc_tune":2,
+"pre_es_fb_ncc_tune":2,
+"post_es_fb_nstg":4,
+"post_es_fb_nstg_cc_tune":2,
+"post_es_fb_ncc_tune":2
+	}
+}

@@ -85,8 +85,8 @@ pll_gen_beta12:
 pll_gen_beta12_kbr:
 	$(PY_DIR)/PLL_GEN_Beta.py --specfile test_alpha12.json --output ./work --platform gf12lp --mode macro --synth_tool genus --track 9
 
-ble_gen:
-	$(PY_DIR)/BLE_GEN.py --specfile test_alpha12.json --output ./ble_outputs --platform gf12lp --mode macro
+ble_pll_gen:
+	$(PY_DIR)/BLE_PLL_GEN.py --specfile test_alpha12.json --output ./ble_outputs --platform gf12lp --mode macro
 
 dltdc12:
 	cd $(HOME_PATH); python $(PY_DIR)/ignore_dltdc_gen.py --platform gf12lp --mode full

@@ -524,4 +524,4 @@ def read_std_cell_names(platform,track,std_cell_json):
 		buf2_name	=jsonFile[platform][track_s]["buf2_name"]
 		buf3_name	=jsonFile[platform][track_s]["buf3_name"]
 		Height		=jsonFile[platform][track_s]["Height"]
-	return buf_small,buf_big,buf1_name,buf2_name,buf3_name,tdc_dff,Height
+	return buf_small,buf_big,buf1_name,buf2_name,buf3_name,bufz,tdc_dff,Height

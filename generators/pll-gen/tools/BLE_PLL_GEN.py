@@ -169,7 +169,6 @@ print ('#======================================================================'
 print ('# check directory tree and generate missing directories')
 print ('#======================================================================')
 preparations.ble_dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform,vsimDir,tdc_flowDir)
-
 #--------------------------------------------------------
 # check for private directory 
 #--------------------------------------------------------
@@ -186,9 +185,11 @@ if outMode=='macro' or outMode=='full':
 	W_CC,H_CC,W_FC,H_FC=preparations.aux_parse_size(dco_CC_lib,dco_FC_lib)
 	A_CC=W_CC*H_CC
 	A_FC=W_FC*H_FC
+	design_param_json_file = absPvtDir+'ble_design_params.json'
 else: # dummy areas for verilog mode
 	A_CC=0.01;
 	A_FC=0.01;
+	design_param_json_file = absGenDir+'ble_design_params.json'
 
 
 
@@ -239,12 +240,14 @@ finesim=1
 # verilog gen
 
 #preparations.read_ble_params(absGenDir+'ble_design_params.json')
-dco_design_params,tstdc_counter_design_params = run_digital_flow.ble_verilog_gen(outMode,outputDir,formatDir,absGenDir+'ble_design_params.json')
+dco_design_params,tstdc_counter_design_params = run_digital_flow.ble_verilog_gen(outMode,outputDir,formatDir,design_param_json_file)
+buf = run_digital_flow.ble_verilog_gen(outMode,outputDir,formatDir,absGenDir+'ble_design_params.json')
 
 if run_dco_flow==1:
 	W_dco,H_dco=run_digital_flow.dco_flow_decap_pwr2(pvtFormatDir,dco_flowDir,dcoName,bleach,W_CC,H_CC,W_FC,H_FC,synth,apr,outputDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name,cp_version,welltap_dim,welltap_xc,decap_dim,dco_design_params)
 	run_digital_flow.ble_tstdc_flow(pvtFormatDir,tdc_flowDir,tdc_bleach,W_CC,H_CC,W_FC,H_FC,tdc_synth,tdc_apr,outputDir,tstdc_counter_design_params)
 	run_digital_flow.ble_pll_top_flow(pvtFormatDir,pll_flowDir,pll_bleach,pll_synth,pll_apr,outputDir)
+	run_pex_flow.gen_post_pex_netlist(platform, dcoName, pvtFormatDir, dco_flowDir, extDir, calibreRulesDir, wellpin, pex_spectre)
 	sys.exit(1)
 
 

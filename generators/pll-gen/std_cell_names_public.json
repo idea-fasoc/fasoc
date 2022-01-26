@@ -1,0 +1,39 @@
+{
+"tsmc65lp":
+	{
+	"buf_small":"BUFH_X2M_placeHolder",
+	"buf_big":"BUFH_X9M_placeHolder",
+	"bufz":"BUFZ_X4M_placeHolder",
+	"tdc_dff":"DFFRPQ_X0P5M_placeHolder",
+	"buf1_name":"placeHolder",
+	"buf2_name":"placeHolder",
+	"buf3_name":"placeHolder",
+	"bufz":"BUFZ_X4M_placeHolder",
+	"Height":1.8
+	},
+"gf12lp":
+	{
+	"10.5":
+		{
+		"buf_small":"BUFH_X2N_placeHolder",
+		"buf_big":"BUFH_X8N_placeHolder",
+		"buf1_name":"BUFH_X8N_placeHolder",
+		"buf2_name":"BUFH_X10N_placeHolder",
+		"buf3_name":"BUFH_X10N_placeHolder",
+		"tdc_dff":"DFFQ_X1N_placeHolder",
+		"bufz":"placeHolder",
+		"Height":0.672
+		},
+	"9":
+		{
+		"buf_small":"BUFH_X2N_placeHolder",
+		"buf_big":"BUFH_X8N_placeHolder",
+		"buf1_name":"BUFH_X8N_placeHolder",
+		"buf2_name":"BUFH_X10N_placeHolder",
+		"buf3_name":"BUFH_X10N_placeHolder",
+		"tdc_dff":"DFFQ_X1N_placeHolder",
+		"bufz":"placeHolder",
+		"Height":0.576
+		}
+	}
+}

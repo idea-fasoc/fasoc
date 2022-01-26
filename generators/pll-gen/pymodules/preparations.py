@@ -490,3 +490,38 @@ def ble_aux_copy_export(flowDir,DCDC_CAP_UNIT_lib,BUFH_X14N_pwr_lib):
 	except OSError:
 		print('Error: unable to copy aux-cell files in '+flowDir+'/blocks/')
 		sys.exit(1)
+
+def read_std_cell_names(platform,track,std_cell_json):
+	print ('#----------------------------------------------------------------------')
+	print ('# Loading ' +std_cell_json+ ' for standard cell names...')
+	print ('#----------------------------------------------------------------------')
+	try:
+		with open(std_cell_json) as file:
+			jsonFile = json.load(file)
+	except ValueError as e:
+		print ('Error occurred opening or loading json file.')
+		sys.exit(1)
+	if track==9:
+		track_s="9"
+	elif track==10.5:
+		track_s="10.5"
+
+	if platform=="tsmc65lp":
+		buf_small	=jsonFile[platform]["buf_small"]
+		buf_big		=jsonFile[platform]["buf_big"]
+		bufz		=jsonFile[platform]["bufz"]
+		tdc_dff		=jsonFile[platform]["tdc_dff"]
+		buf1_name	=jsonFile[platform]["buf1_name"]
+		buf2_name	=jsonFile[platform]["buf2_name"]
+		buf3_name	=jsonFile[platform]["buf3_name"]
+		Height		=jsonFile[platform]["Height"]
+	elif platform=="gf12lp":
+		buf_small	=jsonFile[platform][track_s]["buf_small"]
+		buf_big		=jsonFile[platform][track_s]["buf_big"]
+		bufz		=jsonFile[platform][track_s]["bufz"]
+		tdc_dff		=jsonFile[platform][track_s]["tdc_dff"]
+		buf1_name	=jsonFile[platform][track_s]["buf1_name"]
+		buf2_name	=jsonFile[platform][track_s]["buf2_name"]
+		buf3_name	=jsonFile[platform][track_s]["buf3_name"]
+		Height		=jsonFile[platform][track_s]["Height"]
+	return buf_small,buf_big,buf1_name,buf2_name,buf3_name,tdc_dff,Height

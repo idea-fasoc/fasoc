@@ -86,9 +86,6 @@ if platform=='tsmc65lp':
 	tech_node='65'
 	wellpin=0 # aux-cell well pin  
 	edge_sel=1
-	buf_small='BUFH_X2M_A9TR'
-	buf_big='BUFH_X9M_A9TR'
-	bufz='BUFZ_X4M_A9TR'
 	min_p_rng_l= 4
 	min_p_str_l= 3
 	p_rng_w= 1.6 
@@ -98,7 +95,6 @@ if platform=='tsmc65lp':
 	max_r_l=5
 	pll_max_r_l=8
 	outbuff_div=1
-	tdc_dff='DFFRPQ_X0P5M_A9TR'
 	H_stdc=1.8
 	custom_lvs=0
 	cust_place=0
@@ -120,23 +116,8 @@ elif platform=='gf12lp':
 	tech_node='12' 
 	wellpin=1 
 	edge_sel=0
-	if track==9:
-		buf_small='BUFH_X2N_A9PP84TR_C14'
-		buf_big='BUFH_X8N_A9PP84TR_C14'
-		buf1_name='BUFH_X8N_A9PP84TR_C14'
-		buf2_name='BUFH_X10N_A9PP84TR_C14'
-		buf3_name='BUFH_X10N_A9PP84TR_C14'
-		#tdc_dff='DFFRPQL_X1N_A9PP84TR_C14'
-		tdc_dff='DFFQ_X1N_A9PP84TR_C14'
-	else:
-		buf_small='BUFH_X2N_A10P5PP84TR_C14'
-		buf_big='BUFH_X8N_A10P5PP84TR_C14'
-		buf1_name='BUFH_X8N_A10P5PP84TR_C14'
-		buf2_name='BUFH_X10N_A10P5PP84TR_C14'
-		buf3_name='BUFH_X10N_A10P5PP84TR_C14'
-		#tdc_dff='DFFRPQL_X1N_A10P5PP84TR_C14'
-		tdc_dff='DFFQ_X1N_A10P5PP84TR_C14'
-	bufz='placeHolder'
+	if track!=9:
+		track=10.5
 	min_p_rng_l= 4
 	min_p_str_l= 5
 	p_rng_w= 1.6 
@@ -146,7 +127,6 @@ elif platform=='gf12lp':
 	max_r_l=5
 	pll_max_r_l=8
 	outbuff_div=0
-	H_stdc=0.672
 	custom_lvs=0
 	cust_place=1
 	single_ended=1
@@ -179,6 +159,8 @@ print ('#======================================================================'
 print ('# check directory tree and generate missing directories')
 print ('#======================================================================')
 preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform,vsimDir)
+
+buf_small,buf_big,buf1_name,buf2_name,buf3_name,tdc_dff,H_stdc = preparations.read_std_cell_names(platform,track,absGenDir+'std_cell_names.json')
 
 #--------------------------------------------------------
 # check for private directory 

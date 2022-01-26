@@ -444,3 +444,49 @@ def ble_dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceD
 
 	if outputDir!=0:
 		gen_subDirs([outputDir])
+
+def ble_aux_copy_export(flowDir,DCDC_CAP_UNIT_lib,BUFH_X14N_pwr_lib):
+	print ('#----------------------------------------------------------------------')
+	print ('# Parsing decap cells')
+	print ('#----------------------------------------------------------------------')
+	if os.path.isdir(flowDir+'blocks/'):
+		print('INFO: '+flowDir+'blocks/ already exists')
+	else:
+		try:
+			os.mkdir(flowDir+'/blocks')
+		except OSError:
+			print('Error: unable to create '+flowDir+'/blocks/')
+
+	if os.path.isdir(flowDir+'/blocks/DCDC_CAP_UNIT/export/'):
+		print('INFO: '+flowDir+'/blocks/DCDC_CAP_UNIT/export already exists')
+	else:
+		try:
+			os.mkdir(flowDir+'/blocks/DCDC_CAP_UNIT')
+			os.mkdir(flowDir+'/blocks/DCDC_CAP_UNIT/export/')
+			print(flowDir+'/blocks/DCDC_CAP_UNIT/export/ generated')
+		except OSError:
+			print('Error: unable to create '+flowDir+'/blocks/DCDC_CAP_UNIT/export/')
+	if os.path.isdir(flowDir+'/blocks/BUFH_X14N_pwr/export/'):
+		print('INFO: '+flowDir+'/blocks/BUFH_X14N_pwr/export already exists')
+	else:
+		try:
+			os.mkdir(flowDir+'/blocks/BUFH_X14N_pwr')
+			os.mkdir(flowDir+'/blocks/BUFH_X14N_pwr/export/')
+			print(flowDir+'/blocks/BUFH_X14N_pwr/export/ generated')
+		except OSError:
+			print('Error: unable to create '+flowDir+'/blocks/BUFH_X14N_pwr/export/')
+
+
+	print(DCDC_CAP_UNIT_lib)
+
+	try:
+		for CAP_file in os.listdir(DCDC_CAP_UNIT_lib):
+			print("INFO: copying aux-cell file:"+DCDC_CAP_UNIT_lib+CAP_file)
+			shutil.copy(DCDC_CAP_UNIT_lib+CAP_file,flowDir+'blocks/DCDC_CAP_UNIT/export/')
+		for BUF_file in os.listdir(BUFH_X14N_pwr_lib):
+			print("INFO: copying aux-cell file:"+BUFH_X14N_pwr_lib+BUF_file)
+			shutil.copy(BUFH_X14N_pwr_lib+BUF_file,flowDir+'blocks/BUFH_X14N_pwr/export/')
+
+	except OSError:
+		print('Error: unable to copy aux-cell files in '+flowDir+'/blocks/')
+		sys.exit(1)

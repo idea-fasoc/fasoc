@@ -1,8 +1,7 @@
 //DCO coarse cell verilog format
-//
 
-module dco_FC (IN, IP,EN);
+module dco_CC_se_3st (IN, OUT, EN);
 	input IN;
-	input IP;
+	output OUT;
 	input EN;
 endmodule

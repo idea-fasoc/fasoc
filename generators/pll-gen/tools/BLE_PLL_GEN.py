@@ -159,6 +159,9 @@ else:
 		dco_FC_lib=aLib+'/dco_FC_se/latest/'
 	elif FC_half==1:
 		dco_FC_lib=aLib+'/dco_FC_se2_half/latest/'
+
+DCDC_CAP_UNIT_lib = aLib+'/DCDC_CAP_UNIT/latest/'
+BUFH_X14N_pwr_lib = aLib+'/BUFH_X14N_pwr/latest/'
 #========================================================
 # generate directory tree 
 #========================================================
@@ -178,6 +181,7 @@ if outMode=='macro' or outMode=='full':
 	#	read the aux-cells	
 	#--------------------------------------------------------
 	dco_CC_name,dco_FC_name = preparations.aux_copy_export(dco_flowDir,dco_CC_lib,dco_FC_lib)
+	preparations.ble_aux_copy_export(dco_flowDir,DCDC_CAP_UNIT_lib,BUFH_X14N_pwr_lib)
 	preparations.aux_copy_export(pll_flowDir,dco_CC_lib,dco_FC_lib)
 	W_CC,H_CC,W_FC,H_FC=preparations.aux_parse_size(dco_CC_lib,dco_FC_lib)
 	A_CC=W_CC*H_CC

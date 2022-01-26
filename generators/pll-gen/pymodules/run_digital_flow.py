@@ -2116,10 +2116,19 @@ def dco_custom_place_v2p5_genus(formatDir,outputDir,crscell_dim,finecell_dim,ncr
 
 def dco_flow_decap_pwr2(formatDir,flowDir,dcoName,bleach,W_CC,H_CC,W_FC,H_FC,synth,apr,verilogSrcDir,platform,edge_sel,buf_small,buf_big,bufz,min_p_rng_l,min_p_str_l,p_rng_w,p_rng_s,p2_rng_w,p2_rng_s,max_r_l,cust_place,single_ended,FC_half,CC_stack,dco_CC_name,dco_FC_name, dcocp_version, welltap_dim, welltap_xc,decap_dim,dco_design_params):
 	# copy script files
-	shutil.rmtree(flowDir+'/scripts')
-	shutil.copytree(formatDir+'/BLE/ble_dco/scripts',flowDir+'/scripts')
+	try:
+		shutil.rmtree(flowDir+'/scripts')
+	except:
+		print("unable to remove "+flowDir+'/scripts directory. will move on with existing files')
+	try:
+		shutil.copytree(formatDir+'/BLE/ble_dco/scripts',flowDir+'/scripts')
+	except:
+		print("unable to remove "+flowDir+'/scripts directory and re-create updated one. will move on with existing files')
 	shutil.copy(formatDir+'/BLE/ble_dco/Makefile', flowDir+'Makefile')
 	shutil.copy(formatDir+'/BLE/ble_dco/include.mk', flowDir+'include.mk')
+	shutil.copy(verilogSrcDir+'/ble_dco.v', flowDir+'/src/ble_dco.v')
+	shutil.copy(verilogSrcDir+'/dco_CC_se_3st.v', flowDir+'/src/dco_CC_se_3st.v')
+	shutil.copy(verilogSrcDir+'/dco_FC_se2_half.v', flowDir+'/src/dco_FC_se2_half.v')
 
 	#--- calculate area ---
 	[nstg,ndrv,ncc,nfc,ND] = dco_design_params
@@ -2456,7 +2465,8 @@ def dco_custom_place_v3_pwr2(formatDir,outputDir,crscell_dim,finecell_dim,ncrs,n
 	v_decap_x_end = v_decap_x_start + 2*decap_w
 	bufpwr_x_start = v_decap_x_end + 8
 	direct_out_x_start = bufpwr_x_start
-	buf_crs_w = 1.008	
+	#buf_crs_w = 1.008	
+	buf_crs_w = crs_w 
 	div_dff_w = 1.932
 	inv_min_w = 0.168
 
@@ -2611,6 +2621,8 @@ def ble_verilog_gen(outMode,outDir,formatDir,dp_json):
 	shutil.copy(formatDir+'/ble_pll_top/dltdc_lut_lib.sv',outDir+'/dltdc_lut_lib.sv')
 	shutil.copy(formatDir+'/ble_pll_top/ssc_generator.v',outDir+'/ssc_generator.v')
 	shutil.copy(formatDir+'/tstdc_counter/lpdtc_v2.sv',outDir+'/lpdtc_v2.sv')
+	shutil.copy(formatDir+'/ble_dco/dco_CC_se_3st.v',outDir+'/dco_CC_se_3st.v')
+	shutil.copy(formatDir+'/ble_dco/dco_FC_se2_half.v',outDir+'/dco_FC_se2_half.v')
 
 
 	print ('#----------------------------------------------------------------------')

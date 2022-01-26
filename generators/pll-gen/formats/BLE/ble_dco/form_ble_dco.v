@@ -2,8 +2,8 @@
 module ble_dco(PH_out, CC, FC, FCB, osc_en,clk, dum_in, dum_out, div_sel, RST); 
 @@ parameter NSTG = @nM; 
 @@ parameter NDRIV = @nD;
-@@ parameter NFC = @nC;
-@@ parameter NCC = @nF;
+@@ parameter NCC = @nC;
+@@ parameter NFC = @nF;
 @@ parameter NDCC = @ND; // 2 per row
 parameter NDECAP = 26; 
 parameter p2_NDECAP = 8; 
@@ -130,10 +130,10 @@ parameter NUM_BUF_LAST = 2;
 	// DIVIDER + buffer use VDD_BUF
 
 	// direct connection without divider 
-	dco_CC_se p2_direct_outbuf0 (.OUT(buf_net_n[0]),.IN(clk_out_n2),.EN(div_sel[0]));	
-	dco_CC_se p2_direct_outbuf1 (.OUT(buf_net_n[0]),.IN(clk_out_n2),.EN(div_sel[0]));	
-	dco_CC_se p2_direct_outbuf2 (.OUT(buf_net_n2[0]),.IN(buf_net_n[0]),.EN(div_sel[0]));	
-	dco_CC_se p2_direct_outbuf3 (.OUT(buf_net_n2[0]),.IN(buf_net_n[0]),.EN(div_sel[0]));	
+	dco_CC_se_3st p2_direct_outbuf0 (.OUT(buf_net_n[0]),.IN(clk_out_n2),.EN(div_sel[0]));	
+	dco_CC_se_3st p2_direct_outbuf1 (.OUT(buf_net_n[0]),.IN(clk_out_n2),.EN(div_sel[0]));	
+	dco_CC_se_3st p2_direct_outbuf2 (.OUT(buf_net_n2[0]),.IN(buf_net_n[0]),.EN(div_sel[0]));	
+	dco_CC_se_3st p2_direct_outbuf3 (.OUT(buf_net_n2[0]),.IN(buf_net_n[0]),.EN(div_sel[0]));	
 @@	@bT p2_direct_outbuf4 (.Y(clk_out_n3), .A(buf_net_n2[0]));
 
 	assign DIV_NODE[0] = clk_out_n2;
@@ -145,10 +145,10 @@ parameter NUM_BUF_LAST = 2;
 		begin: p2_div_stg
 @@			@df dff (.Q(DIV_NODE[i+1]), .CK(DIV_NODE[0]), .D(nDIV_NODE[i]), .R(RST));	
 @@			@i6 inv0 (.Y(nDIV_NODE[i]),.A(DIV_NODE[i+1]));  //added for hold time 0p6
-			dco_CC_se buff0 (.OUT(buf_net_n[i+1]),.IN(DIV_NODE[0]),.EN(div_sel[i+1]));	
-			dco_CC_se buff1 (.OUT(buf_net_n[i+1]),.IN(DIV_NODE[0]),.EN(div_sel[i+1]));	
-			dco_CC_se buff2 (.OUT(buf_net_n2[i+1]),.IN(buf_net_n[i+1]),.EN(div_sel[i+1]));	
-			dco_CC_se buff3 (.OUT(buf_net_n2[i+1]),.IN(buf_net_n[i+1]),.EN(div_sel[i+1]));	
+			dco_CC_se_3st buff0 (.OUT(buf_net_n[i+1]),.IN(DIV_NODE[0]),.EN(div_sel[i+1]));	
+			dco_CC_se_3st buff1 (.OUT(buf_net_n[i+1]),.IN(DIV_NODE[0]),.EN(div_sel[i+1]));	
+			dco_CC_se_3st buff2 (.OUT(buf_net_n2[i+1]),.IN(buf_net_n[i+1]),.EN(div_sel[i+1]));	
+			dco_CC_se_3st buff3 (.OUT(buf_net_n2[i+1]),.IN(buf_net_n[i+1]),.EN(div_sel[i+1]));	
 @@			@Bt buff4 (.Y(clk_out_n3), .A(buf_net_n2[i+1]));
 		end
 	endgenerate	

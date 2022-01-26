@@ -161,7 +161,7 @@ print ('# check directory tree and generate missing directories')
 print ('#======================================================================')
 preparations.dir_tree(outMode,absPvtDir_plat,outputDir,extDir,calibreRulesDir,hspiceDir,finesimDir,dco_flowDir,outbuff_div_flowDir,pll_flowDir,platform,vsimDir)
 
-buf_small,buf_big,buf1_name,buf2_name,buf3_name,bufz,tdc_dff,H_stdc = preparations.read_std_cell_names(platform,track,absGenDir+'std_cell_names.json')
+buf_small,buf_big,buf1_name,buf2_name,buf3_name,bufz,tdc_dff,H_stdc = preparations.read_std_cell_names(platform,track,absGenDir+'std_cell_names_public.json')
 
 #--------------------------------------------------------
 # check for private directory 

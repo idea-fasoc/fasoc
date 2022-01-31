@@ -145,7 +145,7 @@ Date    : Jan 26, 2022
    make ble_pll_gen 
     ```
 
-1. Check the results in 'fasoc/generators/pll-gen/ble_outputs/' for verilog source files and 'fasoc/private/generators/pll-gen/$technology/flow_ble_*'.
+1. Check the results in 'fasoc/generators/pll-gen/ble_outputs/' for verilog source files and 'fasoc/private/generators/pll-gen/$technology/flow_ble_*' for digital flow results and gds.
    
 
 # Known bugs 

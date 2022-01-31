@@ -6,7 +6,7 @@ See more at https://fasoc.engin.umich.edu/ad-pll/
 # Version Details
 ```
 Version : Beta-1.0                                                             
-Date    : May 27, 2020 
+Date    : Jan 26, 2022 
 ```
 # Major updates 
 ```
@@ -16,6 +16,11 @@ Date    : May 3, 2020
 	3. Output buffer/ divder block is embedded in PLL to drive large load of pad and to enable devided output clock. Power domain of this block is separated from controller and DCO as well for the noise performance.
 Date    : May 27, 2020
 	1. Codes are modified to support gf12lp and tsmc65lp
+
+Date    : Jan 26, 2022
+	1. PLL generation for BLE-TX has been added. A testchip is verified in silicon in gf12lp. Currently the generator takes DCO and TDC design parameters as inputs.
+	2. Genus is supported for synthesis along with DC-compiler.
+	3. Metal tracks of standard cell is taken as an input to support different tracks. 
 	
 ```
 
@@ -129,6 +134,19 @@ Date    : May 27, 2020
     ```bash
    make bleach_all 
     ```
+
+# Running BLE PLL Generation 
+1. If the machine has no private directory installed, the generator will parse 'fasoc/generators/pll-gen/ble_design_params.json'. If private directory exists, the generator will use 'fasoc/private/generators/pll-gen/ble_design_params.json'. Example in the private directory has the exact standard cell names as used in the measured chip while the public version has placeholders. 
+
+1. Modify the 'ble_design_params.json' as desired. Details about the design parameters are depicted in https://fasoc.engin.umich.edu/ad-pll/. 
+
+1. Run the command. (The command can be modified or added in Makefile) 
+    ```bash
+   make ble_pll_gen 
+    ```
+
+1. Check the results in 'fasoc/generators/pll-gen/ble_outputs/' for verilog source files and 'fasoc/private/generators/pll-gen/$technology/flow_ble_*'.
+   
 
 # Known bugs 
 1. Current pll controller has potential metastability issue in retiming due to reference cycle latency in the procedure of retiming edge selection. Verilog simulation with sdf annotation doesn't give correct result due to this metastability issue. Controller and testbench will be updated to address the problems in the Beta release.

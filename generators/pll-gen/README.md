@@ -138,7 +138,7 @@ Date    : Jan 26, 2022
 # Running BLE PLL Generation 
 1. If the machine has no private directory installed, the generator will parse 'fasoc/generators/pll-gen/ble_design_params.json'. If private directory exists, the generator will use 'fasoc/private/generators/pll-gen/ble_design_params.json'. Example in the private directory has the exact standard cell names as used in the measured chip while the public version has placeholders. 
 
-1. Modify the 'ble_design_params.json' as desired. Details about the design parameters are depicted in https://fasoc.engin.umich.edu/ad-pll/. 
+1. Modify the 'ble_design_params.json' as desired. Details about the design parameters are depicted in https://fasoc.engin.umich.edu/adpll-for-ble-transmitter/. 
 
 1. Run the command. (The command can be modified or added in Makefile) 
     ```bash

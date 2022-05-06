@@ -5,8 +5,8 @@ See more at https://fasoc.engin.umich.edu/digital-ldo/
 
 # Version Details
 ```
-Version : Beta-1.0                                                             
-Date    : June 7, 2020
+Version : Beta-2.0                                                             
+Date    : May 6, 2022
 ```
 
 # What's in the release
@@ -24,6 +24,14 @@ Ensure that your machine has all of the required tools setup and have access to 
 
 
 # Tool Setup
+1. Setup the tools and pdk information (see the following variables) in the [`fasoc/config/platform_config.json`](https://github.com/idea-fasoc/fasoc/blob/master/config/platform_config.json) file.
+    ```bash
+    "synthTool": <Synthesis tool to be use. We only support 'dc' and 'genus' currently>,
+    "simTool": <Simulation tool to be use. We only support 'hspice' and 'finesim' currently>,
+    "extractionTool": "calibre",
+    "netlistTool": "calibredrv",
+    ```
+
 1. Add the Auxiliary library and Model directory paths to the [`fasoc/config/platform_config.json`](https://github.com/idea-fasoc/fasoc/blob/master/config/platform_config.json) file under the corresponding technology node. `ldo-gen` currently supports tsmc65lp, gfbicmos8hp and gf12lp nodes. An example of the platform config with the variable descriptions is provided below.
     ```bash
     "tsmc65lp": {
@@ -97,7 +105,8 @@ Ensure that your machine has all of the required tools setup and have access to 
       "generator": "ldo-gen",
       "specifications": {
         "vin": 0.8,
-        "imax": "1e-03"
+        "imax": "1e-03",
+        "dropout": 0.05
       }
     }
     ```
@@ -111,20 +120,27 @@ Ensure that your machine has all of the required tools setup and have access to 
     
     __specifications__
     - _vin_
-      - Input Voltage of the LDO. 
+      - Input Voltage of the LDO in Volts. 
       - `vin` values from the set [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3] are supported for TSMC65lp & GFBiCMOS8HP PDKs.
       - `vin` values from the set [0.6, 0.7, 0.8, 0.9] are supported for GF12LP PDK.
     - _imax_
-      - Maximum Output Load Current. 
+      - Maximum Output Load Current in Amperes. 
       - `imax` values in the range [0.5e-03, 25e-03] are supported for TSMC65lp & GFBiCMOS8HP PDKs.
       - `imax` values in the range [0.5e-03, 16e-03] are supported for GF12LP PDK.
+    - _dropout_
+      - Dropout betweein input and output (vin - vout) in Volts.
+      - `dropout` values of 0.05 and 0.1 are currently supported for GF12LP PDK.
+      - `dropout` value of 0.05 is currently supported for TSMC65lp & GFBiCMOS8HP PDKs.
 
 1. Running the LDO generator. 
    To run the LDO generator, execute the below command from any location.
     ```bash
-    .{Path_to_Generator_Folder}/tools/ldo_gen.py --specfile {Input_Spec_File.json} --output {Output_Folder} --platform {Technology_Node} [--mode {Run_Mode}] [--clean]
+    .{Path_to_Generator_Folder}/tools/ldo_gen.py --specfile {Input_Spec_File.json} --output {Output_Folder} --platform {Technology_Node} [--mode {Run_Mode}] [--gf12lpTrack {GF12LP_Standard_Cell_Track}] [--useDefaultModel] [--clean]
     ```
-   All the options specified in square brackets [] are optional. When `--clean` option is provided, the tool exits after a cleanup of the workspace. Each of the command line variables are described below in detail.
+   All the options specified in square brackets [] are optional. 
+   
+   When `--useDefaultModel` option is provided, the tool skips the modeling process and uses the model file downloaded from github instead of using the model file specified in [`platform_config.json`](https://github.com/idea-fasoc/fasoc/blob/master/config/platform_config.json) file.
+   When `--clean` option is provided, the tool exits after a cleanup of the workspace. Each of the command line variables are described below in detail.
    
    __{Input_Spec_File.json}__
    - This file is similar to `test.json` file and contains the input specifications of the LDO module.
@@ -136,17 +152,23 @@ Ensure that your machine has all of the required tools setup and have access to 
    - This variable must be either "tsmc65lp" or "gfbicmos8hp" as of now.
    
    __{Run_Mode}__
-   - This must be either "verilog", "macro" or "full". Default mode used is "verilog" if this option is not specified. 
+   - This must be either be "verilog", "macro" or "full". Default mode used is "verilog" if this option is not specified. 
      - "verilog" mode do not need access to the PDK or the CADRE flow and generates only the verilog description of the design. 
      - "macro" mode needs access to PDK/CADRE flow and generates the netlist and gds files along with the verilog description. 
      - "full" mode does a full post-pex extraction of the design netlist and layout files and runs a complete post-pex spice simulation.
    
+   __{GF12LP_Standard_Cell_Track}__
+   - This variable specifies the standard cell row height to be used for `gf12lp` technology must be either be "10P5T" or "9T". Default option used is "10P5T" if this option is not specified. 
+     - "10P5T" : Standard Cell Height = 10.5 * track_height.
+     - "9T"    : Standard Cell Height =  9.0 * track_height.
+   
 1. Running the model generator in standalone mode. 
    Ensure you have the correct `fasoc/config/platform_config.json` file and run the following commands
     ```bash
-    .{Path_to_Generator_Folder}/tools/ldo_model.py --platform {Technology_Node}
+    .{Path_to_Generator_Folder}/tools/ldo_model.py --platform {Technology_Node}  [--gf12lpTrack {GF12LP_Standard_Cell_Track}]
     ```
-   `Technology_Node` must be either "tsmc65lp" or "gfbicmos8hp" as of now.
+   `Technology_Node` must be either be "tsmc65lp" or "gfbicmos8hp" or "gf12lp" as of now.
+   `GF12LP_Standard_Cell_Track` must either be "10P5T" or "9T" as of now.
     
 # Tool Directory Structure
 ```bash

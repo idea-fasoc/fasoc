@@ -50,6 +50,9 @@ parser.add_argument('--platform', required=True,
 parser.add_argument('--mode', default='verilog',
                     choices=['verilog', 'macro', 'full'],
                     help='LDO Gen operation mode. Default mode: \'verilog\'.')
+parser.add_argument('--gf12lpTrack', default='10P5T',
+                    choices=['10P5T', '9T'],
+                    help='Standard cell height for 12LP. Default: \'10P5T\'.')
 parser.add_argument('--clean', action='store_true',
                     help='Clean the workspace.')
 parser.add_argument('--useDefaultModel', action='store_true',
@@ -215,7 +218,10 @@ except KeyError as e:
    sys.exit(1)
 
 mFile = platformConfig['model_lib'] + '/ldoModel.json'
-mFilePublic = genDir + '/models/' + args.platform + '_model.json'
+if args.platform == 'gf12lp' and args.gf12lpTrack == '9T':
+   mFilePublic = genDir + '/models/' + args.platform + '_9T_model.json'
+else:
+   mFilePublic = genDir + '/models/' + args.platform + '_model.json'
 
 if (args.useDefaultModel):
    mFile = mFilePublic
@@ -366,7 +372,7 @@ if not os.path.isfile(mFile):
       mFile = mFilePublic
    else:
       p = sp.Popen(['python',genDir+'./tools/ldo_model.py','--platform', \
-                   args.platform])
+                   args.platform,'--gf12lpTrack',args.gf12lpTrack])
       p.wait()
 
 try:
@@ -452,7 +458,8 @@ if args.mode != 'verilog':
    #---------------------------------------------------------------------------
    # Run Synthesis and APR
    #---------------------------------------------------------------------------
-   designArea = rdf.run_synth_n_apr(args.platform, designName, flowDir)
+   designArea = rdf.run_synth_n_apr(args.platform, designName, flowDir, \
+                                    args.gf12lpTrack)
    print('# LDO - Synthesis and APR finished')
 
 if args.mode == 'full':

@@ -43,6 +43,9 @@ print(sys.argv)
 parser = argparse.ArgumentParser(description='Digital LDO model generator')
 parser.add_argument('--platform', required=True,
                     help='PDK/process kit for cadre flow (.e.g tsmc16)')
+parser.add_argument('--gf12lpTrack', default='10P5T',
+                    choices=['10P5T', '9T'],
+                    help='Standard cell height for 12LP. Default: \'10P5T\'.')
 parser.add_argument('--clean', action='store_true',
                     help='To clean the workspace.')
 args = parser.parse_args()
@@ -217,7 +220,8 @@ for arrSize in [3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, \
    # Run Synthesis and APR
    #---------------------------------------------------------------------------
    print('# Array Size %s - Running Synthesis and APR...' % arrSize)
-   designArea = rdf.run_synth_n_apr(args.platform, designName, flowDir)
+   designArea = rdf.run_synth_n_apr(args.platform, designName, flowDir, \
+                                    args.gf12lpTrack)
    p = sp.Popen(['cp',flowDir+'/reports/innovus/'+designName+'.main.htm.ascii',simDir+'/run/'])
    print('# Array Size %s - Synthesis and APR finished' % arrSize)
 

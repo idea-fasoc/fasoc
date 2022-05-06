@@ -247,14 +247,28 @@ for arrSize in [3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, \
    numSkipLines = 3
    numLine = 1
    numDataLine = 0
+   numDropout = 0
    for line in simResult.readlines():
       if (numLine > numSkipLines):
          if ((numLine % 2) == 1) or (simTool == 'finesim'):
             words = line.split()
-            if numIter == 0:
-               results.append([float(words[1])])
-            results[numDataLine].append([int(arrSize), float(words[2])])
-            numDataLine = numDataLine + 1
+            if float(words[2]) == 0.05:
+               if numIter == 0:
+                  if numDataLine == 0:
+                     results.append([float(words[2])])
+                  results[0].append([float(words[1])])
+               results[0][numDataLine+1].append([int(arrSize), float(words[3])])
+               numDataLine = numDataLine + 1
+            elif float(words[2]) == 0.10:
+               if numDropout == 0:
+                  numDropout = numDropout + 1
+                  numDataLine = 0
+               if numIter == 0:
+                  if numDataLine == 0:
+                     results.append([float(words[2])])
+                  results[1].append([float(words[1])])
+               results[1][numDataLine+1].append([int(arrSize), float(words[3])])
+               numDataLine = numDataLine + 1
       numLine = numLine + 1
    simResult.close()
    numIter = numIter + 1
@@ -276,19 +290,21 @@ jsonModel['power'] = {}
 labels = []
 
 # Iload,max Model
-for i in range(len(results)):
-   jsonModel['Iload,max'][results[i][0]] = []
-   x = [item[1] for item in results[i][1:]]
-   y = [item[0] for item in results[i][1:]]
-   xt = [float(1000000)*item for item in x]
-   plt.semilogx(y, xt)
-   labels.append('Vin = %s' % results[i][0])
-   z = np.polyfit(x,y,8)
-   for item in z:
-      jsonModel['Iload,max'][results[i][0]].append(item)
+for j in range(len(results)):
+   jsonModel['Iload,max'][results[j][0]] = {}
+   for i in range(1,len(results[j])):
+      jsonModel['Iload,max'][results[j][0]][results[j][i][0]] = []
+      x = [item[1] for item in results[j][i][1:]]
+      y = [item[0] for item in results[j][i][1:]]
+      xt = [float(1000000)*item for item in x]
+      plt.semilogx(y, xt)
+      labels.append('Vin = %s' % results[j][i][0])
+      z = np.polyfit(x,y,8)
+      for item in z:
+         jsonModel['Iload,max'][results[j][0]][results[j][i][0]].append(item)
 
 # Area Model
-print(areaValues)
+#print(areaValues)
 x = [item[0] for item in areaValues[0:]]
 y = [item[1] for item in areaValues[0:]]
 z = np.polyfit(x,y,8)

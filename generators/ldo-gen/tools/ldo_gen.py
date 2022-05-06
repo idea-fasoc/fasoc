@@ -52,6 +52,8 @@ parser.add_argument('--mode', default='verilog',
                     help='LDO Gen operation mode. Default mode: \'verilog\'.')
 parser.add_argument('--clean', action='store_true',
                     help='Clean the workspace.')
+parser.add_argument('--useDefaultModel', action='store_true',
+                    help='Uses the model from ldo-gen/models directory.')
 args = parser.parse_args()
 
 if not os.path.isfile(args.specfile):
@@ -111,6 +113,24 @@ except KeyError as e:
    sys.exit(1)
 except ValueError as e:
    print('Error: Bad Input Specfile. Please use a float value for \'vin[min]\'.')
+   sys.exit(1)
+
+try:
+   dropout_max = float(supportedSpecs['dropout']['max'])
+except KeyError as e:
+   print('Error: Bad Supported Inputs file. \'dropout[max]\' value is missing.')
+   sys.exit(1)
+except ValueError as e:
+   print('Error: Bad Input Specfile. Please use a float value for \'dropout[max]\'.')
+   sys.exit(1)
+
+try:
+   dropout_min = float(supportedSpecs['dropout']['min'])
+except KeyError as e:
+   print('Error: Bad Supported Inputs file. \'dropout[min]\' value is missing.')
+   sys.exit(1)
+except ValueError as e:
+   print('Error: Bad Input Specfile. Please use a float value for \'dropout[min]\'.')
    sys.exit(1)
 
 try:
@@ -197,6 +217,11 @@ except KeyError as e:
 mFile = platformConfig['model_lib'] + '/ldoModel.json'
 mFilePublic = genDir + '/models/' + args.platform + '_model.json'
 
+if (args.useDefaultModel):
+   mFile = mFilePublic
+   print('\"useDefaultModel\" is enabled. ' + \
+         'Using the model file provided in the repo.')
+   
 if args.mode == 'full':
    calibreRulesDir = platformConfig['calibreRules']
 
@@ -223,6 +248,21 @@ if vin > vin_max or vin < vin_min:
    sys.exit(1)
 
 try:
+   dropout = float(jsonSpec['specifications']['dropout'])
+except KeyError as e:
+   print('Error: Bad Input Specfile. \'dropout\' value is missing under ' + \
+         '\'specifications\'.')
+   sys.exit(1)
+except ValueError as e:
+   print('Error: Bad Input Specfile. Please use a float value for \'dropout\' '+ \
+         'under \'specifications\'.')
+   sys.exit(1)
+if dropout > dropout_max or dropout < dropout_min:
+   print('Error: Only support dropout from ' + str(dropout_min) + ' to ' + \
+          str(dropout_max) + ' with increments of 50mV now')
+   sys.exit(1)
+
+try:
    imax = float(jsonSpec['specifications']['imax'])
 except KeyError as e:
    print('Error: Bad Input Specfile. \'imax\' value is missing under ' + \
@@ -231,9 +271,11 @@ except KeyError as e:
 except ValueError as e:
    print('Error: Bad Input Specfile. Please use a float value for \'imax\' '+ \
          'under \'specifications\'.')
+maxLoad_max = maxLoad_max*dropout/0.05
+maxLoad_min = maxLoad_min*dropout/0.05
 if imax > maxLoad_max or imax < maxLoad_min:
    print('Error: Only support imax in the range [' + str(maxLoad_min) + ', ' + \
-         str(maxLoad_max)+'] now')
+         str(maxLoad_max)+'] for dropout = '+str(dropout))
    sys.exit(1)
 
 print('Run Config:')
@@ -343,9 +385,9 @@ except ValueError as e:
 
 N = 0
 imax_t = 1.3*imax
-coefLength = len(jsonModel['Iload,max'][str(vin)])
+coefLength = len(jsonModel['Iload,max'][str(dropout)][str(vin)])
 for i in range(coefLength):
-   z = jsonModel['Iload,max'][str(vin)][i]
+   z = jsonModel['Iload,max'][str(dropout)][str(vin)][i]
    N = N + (float(z)*pow(imax_t, (coefLength-i-1)))
 N = int(math.ceil(N))
 arrSize = N
@@ -427,7 +469,7 @@ if args.mode == 'full':
    iMaxOut = sim.run_post_pex_ldo_imax_worst(args.platform, \
                                              platformConfig['hspiceModels'], \
                                              designName, extDir, simDir, \
-                                             simTool, vin, imax)
+                                             simTool, vin, imax, dropout)
    print('# LDO - Hspice Sim Completed')
 
 #------------------------------------------------------------------------------

@@ -4,6 +4,7 @@
   "generator": "ldo-gen",
   "specifications": {
     "vin": 0.8,
-    "imax": "1e-03"
+    "imax": "10e-03",
+    "dropout": "0.05"
   }
 }

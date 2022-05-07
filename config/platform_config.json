@@ -1,6 +1,6 @@
 {
   "schema_version": 0.1,
-  "synthTool": "genus",
+  "synthTool": "dc",
   "simTool": "hspice",
   "extractionTool": "calibre",
   "netlistTool": "calibredrv",

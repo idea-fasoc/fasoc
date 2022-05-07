@@ -200,6 +200,11 @@ if args.mode != 'verilog':
             'as of now')
       sys.exit(1)
 
+   if args.platform != 'gf12lp' and synthTool == 'genus':
+      print('Error: Currrently support \'genus\' synthesis tool for only ' + \
+            '\'gf12lp\' platform')
+      sys.exit(1)
+
    simTool = jsonConfig['simTool']
    if simTool != 'hspice' and simTool != 'finesim':
       print('Error: Supported simulators are \'hspice\' or \'finesim\' ' + \

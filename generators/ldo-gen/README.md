@@ -26,8 +26,8 @@ Ensure that your machine has all of the required tools setup and have access to 
 # Tool Setup
 1. Setup the tools and pdk information (see the following variables) in the [`fasoc/config/platform_config.json`](https://github.com/idea-fasoc/fasoc/blob/master/config/platform_config.json) file.
     ```bash
-    "synthTool": <Synthesis tool to be use. We only support 'dc' and 'genus' currently>,
-    "simTool": <Simulation tool to be use. We only support 'hspice' and 'finesim' currently>,
+    "synthTool": <Synthesis tool to be used. We only support 'dc' and 'genus' currently. 'genus' options is only available for 'gf12lp' platform.>,
+    "simTool": <Simulation tool to be used. We only support 'hspice' and 'finesim' currently.>,
     "extractionTool": "calibre",
     "netlistTool": "calibredrv",
     ```

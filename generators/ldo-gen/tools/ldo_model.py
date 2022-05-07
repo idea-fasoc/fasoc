@@ -88,6 +88,7 @@ calibreRulesDir = ''
 ptCell = 'PT_UNIT_CELL'
 
 # Get the config variable from platfom config file
+synthTool = jsonConfig['synthTool']
 simTool = jsonConfig['simTool']
 if simTool != 'hspice' and simTool != 'finesim':
    print('Error: Supported simulators are \'hspice\' or \'finesim\' as of now')
@@ -168,7 +169,7 @@ print('#---------------------------------------------------------------------')
 print('# Configuring Synth and APR scripts...')
 print('#---------------------------------------------------------------------')
 cfg.ldo_model_dg_flow_cfg(args.platform, platformConfig['nominal_voltage'], \
-                          platformConfig['aux_lib'], flowDir)
+                          platformConfig['aux_lib'], flowDir, synthTool)
 
 #------------------------------------------------------------------------------
 # Initialize the local variables
@@ -209,11 +210,12 @@ for arrSize in [3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, \
       file.write(filedata)
 
    # Update the verilog file list for Synthesis
-   with open(flowDir + '/scripts/dc/dc.filelist.tcl', 'r') as file:
+   vFileList = flowDir + '/scripts/'+synthTool+'/'+synthTool+'.filelist.tcl'
+   with open(vFileList, 'r') as file:
       filedata = file.read()
    filedata = re.sub(r'append MAIN_SOURCE_FILE.*', r'append ' + \
                      'MAIN_SOURCE_FILE \"' + designName + '.v\"', filedata)
-   with open(flowDir + '/scripts/dc/dc.filelist.tcl', 'w') as file:
+   with open(vFileList, 'w') as file:
       file.write(filedata)
 
    #---------------------------------------------------------------------------
@@ -221,7 +223,7 @@ for arrSize in [3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, \
    #---------------------------------------------------------------------------
    print('# Array Size %s - Running Synthesis and APR...' % arrSize)
    designArea = rdf.run_synth_n_apr(args.platform, designName, flowDir, \
-                                    args.gf12lpTrack)
+                                    args.gf12lpTrack, synthTool)
    p = sp.Popen(['cp',flowDir+'/reports/innovus/'+designName+'.main.htm.ascii',simDir+'/run/'])
    print('# Array Size %s - Synthesis and APR finished' % arrSize)
 

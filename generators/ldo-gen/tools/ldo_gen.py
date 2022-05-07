@@ -194,6 +194,12 @@ vin = ''
 
 # Get the config variable from platfom config file
 if args.mode != 'verilog':
+   synthTool = jsonConfig['synthTool']
+   if synthTool != 'dc' and synthTool != 'genus':
+      print('Error: Supported synthesis tools are \'dc\' or \'genus\' ' + \
+            'as of now')
+      sys.exit(1)
+
    simTool = jsonConfig['simTool']
    if simTool != 'hspice' and simTool != 'finesim':
       print('Error: Supported simulators are \'hspice\' or \'finesim\' ' + \
@@ -453,13 +459,13 @@ if args.mode != 'verilog':
    print('# Configuring Synth and APR scripts...')
    print('#------------------------------------------------------------------')
    cfg.ldo_gen_dg_flow_cfg(args.platform, vin, platformConfig['aux_lib'], \
-                           designName, flowDir)
+                           designName, flowDir, synthTool)
 
    #---------------------------------------------------------------------------
    # Run Synthesis and APR
    #---------------------------------------------------------------------------
    designArea = rdf.run_synth_n_apr(args.platform, designName, flowDir, \
-                                    args.gf12lpTrack)
+                                    args.gf12lpTrack, synthTool)
    print('# LDO - Synthesis and APR finished')
 
 if args.mode == 'full':

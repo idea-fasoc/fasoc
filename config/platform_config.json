@@ -1,5 +1,6 @@
 {
   "schema_version": 0.1,
+  "synthTool": "genus",
   "simTool": "hspice",
   "extractionTool": "calibre",
   "netlistTool": "calibredrv",
@@ -26,7 +27,7 @@
     "gf12lp": {
       "nominal_voltage": 0.8,
       "aux_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/aux_lib_gf12lp_10p5_track",
-      "model_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/model_12lp",
+      "model_lib": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/model_12lp_10p5_track",
       "calibreRules": "/net/gaylord/l/yaswanth/Research/forTutu/ruleFiles_12lp",
       "hspiceModels": "/afs/eecs.umich.edu/kits/GF/12LP/V1.0_2.1/Models/HSPICE/models",
       "database": "/afs/eecs.umich.edu/cadre/projects/fasoc/share/database_12lp"

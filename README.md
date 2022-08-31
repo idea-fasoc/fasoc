@@ -51,3 +51,16 @@ The macro generation mode will generate hard macros in addition to the verilog. 
 
 
 1. Change directory to the generator of interest and follow instructions in the readme
+
+## Citation
+If you find this tool useful in your research, we kindly request to cite our [paper](https://ieeexplore.ieee.org/document/9344104):
+
+- T. Ajayi et al., “An open-source framework for autonomous soc design with analog block generation,” in 2020 IFIP/IEEE 28th International Conference on Very Large Scale Integration (VLSI-SOC). IEEE, 2020.
+
+ - @inproceedings{ajayi2020open,\
+  title={An open-source framework for autonomous SoC design with analog block generation},\
+  author={Ajayi, Tutu and Kamineni, Sumanth and Cherivirala, Yaswanth K and Fayazi, Morteza and Kwon, Kyumin and Saligane, Mehdi and Gupta, Shourya and Chen, Chien-Hen and Sylvester, Dennis and Blaauw, David and others},\
+  booktitle={2020 IFIP/IEEE 28th International Conference on Very Large Scale Integration (VLSI-SOC)},\
+  pages={141--146},\
+  year={2020},\
+  organization={IEEE}}

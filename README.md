@@ -17,7 +17,7 @@ The macro generation mode will generate hard macros in addition to the verilog. 
     - General: Python 3.6/3.7 (packages getopt, math, numpy, os, re, shutil, subprocess, sys, smtplib, datetime, logging, matplotlib). Python versions below 3.6 are not supported.
     - Cadre Flow:
       - Synopsys Library Compiler (2018.06)
-      - Synopsys Design Compiler (2018.06)
+      - Synopsys Design Compiler (2018.06) (Cadence Genus v18.10 can also be used for LDO-GEN & PLL-GEN)
       - Quantus QRC extraction (15.23.000)
       - Cadence Innovus (v18.10)
       - Synopsys Primetime (2018.06)

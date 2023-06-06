@@ -148,6 +148,8 @@ Date    : Jan 26, 2022
 1. Check the results in 'fasoc/generators/pll-gen/ble_outputs/' for verilog source files and 'fasoc/private/generators/pll-gen/$technology/flow_ble_*' for digital flow results and gds.
    
 
+# Setting PLL inputs
+
 # Known bugs 
 1. Current pll controller has potential metastability issue in retiming due to reference cycle latency in the procedure of retiming edge selection. Verilog simulation with sdf annotation doesn't give correct result due to this metastability issue. Controller and testbench will be updated to address the problems in the Beta release.
 

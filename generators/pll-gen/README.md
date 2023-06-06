@@ -149,6 +149,12 @@ Date    : Jan 26, 2022
    
 
 # Setting PLL inputs
+1. Refer to fasco/generators/pll-gen/verilog_sim/verilog/tb_pll_top.sv. Some important parameters are:
+    ```bash
+   - kp_real, ki_real : real (decimal) value of proportional gain and integral gain. This will be later scaled to the binary value by multiplying the fractional bitwidth (DLF_KP = $floor(kp_real*(2**KP_FRAC_WIDTH)))
+   - EMBTDC_LUT: this is a 2-d vector where EMBTDC_LUT[i][TDC_WIDTH-1:0] represents the decoded value when the TDC output is 'i'. Assuming a lineary TDC, EMBTDC_LUT[i][TDC_WIDTH-1:0] = floor(((i+0.5)/DCO_NUM_PH)*2**(TDC_WIDTH)) is the ideal value, where DCO_NUM_PH is the number of DCO phases, which is equal to NSTG in our design. '+0.5' is added for mid-rise operation of TDC, which prevents deadzone in the TDC once the PLL is locked to integer-N fcw.
+    ```
+
 
 # Known bugs 
 1. Current pll controller has potential metastability issue in retiming due to reference cycle latency in the procedure of retiming edge selection. Verilog simulation with sdf annotation doesn't give correct result due to this metastability issue. Controller and testbench will be updated to address the problems in the Beta release.

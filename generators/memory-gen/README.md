@@ -3,12 +3,12 @@ Memory-Gen is a technology agnostic python-based memory design platform that aut
 
 # Version Details:
 ```
-Latest Version : Beta-0.1
-Date           : May 21, 2020
+Latest Version : Beta
+Date           : June 21, 2022
 ```
 # What's in the release
-- First Beta version of the tool.
-- Supports the FinFET process in addition to all the features of the alpha-1.0 version. Refer below for alpha-1.0 details.
+- Beta version of the tool.
+- Supports the FinFET process in addition to with-in bank and multi-bank optimization. 
 ```
 Previous Version : Alpha-1.0                                                             
 Date    : Apr 26, 2019 
@@ -29,39 +29,58 @@ The tool is heavily dependent on the EDA tools as well as the technology PDK. He
 ## Tool directory structure:
 ```
         memory-gen
-	|--- apr
-	|--- bin
+	|--- MemGen.py
+	|--- SRAM
 	|--- Makefile   
-	|--- Readme.md        
-	|--- SRAM_input_spec.json 		Generated
+	|--- deo
+	|--- globals
+	|--- macro_gen
+	|--- tech_collaterals
+	|--- Readme.md 
+	|--- private       
+	|--- SRAM_spec.yaml      		
 	|--- runfiles				Generated
 	|--- outputs				Generated
 	|--- MemGen.log				Generated 
 
 ```
-  __apr__
+  __MemGen.py__
 
-   - Folder with the synthesis and APR scripts that runs the CADRE flow. Due to the NDA dependencies, the folder is moved under  **../../private/generators/memory-gen/**. To access this folder, Please contact ajayi@umich.edu.
-```
-        apr
-        |--- include.mk
-	|--- Makefile
-	|--- scripts                           Placeholder for PDK specific apr scripts
-	|--- src                               Placeholder for design files.
-```
-  __bin__
+  - MemGen source script  that encapsulates the entire memory macro generation process. 
+  
+  __SRAM__
 
-  - Directory with source scripts of the tool that encapsulates the memory macro generation process. 
+   - Folder with the SRAM architecture, column- and row-periphery and bitcell array . 
 
+  __private__
+
+   - Contains the python modules with tool specific commands for runnin the innovus and DC compiler steps. Due to the NDA dependencies, the folder is moved under  **../../private/generators/memory-gen/**. To access this folder, Please contact ajayi@umich.edu.
+  
   __Makefile__
 
   - Makefile to run the memory generator.
+  
+  __deo__
 
+   - Folder with the design space exploration and optimization engine.
+
+  __globals__
+
+   - Folder with the all the collaterals required for the MemGen. 
+
+  __macro_gen__
+
+   - Folder with the macro-layout generator. 
+  
+  __tech_collaterals__
+
+   - Folder with the PCK configuration files. 
+  
   __Readme.md__
 
   - Read me file with the instructions for running the tool.
 
-  __SRAM_input_spec.json__
+  __SRAM_spec.yaml__
 
   - Sample SRAM input specification file in json format. It has to be provided as command line argument to the 
 
@@ -142,15 +161,14 @@ Update only the following variables according to the user requirements.
   - For example: To generate memory macro in TSMC 65nm, execute **make mem_tsmc65lp_macro** 
  
 # Known Issues/Limitations:
-1. Capacity is in multiples of 2KB. 
-2. Word size is 32.
-3. Supports only GF12LP and TSMC 65nm PDK.
 
 # Contact Details:
-For further questions, please feel free to contact us at idea-uva@virginia.edu.
+For further questions, please feel free to contact us at sumanthkamineni@virginia.edu
 
 # APPENDIX
 ## Bibliography
-1. S. Kamineni, S. Gupta and B. H. Calhoun, "MemGen: An Open-Source Framework for Autonomous Generation of Memory Macros," 2021 IEEE Custom Integrated Circuits Conference (CICC), 2021, pp. 1-2, doi: 10.1109/CICC51472.2021.9431501.
+1. S. Kamineni, S. Gupta and B. H. Calhoun, "MemGen: An Open-Source Framework for Autonomous Generation of Memory Macros," (Submitted) IEEE Transactions on VLSI Systems TVLSI 
+2. S. Kamineni, A. Sharma, R. Harjani, S. S. Sapatnekar and B. H. Calhoun, "AuxcellGen: A Framework for Autonomous Generation of Analog and Memory Unit Cells," 2023 Design, Automation & Test in Europe Conference & Exhibition (DATE), 2023, pp. 1-6, doi: 10.23919/DATE56975.2023.10137270.
+3. S. Kamineni, S. Gupta and B. H. Calhoun, "MemGen: An Open-Source Framework for Autonomous Generation of Memory Macros," 2021 IEEE Custom Integrated Circuits Conference (CICC), 2021, pp. 1-2, doi: 10.1109/CICC51472.2021.9431501.
 
 

@@ -1,0 +1,5 @@
+min_words_prow_pbank : 1
+max_rows_pbank : 512
+min_words_pcol_pbank : 1
+max_cols_pbank : 512
+max_no_hierarchies : 3

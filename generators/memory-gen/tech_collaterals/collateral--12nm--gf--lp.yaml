@@ -1,0 +1,157 @@
+power_supply:
+  nominal_voltage: 0.8
+  pins:
+    peripheral_power_pin: 'VDDP'
+    bitcellarray_power_pin: 'VDDA'
+    ground_pin: 'VSS'
+    stdcell_power_pin: 'VDD'
+    stdcell_ground_pin: 'VSS'
+    stdcell_nwell_pin: 'VNW'
+    stdcell_pwell_pin: 'VPW'
+auxcells:
+  auxcells_lib_dir: ''
+  col_periphery:
+    pre_charge:
+      name: 'pre_charge_1x'
+      pin_info: {}
+      orientations: ['R0', 'MX']
+    col_mux:
+      name: 'col_mux_4x'
+      pin_info: {}
+      orientations: ['R0', 'R0']
+    sense_amplifier:
+      name: "sense_amplifier_4x"
+      pin_info: {}
+      orientations: ['R0', 'R0']
+    write_driver:
+      name: "write_driver_4x"
+      pin_info: {}
+      orientations: ['R0', 'R0']
+    output_driver:
+      name: "output_driver_4x"
+      pin_info: {}
+      orientations: ['R0', 'R0']
+    col_top_well_contact:
+      name: "col_top_well_contact_4x"
+      pin_info: {}
+      orientations: ['R0', 'R0']
+    col_bottom_well_contact:
+      name: "col_bottom_well_contact_4x"
+      pin_info: {}
+      orientations: ['R0', 'R0']
+  row_periphery:
+    wl_driver:
+      name: 'wordline_driver_2x'
+      pin_info: {}
+      orientations: ['R0', 'MY']
+      no_rows: 2
+    row_top_well_contact:
+      name: 'row_top_well_contact_1x'
+      pin_info: {}
+      orientations: ['R0']
+      no_rows: 1
+    row_middle_well_contact:
+      name: 'row_middle_well_contact_1x'
+      pin_info: {}
+      orientations: ['R0']
+      no_rows: 1
+    row_bottom_well_contact:
+      name: 'row_bottom_well_contact_1x'
+      pin_info: {}
+      orientations: ['R0']
+      no_rows: 1
+  bitcell_array:
+    # Define the variables that would represent the no of rows or cols each component takes.
+    bitcell:
+      name: 'bitcell_6T'
+      pin_info: {}
+      orientations: [['MY', 'R180', 'MY', 'R180'], ['R0', 'MX', 'R0', 'MX']] # index=0 -> Strap below orientations; index=1 -> Strap above orientations
+      no_rows: 2
+      no_cols: 1
+    bitcell_end_cell:
+      name: 'bitcell_end_cell_6T'
+      pin_info: {}
+      orientations: [['MY', 'R180', 'MY', 'R180'], ['R0', 'MX', 'R0', 'MX']]
+      no_rows: 2
+      no_cols: 1
+    strap_cell:
+      name: 'strap_cell_6T'
+      pin_info: {}
+      orientations: ['R0', 'R0']
+      no_rows: 1
+      no_cols: 2
+    strap_end_cell:
+      name: 'strap_end_cell_6T'
+      pin_info: {}
+      orientations: ['R0', 'MX']
+      no_rows: 1
+      no_cols: 2
+    edge_cell:
+      name: 'edge_cell_6T'
+      pin_info: {}
+      orientations: [['R0', 'R0'], ['MY', 'MY']] # index=0 -> Strap below orientations; index=1 -> Strap above orientations
+      no_rows: 1
+      no_cols: 2
+    edge_end_cell:
+      name: 'edge_end_cell_6T'
+      pin_info: {}
+      orientations: [['R0', 'MX'], ['MY', 'R180']]
+      no_rows: 1
+      no_cols: 1
+  # Col Mux Range depends on the availabiltity of the auxcells in the given PDK. Specified as list
+  col_mux_range: [4]
+
+
+spice_lib: # To run the spice sims in exploring the SRAM design space and optimize the design.
+  hspice_lib:
+    tt_lib: ''
+    fs_lib: ''
+    sf_lib: ''
+    default: ''
+  spectre_lib:
+
+stdcell_lib:
+  hvt_lib: ''
+  rvt_lib: ''
+  lvt_lib: ''
+  default: ''
+
+layout_info:
+  bank:
+    bank_arch_type: 'rp_bca_cp_cu' # Allowed values are cu_rp_bca_cp or rp_bca_cp_cu. The location of peripherals wrt bca counter-clockwise. Starting lower left.
+    component_spacing:
+      min_rp_bca_spacing: 0 #0.046
+      min_cp_bca_spacing:  # 0.553 - 0.09(BLandBLB short to bca boundary)
+    control_unit_spacing:
+      min_ls_gap: 
+      min_bs_gap: 
+      min_rs_gap: 
+      min_ts_gap: 
+    pin_placement:
+      h_layer: 
+      h_min_width: 
+      h_max_width: 
+      h_depth: 
+      v_layer: 
+      v_min_width: 
+      v_max_width: 
+      v_depth: 
+    power_plan:
+      metal_layers_props: {'M1':{'name':'M1', 'direction': 'horizontal'},
+                           'M2':{'name':'M2', 'direction': 'horizontal'},
+                           'M3':{'name':'M3', 'direction': 'vertical'},
+                           'M4':{'name':'C4', 'direction': 'horizontal'}
+      }
+      stripe_widths: { 'M1': ,
+                       'M2': ,
+                       'M3': ,
+                       'M4':
+      }
+      ring_widths: { 'M1': 1,
+                     'M2': 1,
+                     'M3': 1,
+                     'M4': 1
+      }
+
+
+
